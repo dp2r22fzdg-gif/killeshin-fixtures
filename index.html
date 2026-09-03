@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Killeshin GAA — Fixtures, Results &amp; News</title>
+<meta name="description" content="Every Killeshin GAA fixture, result, league table and news story, senior down to U13. Updated daily.">
+<meta name="theme-color" content="#000000">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="apple-mobile-web-app-title" content="Killeshin GAA">
+<link rel="apple-touch-icon" href="crest.png">
+<link rel="icon" href="crest.png">
+<link rel="manifest" href="manifest.json">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=Archivo+Black&display=swap" rel="stylesheet">
+<style>
+/* Palette taken straight off the crest: black line art, its green banner,
+   white stone. Nothing else earns a place. */
+:root{
+  --ink:#000;
+  --green:#17A94C;      /* the banner green, pushed to full strength */
+  --green-deep:#0A5C2A;
+  --green-pale:#E8F6ED;
+  --red:#D6222E;
+  --white:#fff;
+  --grey:#F1F1EE;
+  --mute:#63676A;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--white);color:var(--ink);
+  font-family:Archivo,'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:16px;line-height:1.4;
+  padding-bottom:env(safe-area-inset-bottom)}
+h1,h2,h3{margin:0;line-height:1}
+.d{font-family:'Archivo Black',Archivo,Arial,sans-serif;font-weight:400;letter-spacing:-.015em}
+button{font:inherit;color:inherit;cursor:pointer;border:0;background:none}
+a{color:inherit;text-decoration:none}
+:focus-visible{outline:3px solid var(--green);outline-offset:2px}
+
+/* ── masthead ─────────────────────────────────────────── */
+.mast{background:var(--ink);color:var(--white);
+  padding:calc(16px + env(safe-area-inset-top)) 16px 16px;
+  display:flex;align-items:center;gap:14px;border-bottom:5px solid var(--green)}
+.mast .badge{width:64px;height:64px;flex:none;background:var(--white);
+  display:grid;place-items:center;padding:6px}
+.mast .badge img{width:100%;height:100%;object-fit:contain}
+.mast h1{font-size:27px;text-transform:uppercase}
+.mast p{margin:5px 0 0;font-size:11.5px;font-weight:600;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--green)}
+
+/* ── next match: a scoreboard slab ────────────────────── */
+.next{background:var(--ink);color:var(--white);padding:16px;position:relative;overflow:hidden}
+.next::after{content:"";position:absolute;right:-44px;top:50%;transform:translateY(-50%);
+  width:210px;height:210px;background:url(crest.png) no-repeat center/contain;
+  filter:brightness(0) invert(1);opacity:.08;pointer-events:none}
+.next>*{position:relative;z-index:1}
+.next .when{display:inline-block;background:var(--green);color:var(--ink);
+  font-size:11.5px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;
+  padding:4px 9px;margin-bottom:14px}
+.board{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:10px}
+.board .side{font-size:26px;text-transform:uppercase;line-height:.98}
+.board .side.us{color:var(--green)}
+.board .side.away{text-align:right}
+.board .v{font-size:13px;color:var(--white);opacity:.45;letter-spacing:.1em}
+.next .meta{margin-top:14px;padding-top:12px;border-top:1px solid rgba(255,255,255,.18);
+  font-size:13.5px;color:#B9BDBE;line-height:1.55}
+.next .meta strong{color:var(--white);font-weight:600}
+
+/* ── next at home ─────────────────────────────────────── */
+.home{display:flex;gap:13px;align-items:center;padding:14px 16px;
+  background:var(--green-pale);border-bottom:3px solid var(--ink)}
+.home img{width:44px;height:44px;object-fit:contain;flex:none}
+.home .lab{font-size:11px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--green-deep)}
+.home .ln{font-size:17px;margin-top:4px;text-transform:uppercase}
+.home .sub{font-size:13px;color:var(--mute);margin-top:3px;font-weight:500}
+
+/* ── filters + tabs ───────────────────────────────────── */
+.grades{display:flex;gap:6px;overflow-x:auto;padding:11px 16px;background:var(--white);
+  border-bottom:1px solid #DDDCD7;scrollbar-width:none;position:sticky;top:0;z-index:20}
+.grades::-webkit-scrollbar{display:none}
+.grades[hidden]{display:none}
+.chip{flex:none;padding:0 13px;height:34px;line-height:32px;border:2px solid var(--ink);
+  background:var(--white);font-size:13.5px;font-weight:600;white-space:nowrap;
+  text-transform:uppercase;letter-spacing:.03em}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--white)}
+.tabs{display:flex;background:var(--white);border-bottom:3px solid var(--ink);
+  position:sticky;top:57px;z-index:19}
+.tabs.solo{top:0}
+.tab{flex:1;height:46px;font-size:13px;font-weight:700;color:var(--mute);
+  text-transform:uppercase;letter-spacing:.09em;border-bottom:4px solid transparent;
+  margin-bottom:-3px}
+.tab[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--green)}
+
+/* ── lists ────────────────────────────────────────────── */
+main{padding:0 0 34px}
+.dayhead{background:var(--ink);color:var(--white);font-size:12.5px;font-weight:700;
+  letter-spacing:.13em;text-transform:uppercase;padding:7px 16px;
+  position:sticky;top:103px;z-index:18}
+.solo~main .dayhead{top:46px}
+.dayhead.soon{background:var(--green);color:var(--ink)}
+.match{display:block;padding:14px 16px;border-bottom:1px solid #E4E3DE;background:var(--white)}
+.match.athome{border-left:6px solid var(--green);padding-left:10px}
+.match .top{display:flex;align-items:baseline;gap:11px}
+.match .time{font-size:17px;min-width:54px;flex:none}
+.match .teams{font-size:16px;font-weight:500;line-height:1.28;flex:1}
+.match .teams b{font-weight:700}
+.match .comp,.match .venue{font-size:12.5px;color:var(--mute);margin-left:65px;line-height:1.4}
+.match .comp{margin-top:5px}
+.match .venue.h{color:var(--green-deep);font-weight:700}
+
+/* results */
+.res{display:flex;gap:12px;align-items:stretch}
+.mark{width:28px;flex:none;color:var(--white);font-size:14px;display:grid;place-items:center;
+  font-family:'Archivo Black',Arial,sans-serif}
+.mark.W{background:var(--green)}.mark.L{background:var(--red)}.mark.D{background:var(--mute)}
+.res .body{flex:1;min-width:0}
+.line{display:flex;justify-content:space-between;gap:10px;align-items:baseline;padding:1.5px 0}
+.line .nm{font-size:15.5px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.line.win .nm{font-weight:700}
+.line .sc{font-size:18px;flex:none;font-variant-numeric:tabular-nums}
+.line .sc small{font-size:11.5px;color:var(--mute);margin-left:6px;font-family:Archivo,Arial,sans-serif;
+  font-weight:600}
+.res .sub{font-size:12.5px;color:var(--mute);margin-top:6px;line-height:1.4}
+
+/* tables */
+.tbl{border-bottom:3px solid var(--ink);background:var(--white)}
+.tbl h3{font-size:16px;padding:13px 16px 4px;text-transform:uppercase}
+.tbl .grd{font-size:11px;color:var(--green-deep);padding:0 16px 10px;font-weight:700;
+  letter-spacing:.14em;text-transform:uppercase}
+table{width:100%;border-collapse:collapse;font-size:14px;font-variant-numeric:tabular-nums}
+th{font-size:10.5px;font-weight:700;color:var(--white);background:var(--ink);text-align:right;
+  padding:6px 4px;letter-spacing:.06em;text-transform:uppercase}
+th.t,td.t{text-align:left;padding-left:16px;width:100%}
+th.p,td.p{padding-right:16px;font-weight:700}
+td{padding:9px 4px;text-align:right;border-bottom:1px solid #EDECE7}
+tr:last-child td{border-bottom:0}
+tr.us{background:var(--green-pale);box-shadow:inset 4px 0 0 var(--green)}
+tr.us td{font-weight:700}
+
+/* ── news ─────────────────────────────────────────────── */
+.newshead{padding:18px 16px 10px}
+.newshead h2{font-size:20px;text-transform:uppercase}
+.newshead h2 .rule{display:block;width:44px;height:5px;background:var(--green);margin-bottom:9px}
+.newshead p{margin:6px 0 0;font-size:13px;color:var(--mute);line-height:1.45}
+.story{display:block;padding:14px 16px;border-bottom:1px solid #E4E3DE;background:var(--white)}
+.story h3{font-size:16.5px;font-weight:600;line-height:1.3;font-family:Archivo,Arial,sans-serif}
+.story .by{margin-top:7px;font-size:12px;color:var(--mute);font-weight:500}
+.story .by b{color:var(--green-deep);font-weight:700;text-transform:uppercase;letter-spacing:.05em}
+.pin{display:inline-block;font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
+  padding:2px 6px;background:var(--grey);color:#4E5254;margin-left:7px}
+/* subscriber stories get their own black-ruled block */
+.paid{background:var(--grey);border-top:4px solid var(--ink)}
+.paid .newshead h2 .rule{background:var(--ink)}
+.paid .story{background:transparent;border-bottom-color:#DEDDD8}
+.paid .pin.lock{background:var(--ink);color:var(--white)}
+
+/* ── footer / empty ───────────────────────────────────── */
+.foot{background:var(--ink);color:#9DA1A3;padding:22px 16px calc(28px + env(safe-area-inset-bottom));
+  font-size:12.5px;line-height:1.65;display:flex;gap:14px;align-items:flex-start}
+.foot img{width:44px;height:44px;object-fit:contain;flex:none;filter:brightness(0) invert(1);opacity:.75}
+.foot a,.foot b{color:var(--green)}
+.foot b{font-weight:700}
+.empty{padding:44px 24px 52px;text-align:center;color:var(--mute)}
+.empty img{width:62px;height:62px;object-fit:contain;opacity:.22;margin:0 auto 14px;display:block}
+.empty b{display:block;color:var(--ink);font-size:16px;font-weight:700;margin-bottom:6px;
+  text-transform:uppercase;letter-spacing:.04em}
+@media (min-width:620px){
+  body{max-width:620px;margin:0 auto;border-left:1px solid #E4E3DE;border-right:1px solid #E4E3DE}
+  .mast h1{font-size:31px}
+}
+</style>
+</head>
+<body>
+
+<header class="mast">
+  <span class="badge"><img src="crest.png" alt="Killeshin GAA crest"></span>
+  <div><h1 class="d">Killeshin GAA</h1><p>CLG Gleann Uiseann</p></div>
+</header>
+
+<section class="next" id="next" hidden>
+  <div class="when" id="nextWhen"></div>
+  <div class="board">
+    <div class="side d" id="nextHome"></div>
+    <div class="v d">V</div>
+    <div class="side away d" id="nextAway"></div>
+  </div>
+  <div class="meta" id="nextMeta"></div>
+</section>
+
+<section class="home" id="homeNext" hidden>
+  <img src="crest.png" alt="">
+  <div>
+    <div class="lab">Next at home</div>
+    <div class="ln d" id="homeLine"></div>
+    <div class="sub" id="homeSub"></div>
+  </div>
+</section>
+
+<nav class="grades" id="grades" aria-label="Filter by team"></nav>
+
+<div class="tabs" id="tabs" role="tablist">
+  <button class="tab" role="tab" aria-selected="true"  data-view="fixtures">Fixtures</button>
+  <button class="tab" role="tab" aria-selected="false" data-view="results">Results</button>
+  <button class="tab" role="tab" aria-selected="false" data-view="tables">Tables</button>
+  <button class="tab" role="tab" aria-selected="false" data-view="news">News</button>
+</div>
+
+<main id="out"></main>
+
+<div class="foot">
+  <img src="crest.png" alt="">
+  <div>
+    Fixtures, results and tables come from the Laois GAA county board, where Killeshin runs as
+    <b>Gleann Uiseann</b>. News is gathered from the local papers. Everything refreshes twice a day.<br>
+    <span id="stamp"></span> · <a id="src" href="#" target="_blank" rel="noopener">Check on laoisgaa.ie</a>
+  </div>
+</div>
+
+<script id="seed" type="application/json">{"club":"Killeshin GAA","clubIrish":"CLG Gleann Uiseann","teamName":"Gleann Uiseann","county":"Laois","source":"https://laoisgaa.ie/fixtures-results/team/gleann-uiseann/6547884c-ea64-5502-8472-8eb26b092437/","updated":"2026-09-02T21:00:00+01:00","fixtures":[{"date":"2026-09-06","time":"12:30","competition":"U17 Football \"B\" Championship - League Division 1 - Round 6","grade":"U17","home":"Ballyfin CLG","away":"Gleann Uiseann","venue":"Ballyfin GAA","referee":"Eamonn O'Connell","isHome":false,"opponent":"Ballyfin CLG"},{"date":"2026-09-06","time":"17:00","competition":"U13 Football \"C\" Competition - League Division 1 - Round 7","grade":"U13","home":"Gleann Uiseann","away":"Colt Shanahoe","venue":"Killeshin GAA Grounds","referee":"Pat Moran","isHome":true,"opponent":"Colt Shanahoe"},{"date":"2026-09-12","time":"11:30","competition":"U15 Football \"B\" Championship - Cup Division 1 - Semi-final","grade":"U15","home":"Ballylinan","away":"Gleann Uiseann","venue":"Ballylinan GAA Grounds","referee":"TBC","isHome":false,"opponent":"Ballylinan"},{"date":"2026-09-12","time":"19:00","competition":"Senior Football Championship - Quarter-final","grade":"Senior","home":"Portlaoise","away":"Gleann Uiseann","venue":"Laois Hire O'Moore Park, Portlaoise","referee":"Clifford Ward","isHome":false,"opponent":"Portlaoise"},{"date":"2026-09-13","time":"12:00","competition":"Junior Football Championship - Quarter-final","grade":"Junior","home":"The Rock GAA Club","away":"Gleann Uiseann","venue":"The Rock GAA","referee":"TBC","isHome":false,"opponent":"The Rock GAA Club"},{"date":"2026-09-20","time":"11:30","competition":"U17 Football \"B\" Championship - League Division 1 - Round 7","grade":"U17","home":"Gleann Uiseann","away":"St Joseph's","venue":"Killeshin GAA Grounds","referee":"TBC","isHome":true,"opponent":"St Joseph's"},{"date":"2026-10-16","time":"19:30","competition":"Under 20 Football Championship - League Division 2 - Round 1","grade":"U20","home":"Stradbally Parish Gaels","away":"Gleann Uiseann","venue":"TBC","referee":"TBC","isHome":false,"opponent":"Stradbally Parish Gaels"},{"date":"2026-10-24","time":"19:00","competition":"Under 20 Football Championship - League Division 2 - Round 2","grade":"U20","home":"Gleann Uiseann","away":"Portarlington","venue":"Killeshin GAA Grounds","referee":"TBC","isHome":true,"opponent":"Portarlington"},{"date":"2026-11-06","time":"19:30","competition":"Under 20 Football Championship - League Division 2 - Round 3","grade":"U20","home":"Portlaoise","away":"Gleann Uiseann","venue":"TBC","referee":"TBC","isHome":false,"opponent":"Portlaoise"}],"results":[{"date":"2026-08-26","time":"19:30","competition":"Junior Football Championship Group B - Round 5","grade":"Junior","home":"St Joseph's","away":"Gleann Uiseann","homeScore":"4-12","awayScore":"1-12","homeTotal":24,"awayTotal":15,"venue":"Tony Byrne Park","referee":"Colin Bailey","isHome":false,"opponent":"St Joseph's","ourTotal":15,"theirTotal":24,"outcome":"L"},{"date":"2026-08-23","time":"16:00","competition":"Senior Football Championship - Round 3","grade":"Senior","home":"Graiguecullen GAA","away":"Gleann Uiseann","homeScore":"1-14","awayScore":"0-21","homeTotal":17,"awayTotal":21,"venue":"Laois Hire O'Moore Park, Portlaoise","referee":"Colin Bailey","isHome":false,"opponent":"Graiguecullen GAA","ourTotal":21,"theirTotal":17,"outcome":"W"},{"date":"2026-08-22","time":"14:00","competition":"U15 Football \"B\" Championship - League Division 1 - Round 5","grade":"U15","home":"Graiguecullen GAA","away":"Gleann Uiseann","homeScore":"4-5","awayScore":"1-11","homeTotal":17,"awayTotal":14,"venue":"Graiguecullen GAA","referee":"Johnnie Brennan","isHome":false,"opponent":"Graiguecullen GAA","ourTotal":14,"theirTotal":17,"outcome":"L"},{"date":"2026-08-19","time":"19:15","competition":"Junior C Football Championship Group E - Round 3","grade":"Junior","home":"Gleann Uiseann","away":"Portarlington","homeScore":"1-9","awayScore":"7-11","homeTotal":12,"awayTotal":32,"venue":"Killeshin GAA Grounds","referee":"Dominic Braonain","isHome":true,"opponent":"Portarlington","ourTotal":12,"theirTotal":32,"outcome":"L"},{"date":"2026-08-17","time":"19:00","competition":"U13 Football \"C\" Competition - League Division 1 - Round 6","grade":"U13","home":"Gleann Uiseann","away":"Camross GAA Club","homeScore":"9-7","awayScore":"3-1","homeTotal":34,"awayTotal":10,"venue":"Killeshin GAA Grounds","referee":"Robbie Moran","isHome":true,"opponent":"Camross GAA Club","ourTotal":34,"theirTotal":10,"outcome":"W"},{"date":"2026-08-17","time":"18:45","competition":"U17 Football \"B\" Championship - League Division 1 - Round 5","grade":"U17","home":"Gleann Uiseann","away":"The Harps","homeScore":"1-13","awayScore":"1-8","homeTotal":16,"awayTotal":11,"venue":"Killeshin GAA Grounds","referee":"Clifford Ward","isHome":true,"opponent":"The Harps","ourTotal":16,"theirTotal":11,"outcome":"W"},{"date":"2026-08-13","time":"18:45","competition":"U15 Football \"B\" Championship - League Division 1 - Round 4","grade":"U15","home":"Gleann Uiseann","away":"Barrow Gaels","homeScore":"6-12","awayScore":"2-9","homeTotal":30,"awayTotal":15,"venue":"Killeshin GAA Grounds","referee":"Eugene Dowdall","isHome":true,"opponent":"Barrow Gaels","ourTotal":30,"theirTotal":15,"outcome":"W"},{"date":"2026-08-09","time":"12:00","competition":"U17 Football \"B\" Championship - League Division 1 - Round 4","grade":"U17","home":"Heath Colt Shanahoe","away":"Gleann Uiseann","homeScore":"3-5","awayScore":"8-15","homeTotal":14,"awayTotal":39,"venue":"The Heath GAA Club","referee":"Pat Moran","isHome":false,"opponent":"Heath Colt Shanahoe","ourTotal":39,"theirTotal":14,"outcome":"W"},{"date":"2026-08-09","time":"11:30","competition":"U13 Football \"C\" Competition - League Division 1 - Round 5","grade":"U13","home":"Portlaoise","away":"Gleann Uiseann","homeScore":"2-9","awayScore":"4-8","homeTotal":15,"awayTotal":20,"venue":"Rathleague","referee":"TBC","isHome":false,"opponent":"Portlaoise","ourTotal":20,"theirTotal":15,"outcome":"W"},{"date":"2026-08-07","time":"19:30","competition":"Senior Football Championship - Round 2 Qualifier","grade":"Senior","home":"Gleann Uiseann","away":"Rosenallis","homeScore":"0-13","awayScore":"1-8","homeTotal":13,"awayTotal":11,"venue":"Annanough GAA","referee":"Colin Bailey","isHome":true,"opponent":"Rosenallis","ourTotal":13,"theirTotal":11,"outcome":"W"},{"date":"2026-08-05","time":"19:30","competition":"Junior Football Championship Group B - Round 3","grade":"Junior","home":"Gleann Uiseann","away":"O'Dempseys","homeScore":"2-9","awayScore":"2-15","homeTotal":15,"awayTotal":21,"venue":"Killeshin GAA Grounds","referee":"Johnnie Brennan","isHome":true,"opponent":"O'Dempseys","ourTotal":15,"theirTotal":21,"outcome":"L"},{"date":"2026-08-04","time":"19:30","competition":"Junior C Football Championship Group E - Round 2","grade":"Junior","home":"Annanough","away":"Gleann Uiseann","homeScore":"3-10","awayScore":"2-3","homeTotal":19,"awayTotal":9,"venue":"Annanough GAA","referee":"Eugene Dowdall","isHome":false,"opponent":"Annanough","ourTotal":9,"theirTotal":19,"outcome":"L"},{"date":"2026-08-03","time":"12:30","competition":"U17 Football \"B\" Championship - League Division 1 - Round 3","grade":"U17","home":"Gleann Uiseann","away":"Ballylinan","homeScore":"4-13","awayScore":"1-3","homeTotal":25,"awayTotal":6,"venue":"Killeshin GAA Grounds","referee":"Des Cooney","isHome":true,"opponent":"Ballylinan","ourTotal":25,"theirTotal":6,"outcome":"W"},{"date":"2026-08-03","time":"11:00","competition":"U13 Football \"C\" Competition - League Division 1 - Round 4","grade":"U13","home":"Gleann Uiseann","away":"The Harps","homeScore":"4-14","awayScore":"0-5","homeTotal":26,"awayTotal":5,"venue":"Killeshin GAA Grounds","referee":"Robbie Moran","isHome":true,"opponent":"The Harps","ourTotal":26,"theirTotal":5,"outcome":"W"},{"date":"2026-07-29","time":"19:00","competition":"U15 Football \"B\" Championship - League Division 1 - Round 3","grade":"U15","home":"The Harps","away":"Gleann Uiseann","homeScore":"3-14","awayScore":"3-9","homeTotal":23,"awayTotal":18,"venue":"Cullohill","referee":"Craig Haslam","isHome":false,"opponent":"The Harps","ourTotal":18,"theirTotal":23,"outcome":"L"},{"date":"2026-07-28","time":"19:30","competition":"Junior C Football Championship Group E - Round 1","grade":"Junior","home":"Gleann Uiseann","away":"Ard Lios Cill Chruis","homeScore":"1-11","awayScore":"0-10","homeTotal":14,"awayTotal":10,"venue":"Killeshin GAA Grounds","referee":"Seamus O'Shea","isHome":true,"opponent":"Ard Lios Cill Chruis","ourTotal":14,"theirTotal":10,"outcome":"W"},{"date":"2026-07-26","time":"10:00","competition":"U13 Football \"C\" Competition - League Division 1 - Round 3","grade":"U13","home":"Stradbally Parish Gaels","away":"Gleann Uiseann","homeScore":"2-4","awayScore":"9-8","homeTotal":10,"awayTotal":35,"venue":"Annanough GAA","referee":"Johnnie Brennan","isHome":false,"opponent":"Stradbally Parish Gaels","ourTotal":35,"theirTotal":10,"outcome":"W"},{"date":"2026-07-24","time":"19:30","competition":"Junior Football Championship Group B - Round 2","grade":"Junior","home":"Stradbally","away":"Gleann Uiseann","homeScore":"1-15","awayScore":"1-13","homeTotal":18,"awayTotal":16,"venue":"Stradbally GAA","referee":"Eugene Dowdall","isHome":false,"opponent":"Stradbally","ourTotal":16,"theirTotal":18,"outcome":"L"},{"date":"2026-07-22","time":"19:30","competition":"Senior Football Championship - Round 1","grade":"Senior","home":"Gleann Uiseann","away":"Stradbally","homeScore":"2-16","awayScore":"2-22","homeTotal":22,"awayTotal":28,"venue":"Ratheniska","referee":"Brendan McCann","isHome":true,"opponent":"Stradbally","ourTotal":22,"theirTotal":28,"outcome":"L"},{"date":"2026-07-20","time":"19:00","competition":"U17 Football \"B\" Championship - League Division 1 - Round 2","grade":"U17","home":"Graiguecullen GAA","away":"Gleann Uiseann","homeScore":"1-20","awayScore":"2-6","homeTotal":23,"awayTotal":12,"venue":"Graiguecullen GAA","referee":"Johnnie Brennan","isHome":false,"opponent":"Graiguecullen GAA","ourTotal":12,"theirTotal":23,"outcome":"L"},{"date":"2026-07-19","time":"11:30","competition":"U13 Football \"C\" Competition - League Division 1 - Round 2","grade":"U13","home":"Gleann Uiseann","away":"Barrow Gaels","homeScore":"5-11","awayScore":"1-6","homeTotal":26,"awayTotal":9,"venue":"Killeshin GAA Grounds","referee":"Pat Moran","isHome":true,"opponent":"Barrow Gaels","ourTotal":26,"theirTotal":9,"outcome":"W"},{"date":"2026-07-15","time":"19:00","competition":"U15 Football \"B\" Championship - League Division 1 - Round 2","grade":"U15","home":"Gleann Uiseann","away":"Ballyfin CLG","homeScore":"8-8","awayScore":"7-5","homeTotal":32,"awayTotal":26,"venue":"Killeshin GAA Grounds","referee":"Robbie Moran","isHome":true,"opponent":"Ballyfin CLG","ourTotal":32,"theirTotal":26,"outcome":"W"},{"date":"2026-07-13","time":"18:30","competition":"U13 Football \"C\" Competition - League Division 1 - Round 1","grade":"U13","home":"Naomh Fiontáin Maighean Rátha","away":"Gleann Uiseann","homeScore":"2-4","awayScore":"4-15","homeTotal":10,"awayTotal":27,"venue":"St. Fintan's GAA Grounds","referee":"Peter O'Neill","isHome":false,"opponent":"Naomh Fiontáin Maighean Rátha","ourTotal":27,"theirTotal":10,"outcome":"W"},{"date":"2026-07-10","time":"19:30","competition":"Junior Football Championship Group B - Round 1","grade":"Junior","home":"Gleann Uiseann","away":"An Fraoch","homeScore":"2-17","awayScore":"0-13","homeTotal":23,"awayTotal":13,"venue":"Killeshin GAA Grounds","referee":"Frank Ryder","isHome":true,"opponent":"An Fraoch","ourTotal":23,"theirTotal":13,"outcome":"W"},{"date":"2026-06-27","time":"19:00","competition":"ACFL Division 2 - Relegation Final","grade":"Adult League","home":"Gleann Uiseann","away":"Ballyfin CLG","homeScore":"3-7","awayScore":"0-13","homeTotal":16,"awayTotal":13,"venue":"Killeshin GAA Grounds","referee":"Eamonn O'Connell","isHome":true,"opponent":"Ballyfin CLG","ourTotal":16,"theirTotal":13,"outcome":"W"},{"date":"2026-06-19","time":"20:00","competition":"ACFL Division 4 - Round 7","grade":"Adult League","home":"Gleann Uiseann","away":"Stradbally","homeScore":"1-17","awayScore":"1-11","homeTotal":20,"awayTotal":14,"venue":"Killeshin GAA Grounds","referee":"Seamus O'Shea","isHome":true,"opponent":"Stradbally","ourTotal":20,"theirTotal":14,"outcome":"W"},{"date":"2026-06-19","time":"18:30","competition":"U13 Football League Division 2A - Shield Final","grade":"U13","home":"Gleann Uiseann","away":"Mountmellick","homeScore":"6-15","awayScore":"1-8","homeTotal":33,"awayTotal":11,"venue":"Killeshin GAA Grounds","referee":"Pat Moran","isHome":true,"opponent":"Mountmellick","ourTotal":33,"theirTotal":11,"outcome":"W"},{"date":"2026-06-12","time":"20:00","competition":"ACFL Division 2 - Round 7","grade":"Adult League","home":"O'Dempseys","away":"Gleann Uiseann","homeScore":"3-16","awayScore":"1-4","homeTotal":25,"awayTotal":7,"venue":"O'Dempsey's GAA","referee":"Brendan McCann","isHome":false,"opponent":"O'Dempseys","ourTotal":7,"theirTotal":25,"outcome":"L"},{"date":"2026-06-11","time":"19:30","competition":"ACFL Division 7 Group B - Round 6","grade":"Adult League","home":"Barrowhouse GAA","away":"Gleann Uiseann","homeScore":"2-12","awayScore":"0-4","homeTotal":18,"awayTotal":4,"venue":"Barrowhouse GAA","referee":"Brendan Hickey","isHome":false,"opponent":"Barrowhouse GAA","ourTotal":4,"theirTotal":18,"outcome":"L"},{"date":"2026-06-04","time":"18:30","competition":"U13 Football League Division 2A - Round 5","grade":"U13","home":"Gleann Uiseann","away":"St Joseph's","homeScore":"4-9","awayScore":"1-6","homeTotal":21,"awayTotal":9,"venue":"Killeshin GAA Grounds","referee":"Robbie Moran","isHome":true,"opponent":"St Joseph's","ourTotal":21,"theirTotal":9,"outcome":"W"},{"date":"2026-05-28","time":"18:30","competition":"U15 Football League Division 1A - Shield Final","grade":"U15","home":"Stradbally Parish Gaels","away":"Gleann Uiseann","homeScore":"8-10","awayScore":"0-7","homeTotal":34,"awayTotal":7,"venue":"Stradbally GAA","referee":"Frank Ryder","isHome":false,"opponent":"Stradbally Parish Gaels","ourTotal":7,"theirTotal":34,"outcome":"L"},{"date":"2026-05-26","time":"19:30","competition":"ACFL Division 4 - Round 6","grade":"Adult League","home":"Gleann Uiseann","away":"Timahoe","homeScore":"3-10","awayScore":"2-15","homeTotal":19,"awayTotal":21,"venue":"Killeshin GAA Grounds","referee":"Des Cooney","isHome":true,"opponent":"Timahoe","ourTotal":19,"theirTotal":21,"outcome":"L"},{"date":"2026-05-25","time":"19:00","competition":"U17 Football Academy League Division 1B - Round 5","grade":"U17","home":"Gleann Uiseann","away":"St Pauls","homeScore":"6-8","awayScore":"1-19","homeTotal":26,"awayTotal":22,"venue":"Killeshin GAA Grounds","referee":"Johnnie Brennan","isHome":true,"opponent":"St Pauls","ourTotal":26,"theirTotal":22,"outcome":"W"},{"date":"2026-05-22","time":"18:30","competition":"U13 Football League Division 2A - Round 4","grade":"U13","home":"Barrow Gaels","away":"Gleann Uiseann","homeScore":"0-7","awayScore":"9-4","homeTotal":7,"awayTotal":31,"venue":"Rosenallis GAA","referee":"Michael Tarpey","isHome":false,"opponent":"Barrow Gaels","ourTotal":31,"theirTotal":7,"outcome":"W"},{"date":"2026-05-21","time":"19:30","competition":"ACFL Division 2 - Round 6","grade":"Adult League","home":"Portarlington","away":"Gleann Uiseann","homeScore":"1-17","awayScore":"1-14","homeTotal":20,"awayTotal":17,"venue":"McCann Park, Portarlington","referee":"Séamus Mulhare","isHome":false,"opponent":"Portarlington","ourTotal":17,"theirTotal":20,"outcome":"L"},{"date":"2026-05-20","time":"18:30","competition":"U15 Football League Division 1A - Round 5","grade":"U15","home":"Gleann Uiseann","away":"Stradbally Parish Gaels","homeScore":"0-11","awayScore":"6-16","homeTotal":11,"awayTotal":34,"venue":"Killeshin GAA Grounds","referee":"Robbie Moran","isHome":true,"opponent":"Stradbally Parish Gaels","ourTotal":11,"theirTotal":34,"outcome":"L"},{"date":"2026-05-14","time":"19:30","competition":"ACFL Division 7 Group B - Round 4","grade":"Adult League","home":"Graiguecullen GAA","away":"Gleann Uiseann","homeScore":"3-20","awayScore":"1-4","homeTotal":29,"awayTotal":7,"venue":"Graiguecullen GAA","referee":"Johnny Holland","isHome":false,"opponent":"Graiguecullen GAA","ourTotal":7,"theirTotal":29,"outcome":"L"},{"date":"2026-05-12","time":"20:00","competition":"ACFL Division 4 - Round 5","grade":"Adult League","home":"Annanough","away":"Gleann Uiseann","homeScore":"4-13","awayScore":"1-7","homeTotal":25,"awayTotal":10,"venue":"Annanough GAA","referee":"Johnnie Brennan","isHome":false,"opponent":"Annanough","ourTotal":10,"theirTotal":25,"outcome":"L"},{"date":"2026-05-11","time":"19:00","competition":"U17 Football Academy League Division 1B - Round 4","grade":"U17","home":"O'Dempseys","away":"Gleann Uiseann","homeScore":"1-12","awayScore":"2-11","homeTotal":15,"awayTotal":17,"venue":"O'Dempsey's GAA","referee":"Eamonn O'Connell","isHome":false,"opponent":"O'Dempseys","ourTotal":17,"theirTotal":15,"outcome":"W"},{"date":"2026-05-10","time":"11:30","competition":"ACFL Division 2 - Round 5","grade":"Adult League","home":"Gleann Uiseann","away":"Emo","homeScore":"1-11","awayScore":"1-18","homeTotal":14,"awayTotal":21,"venue":"Killeshin GAA Grounds","referee":"Colin Bailey","isHome":true,"opponent":"Emo","ourTotal":14,"theirTotal":21,"outcome":"L"},{"date":"2026-05-08","time":"18:30","competition":"U13 Football League Division 2A - Round 3","grade":"U13","home":"Gleann Uiseann","away":"St Pauls","homeScore":"4-5","awayScore":"6-12","homeTotal":17,"awayTotal":30,"venue":"Killeshin GAA Grounds","referee":"Robbie Moran","isHome":true,"opponent":"St Pauls","ourTotal":17,"theirTotal":30,"outcome":"L"},{"date":"2026-05-06","time":"18:30","competition":"U15 Football League Division 1A - Round 4","grade":"U15","home":"Portlaoise","away":"Gleann Uiseann","homeScore":"5-12","awayScore":"0-7","homeTotal":27,"awayTotal":7,"venue":"Killeshin GAA Grounds","referee":"Des Cooney","isHome":false,"opponent":"Portlaoise","ourTotal":7,"theirTotal":27,"outcome":"L"},{"date":"2026-04-30","time":"19:15","competition":"ACFL Division 7 Group B - Round 3","grade":"Adult League","home":"Gleann Uiseann","away":"The Rock GAA Club","homeScore":"3-6","awayScore":"1-13","homeTotal":15,"awayTotal":16,"venue":"Killeshin GAA Grounds","referee":"Des Cooney","isHome":true,"opponent":"The Rock GAA Club","ourTotal":15,"theirTotal":16,"outcome":"L"},{"date":"2026-04-28","time":"19:15","competition":"ACFL Division 4 - Round 4","grade":"Adult League","home":"Gleann Uiseann","away":"Portarlington","homeScore":"3-5","awayScore":"2-15","homeTotal":14,"awayTotal":21,"venue":"Killeshin GAA Grounds","referee":"Eugene Dowdall","isHome":true,"opponent":"Portarlington","ourTotal":14,"theirTotal":21,"outcome":"L"},{"date":"2026-04-26","time":"12:00","competition":"ACFL Division 2 - Round 4","grade":"Adult League","home":"Rosenallis","away":"Gleann Uiseann","homeScore":"3-12","awayScore":"1-9","homeTotal":21,"awayTotal":12,"venue":"Rosenallis GAA","referee":"Clifford Ward","isHome":false,"opponent":"Rosenallis","ourTotal":12,"theirTotal":21,"outcome":"L"},{"date":"2026-04-26","time":"11:15","competition":"Féile Peile na nÓg - Division 1 Group 4 - Round 2","grade":"Féile","home":"Gleann Uiseann","away":"Ballylinan","homeScore":"3-2","awayScore":"3-6","homeTotal":11,"awayTotal":15,"venue":"Ballylinan GAA Grounds","referee":"Sean McDonald","isHome":true,"opponent":"Ballylinan","ourTotal":11,"theirTotal":15,"outcome":"L"},{"date":"2026-04-26","time":"10:30","competition":"Féile Peile na nÓg - Division 1 Group 4 - Round 1","grade":"Féile","home":"O'Dempseys","away":"Gleann Uiseann","homeScore":"3-7","awayScore":"2-4","homeTotal":16,"awayTotal":10,"venue":"Ballylinan GAA Grounds","referee":"Sean McDonald","isHome":false,"opponent":"O'Dempseys","ourTotal":10,"theirTotal":16,"outcome":"L"}],"tables":[{"competition":"U13 Football \"C\" Competition - League Division 1","grade":"U13","rows":[{"team":"Gleann Uiseann","p":6,"w":6,"l":0,"d":0,"f":168,"a":59,"pts":12},{"team":"Portlaoise","p":6,"w":5,"l":1,"d":0,"f":97,"a":67,"pts":10},{"team":"Barrow Gaels","p":7,"w":5,"l":2,"d":0,"f":99,"a":68,"pts":10},{"team":"Camross GAA Club","p":6,"w":3,"l":3,"d":0,"f":82,"a":93,"pts":6},{"team":"Naomh Fiontáin Maighean Rátha","p":6,"w":2,"l":4,"d":0,"f":51,"a":85,"pts":4},{"team":"Stradbally Parish Gaels","p":6,"w":2,"l":4,"d":0,"f":76,"a":109,"pts":4},{"team":"The Harps","p":7,"w":1,"l":6,"d":0,"f":32,"a":89,"pts":2},{"team":"Colt Shanahoe","p":6,"w":1,"l":5,"d":0,"f":26,"a":61,"pts":2}]},{"competition":"U15 Football \"B\" Championship - League Division 1","grade":"U15","rows":[{"team":"Graiguecullen GAA","p":4,"w":4,"l":0,"d":0,"f":78,"a":50,"pts":8},{"team":"Gleann Uiseann","p":4,"w":2,"l":2,"d":0,"f":94,"a":81,"pts":4},{"team":"Ballyfin CLG","p":4,"w":2,"l":2,"d":0,"f":88,"a":88,"pts":4},{"team":"The Harps","p":4,"w":1,"l":2,"d":1,"f":73,"a":83,"pts":3},{"team":"Barrow Gaels","p":4,"w":0,"l":3,"d":1,"f":60,"a":91,"pts":1}]},{"competition":"U17 Football \"B\" Championship - League Division 1","grade":"U17","rows":[{"team":"Graiguecullen GAA","p":4,"w":4,"l":0,"d":0,"f":91,"a":47,"pts":8},{"team":"St Joseph's","p":5,"w":4,"l":1,"d":0,"f":99,"a":79,"pts":8},{"team":"Gleann Uiseann","p":4,"w":3,"l":1,"d":0,"f":92,"a":54,"pts":6},{"team":"Ballyfin CLG","p":4,"w":2,"l":2,"d":0,"f":108,"a":87,"pts":4},{"team":"The Harps","p":4,"w":1,"l":3,"d":0,"f":64,"a":82,"pts":2},{"team":"Ballylinan","p":4,"w":1,"l":3,"d":0,"f":53,"a":105,"pts":2},{"team":"Heath Colt Shanahoe","p":5,"w":0,"l":5,"d":0,"f":44,"a":97,"pts":0}]},{"competition":"U17 Football Academy League Division 1B","grade":"U17","rows":[{"team":"Graiguecullen GAA","p":5,"w":4,"l":1,"d":0,"f":82,"a":45,"pts":8},{"team":"Mainistir Béal Atha an Róine/Ballyroan Abbey","p":5,"w":4,"l":1,"d":0,"f":91,"a":66,"pts":8},{"team":"Gleann Uiseann","p":5,"w":4,"l":1,"d":0,"f":61,"a":65,"pts":8},{"team":"St Pauls","p":5,"w":2,"l":3,"d":0,"f":82,"a":102,"pts":4},{"team":"O'Dempseys","p":5,"w":1,"l":4,"d":0,"f":79,"a":98,"pts":2},{"team":"St Joseph's","p":5,"w":0,"l":5,"d":0,"f":78,"a":97,"pts":0}]},{"competition":"U15 Football League Division 1A","grade":"U15","rows":[{"team":"Portlaoise","p":6,"w":5,"l":1,"d":0,"f":113,"a":76,"pts":10},{"team":"Mountmellick Parish Gaels","p":6,"w":4,"l":1,"d":1,"f":187,"a":70,"pts":9},{"team":"Stradbally Parish Gaels","p":6,"w":4,"l":1,"d":1,"f":158,"a":73,"pts":9},{"team":"Gleann Uiseann","p":6,"w":1,"l":5,"d":0,"f":67,"a":158,"pts":2},{"team":"Ballyfin CLG","p":5,"w":1,"l":4,"d":0,"f":64,"a":126,"pts":2},{"team":"Ballylinan","p":5,"w":1,"l":4,"d":0,"f":50,"a":136,"pts":2}]},{"competition":"U13 Football League Division 2A","grade":"U13","rows":[{"team":"St Pauls","p":5,"w":5,"l":0,"d":0,"f":131,"a":61,"pts":10},{"team":"An Fraoch","p":5,"w":4,"l":1,"d":0,"f":103,"a":38,"pts":8},{"team":"Gleann Uiseann","p":5,"w":2,"l":3,"d":0,"f":91,"a":77,"pts":4},{"team":"Mountmellick","p":5,"w":2,"l":3,"d":0,"f":65,"a":96,"pts":4},{"team":"St Joseph's","p":5,"w":2,"l":3,"d":0,"f":60,"a":110,"pts":4},{"team":"Barrow Gaels","p":5,"w":0,"l":5,"d":0,"f":41,"a":109,"pts":0}]},{"competition":"Junior Football Championship Group B","grade":"Junior","rows":[{"team":"St Joseph's","p":4,"w":4,"l":0,"d":0,"f":90,"a":52,"pts":8},{"team":"O'Dempseys","p":4,"w":3,"l":1,"d":0,"f":73,"a":55,"pts":6},{"team":"Gleann Uiseann","p":4,"w":1,"l":3,"d":0,"f":69,"a":76,"pts":2},{"team":"Stradbally","p":4,"w":1,"l":3,"d":0,"f":65,"a":78,"pts":2},{"team":"An Fraoch","p":4,"w":1,"l":3,"d":0,"f":52,"a":88,"pts":2}]},{"competition":"Junior C Football Championship Group E","grade":"Junior","rows":[{"team":"Portarlington","p":3,"w":3,"l":0,"d":0,"f":85,"a":36,"pts":6},{"team":"Annanough","p":3,"w":2,"l":1,"d":0,"f":29,"a":37,"pts":4},{"team":"Gleann Uiseann","p":3,"w":1,"l":2,"d":0,"f":35,"a":61,"pts":2},{"team":"Ard Lios Cill Chruis","p":3,"w":0,"l":3,"d":0,"f":24,"a":39,"pts":0}]},{"competition":"ACFL Division 2","grade":"Adult League","rows":[{"team":"O'Dempseys","p":7,"w":7,"l":0,"d":0,"f":149,"a":83,"pts":14},{"team":"Portarlington","p":7,"w":6,"l":1,"d":0,"f":131,"a":86,"pts":12},{"team":"Rosenallis","p":7,"w":4,"l":3,"d":0,"f":103,"a":102,"pts":8},{"team":"An Fraoch","p":7,"w":2,"l":3,"d":2,"f":111,"a":119,"pts":6},{"team":"Emo","p":7,"w":3,"l":4,"d":0,"f":94,"a":112,"pts":6},{"team":"Mountmellick","p":7,"w":2,"l":4,"d":1,"f":110,"a":122,"pts":5},{"team":"Gleann Uiseann","p":7,"w":1,"l":5,"d":1,"f":100,"a":139,"pts":3},{"team":"Ballyfin CLG","p":7,"w":1,"l":6,"d":0,"f":74,"a":109,"pts":2}]},{"competition":"ACFL Division 4","grade":"Adult League","rows":[{"team":"Annanough","p":7,"w":6,"l":1,"d":0,"f":148,"a":79,"pts":12},{"team":"Portarlington","p":7,"w":5,"l":2,"d":0,"f":149,"a":110,"pts":10},{"team":"Graiguecullen GAA","p":7,"w":4,"l":3,"d":0,"f":124,"a":134,"pts":8},{"team":"Barrowhouse GAA","p":7,"w":3,"l":3,"d":1,"f":102,"a":115,"pts":7},{"team":"Timahoe","p":7,"w":3,"l":4,"d":0,"f":100,"a":119,"pts":6},{"team":"Gleann Uiseann","p":7,"w":2,"l":4,"d":1,"f":105,"a":127,"pts":5},{"team":"Stradbally","p":7,"w":2,"l":4,"d":1,"f":106,"a":118,"pts":5},{"team":"The Rock GAA Club","p":7,"w":1,"l":5,"d":1,"f":90,"a":122,"pts":3}]},{"competition":"ACFL Division 7 Group B","grade":"Adult League","rows":[{"team":"Crettyard","p":7,"w":7,"l":0,"d":0,"f":115,"a":56,"pts":14},{"team":"Annanough","p":7,"w":5,"l":1,"d":1,"f":121,"a":71,"pts":11},{"team":"Graiguecullen GAA","p":7,"w":5,"l":2,"d":0,"f":102,"a":80,"pts":10},{"team":"The Rock GAA Club","p":7,"w":4,"l":3,"d":0,"f":78,"a":89,"pts":8},{"team":"Barrowhouse GAA","p":7,"w":3,"l":3,"d":1,"f":101,"a":87,"pts":7},{"team":"Gleann Uiseann","p":7,"w":2,"l":5,"d":0,"f":54,"a":98,"pts":4},{"team":"Stradbally","p":7,"w":1,"l":6,"d":0,"f":74,"a":139,"pts":2},{"team":"Timahoe","p":7,"w":0,"l":7,"d":0,"f":38,"a":63,"pts":0}]},{"competition":"Kelly Cup Group C","grade":"Adult League","rows":[{"team":"Crettyard","p":2,"w":2,"l":0,"d":0,"f":34,"a":21,"pts":4},{"team":"Gleann Uiseann","p":2,"w":1,"l":1,"d":0,"f":8,"a":17,"pts":2},{"team":"Rosenallis","p":2,"w":0,"l":2,"d":0,"f":13,"a":17,"pts":0}]},{"competition":"Féile Peile na nÓg - Division 1 Group 4","grade":"Féile","rows":[{"team":"O'Dempseys","p":2,"w":2,"l":0,"d":0,"f":31,"a":20,"pts":4},{"team":"Ballylinan","p":2,"w":1,"l":1,"d":0,"f":25,"a":26,"pts":2},{"team":"Gleann Uiseann","p":2,"w":0,"l":2,"d":0,"f":21,"a":31,"pts":0}]},{"competition":"Under 20 Football Championship - League Division 2","grade":"U20","rows":[{"team":"Portlaoise","p":0,"w":0,"l":0,"d":0,"f":0,"a":0,"pts":0},{"team":"Gleann Uiseann","p":0,"w":0,"l":0,"d":0,"f":0,"a":0,"pts":0},{"team":"Stradbally Parish Gaels","p":0,"w":0,"l":0,"d":0,"f":0,"a":0,"pts":0},{"team":"Portarlington","p":0,"w":0,"l":0,"d":0,"f":0,"a":0,"pts":0}]}],"grades":["Senior","Junior","Adult League","U20","U17","U15","U13","Féile"],"venueHome":"Killeshin GAA Grounds","ground":"Seamus Hearns Park","newsSources":[{"name":"Leinster Express","url":"https://www.leinsterexpress.ie/sport/gaa","access":"free"},{"name":"Laois Nationalist","url":"https://www.laois-nationalist.ie/","access":"free"},{"name":"Carlow Nationalist","url":"https://www.carlow-nationalist.ie/sport/gaa/","access":"free"},{"name":"Laois GAA","url":"https://laoisgaa.ie/news/","access":"free"},{"name":"LaoisToday","url":"https://www.laoistoday.ie/tag/killeshin/","access":"subscriber"}],"news":[{"date":"2026-08-23","title":"Laois SFC: History made as Killeshin defeat neighbours Graiguecullen for the first time ever","source":"LaoisToday","tag":"GAA","access":"free","url":"https://www.laoistoday.ie/2026/08/23/laois-sfc-history-made-as-killeshin-defeat-neighbours-graiguecullen-for-the-first-time-ever/"},{"date":"2026-07-22","title":"Killeshin and Stradbally kick off this year's championship","source":"Laois Nationalist","tag":"GAA","access":"free","url":"https://www.laois-nationalist.ie/killeshin-and-stradbally-kick-off-this-years-championship_arid-105805.html"},{"date":"2026-07-22","title":"Stradbally make winning start against Killeshin in Laois GAA SFC","source":"Leinster Express","tag":"GAA","access":"free","url":"https://www.leinsterexpress.ie/sport/gaa/stradbally-make-winning-start-against-killeshin-in-laois-gaa-sfc-8816841"},{"date":"2026-06-26","title":"Parents question Killeshin NS's 'problematic' admissions policy","source":"Carlow Nationalist","tag":"Community","access":"free","url":"https://www.carlow-nationalist.ie/news/parents-question-killeshin-nss-problematic-admissions-policy_arid-103072.html"},{"date":"2025-10-18","title":"Killeshin progress to Leinster semi-final after strong win over Wicklow's ABG","source":"Leinster Express","tag":"Ladies","access":"free","url":"https://www.leinsterexpress.ie/news/gaa/1922191/killeshin-progress-to-leinster-semi-final-after-strong-win-over-wicklows-abg.html"},{"date":"2025-07-27","title":"Clinical Killeshin cut down Clonaslee in Laois GAA opener in Portlaoise","source":"Leinster Express","tag":"GAA","access":"free","url":"https://www.leinsterexpress.ie/news/gaa/1857662/clinical-killeshin-cut-down-clonaslee-in-laois-gaa-opener-in-portlaoise.html"},{"date":"2026-08-18","title":"Killeshin Waterworks celebrates heritage and biodiversity with unveiling of restored sluice gate","source":"LaoisToday","tag":"Community","access":"subscriber","url":"https://www.laoistoday.ie/2026/08/18/killeshin-waterworks-celebrates-heritage-and-biodiversity-with-unveiling-of-restored-sluice-gate/"},{"date":"2026-08-07","title":"Laois SFC: Killeshin survive late Rosenallis revival to go through","source":"LaoisToday","tag":"GAA","access":"subscriber","url":"https://www.laoistoday.ie/2026/08/07/laois-sfc-killeshin-survive-late-rosenallis-revival-to-go-through/"},{"date":"2026-06-27","title":"ACFL Division 2: Finlay strikes late as O'Dempsey's reach final | Killeshin send Ballyfin packing","source":"LaoisToday","tag":"GAA","access":"subscriber","url":"https://www.laoistoday.ie/2026/06/27/acfl-division-2-finlay-strikes-late-as-odempseys-reach-final-killeshin-send-ballyfin-packing/"},{"date":"2025-09-04","title":"Killeshin GAA score €15,000 after Electric Picnic can and bottle collection","source":"LaoisToday","tag":"Club","access":"subscriber","url":"https://www.laoistoday.ie/2025/09/04/killeshin-gaa-score-e15000-after-electric-picnic-can-and-bottle-collection/"}]}</script>
+<script>
+(function(){
+"use strict";
+
+var DATA = JSON.parse(document.getElementById('seed').textContent);
+var grade = 'All', view = 'fixtures';
+var MON = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+var DAY = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+
+function d(s){ var p=s.split('-'); return new Date(+p[0], p[1]-1, +p[2]); }
+function longDate(s){ var x=d(s); return DAY[x.getDay()]+' '+x.getDate()+' '+MON[x.getMonth()]; }
+function shortDate(s){ var x=d(s); return DAY[x.getDay()].slice(0,3)+' '+x.getDate()+' '+MON[x.getMonth()]; }
+function esc(t){ return String(t==null?'':t).replace(/[&<>"]/g,function(c){
+  return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
+function daysAway(s){ var t=new Date(); t.setHours(0,0,0,0); return Math.round((d(s)-t)/86400000); }
+function label(n){ return n===DATA.teamName ? 'Killeshin' : n; }
+function atHome(m){ return (m.venue||'').indexOf('Killeshin') > -1; }
+function upcoming(){ return DATA.fixtures.filter(function(f){ return daysAway(f.date) >= 0; }); }
+function byGrade(l){ return grade==='All' ? l : l.filter(function(m){ return m.grade===grade; }); }
+function crest(){ return '<img src="crest.png" alt="">'; }
+
+/* ---- next match, and next one at home ---- */
+function renderNext(){
+  var up = upcoming(), box = document.getElementById('next');
+  if(!up.length){ box.hidden = true; } else {
+    var f = up[0], n = daysAway(f.date);
+    box.hidden = false;
+    document.getElementById('nextWhen').textContent =
+      (n===0?'Today':n===1?'Tomorrow':'In '+n+' days') + ' \u00b7 ' + shortDate(f.date) + ' \u00b7 ' + f.time;
+    document.getElementById('nextHome').className = 'side d' + (f.isHome?' us':'');
+    document.getElementById('nextAway').className = 'side away d' + (f.isHome?'':' us');
+    document.getElementById('nextHome').textContent = label(f.home);
+    document.getElementById('nextAway').textContent = label(f.away);
+    document.getElementById('nextMeta').innerHTML = esc(f.competition) +
+      '<br><strong>' + esc(f.venue) + '</strong>' +
+      (f.referee && f.referee!=='TBC' ? ' \u00b7 Ref ' + esc(f.referee) : '');
+  }
+
+  var hm = upcoming().filter(atHome)[0], hbox = document.getElementById('homeNext');
+  /* Skip it when the very next match is already the home one. */
+  if(!hm || (up.length && hm === up[0])){ hbox.hidden = true; return; }
+  hbox.hidden = false;
+  document.getElementById('homeLine').textContent = hm.grade + ' v ' + label(hm.opponent);
+  document.getElementById('homeSub').textContent =
+    shortDate(hm.date) + ' \u00b7 ' + hm.time + ' \u00b7 ' + (DATA.ground || hm.venue);
+}
+
+/* ---- fixtures ---- */
+function renderFixtures(){
+  var list = byGrade(upcoming());
+  if(!list.length) return empty('No fixtures listed',
+    grade==='All' ? 'Nothing down for any team yet. New fixtures appear the morning after the county board publishes them.'
+                  : 'Nothing down for ' + grade + ' right now. Try another team above.');
+  var html='', day=null;
+  list.forEach(function(f){
+    if(f.date!==day){
+      day=f.date; var n=daysAway(f.date);
+      html += '<div class="dayhead'+(n<=2?' soon':'')+'">' + esc(longDate(f.date)) +
+              (n===0?' \u2014 today':n===1?' \u2014 tomorrow':'') + '</div>';
+    }
+    html += '<div class="match'+(atHome(f)?' athome':'')+'"><div class="top">' +
+      '<div class="time d">'+esc(f.time)+'</div><div class="teams">'+teamLine(f.home,f.away)+'</div></div>' +
+      '<div class="comp">'+esc(f.competition)+'</div>' +
+      '<div class="venue'+(atHome(f)?' h':'')+'">'+esc(f.venue)+(atHome(f)?' \u00b7 home':'')+'</div></div>';
+  });
+  return html;
+}
+function teamLine(h,a){
+  var H=h===DATA.teamName, A=a===DATA.teamName;
+  return (H?'<b>':'')+esc(label(h))+(H?'</b>':'')+' v '+(A?'<b>':'')+esc(label(a))+(A?'</b>':'');
+}
+
+/* ---- results ---- */
+function renderResults(){
+  var list = byGrade(DATA.results);
+  if(!list.length) return empty('No results yet',
+    'Once ' + (grade==='All'?'a Killeshin team':grade) + ' plays, the score shows up here.');
+  var html='', day=null;
+  list.forEach(function(r){
+    if(r.date!==day){ day=r.date; html += '<div class="dayhead">'+esc(longDate(r.date))+'</div>'; }
+    html += '<div class="match"><div class="res">' +
+      '<div class="mark '+r.outcome+'">'+r.outcome+'</div><div class="body">' +
+      scoreLine(r.home,r.homeScore,r.homeTotal,r.homeTotal>r.awayTotal) +
+      scoreLine(r.away,r.awayScore,r.awayTotal,r.awayTotal>r.homeTotal) +
+      '<div class="sub">'+esc(r.competition)+'<br>'+esc(r.venue)+'</div></div></div></div>';
+  });
+  return html;
+}
+function scoreLine(n,sc,tot,won){
+  return '<div class="line'+(won?' win':'')+'"><div class="nm">'+esc(label(n))+'</div>' +
+         '<div class="sc d">'+esc(sc)+'<small>'+tot+'</small></div></div>';
+}
+
+/* ---- tables ---- */
+function renderTables(){
+  var list = grade==='All' ? DATA.tables : DATA.tables.filter(function(t){ return t.grade===grade; });
+  if(!list.length) return empty('No table for this team',
+    'Knockout and championship groups do not always run a league table.');
+  return list.map(function(t){
+    var rows = t.rows.map(function(r,i){
+      return '<tr'+(r.team===DATA.teamName?' class="us"':'')+'><td>'+(i+1)+'</td>' +
+        '<td class="t">'+esc(label(r.team))+'</td><td>'+r.p+'</td><td>'+r.w+'</td><td>'+r.d+'</td>' +
+        '<td>'+r.l+'</td><td>'+r.f+'</td><td>'+r.a+'</td><td class="p">'+r.pts+'</td></tr>';
+    }).join('');
+    return '<section class="tbl"><h3 class="d">'+esc(t.competition)+'</h3>' +
+      '<div class="grd">'+esc(t.grade)+'</div>' +
+      '<table><thead><tr><th></th><th class="t">Team</th><th>P</th><th>W</th><th>D</th><th>L</th>' +
+      '<th>For</th><th>Ag</th><th class="p">Pts</th></tr></thead><tbody>'+rows+'</tbody></table></section>';
+  }).join('');
+}
+
+/* ---- news: free to read first, subscriber stories grouped below ---- */
+function renderNews(){
+  var all = DATA.news || [];
+  if(!all.length) return empty('Nothing in the papers yet',
+    'Anything the local papers publish about Killeshin lands here within a day.');
+  var free = all.filter(function(n){ return n.access !== 'subscriber'; });
+  var paid = all.filter(function(n){ return n.access === 'subscriber'; });
+  var html = '';
+
+  if(free.length){
+    html += head('Free to read', 'Open these and read the whole story, no account needed.') +
+      free.map(story).join('');
+  } else {
+    html += empty('Nothing free this week', 'The subscriber stories below are all that came up.');
+  }
+  if(paid.length){
+    html += '<div class="paid">' +
+      head('Behind a subscription', 'You will hit a paywall on these. Headline and link only.') +
+      paid.map(story).join('') + '</div>';
+  }
+  return html;
+}
+function head(t,p){
+  return '<div class="newshead"><h2 class="d"><span class="rule"></span>'+esc(t)+'</h2>' +
+         '<p>'+esc(p)+'</p></div>';
+}
+function story(n){
+  var age = -daysAway(n.date), when = shortDate(n.date);
+  if(age === 0) when = 'Today';
+  else if(age === 1) when = 'Yesterday';
+  else if(age > 1 && age < 7) when = age + ' days ago';
+  return '<a class="story" href="'+esc(n.url)+'" target="_blank" rel="noopener">' +
+    '<h3>'+esc(n.title)+'</h3><div class="by"><b>'+esc(n.source)+'</b> \u00b7 '+esc(when) +
+    (n.tag ? '<span class="pin">'+esc(n.tag)+'</span>' : '') +
+    (n.access==='subscriber' ? '<span class="pin lock">Subscribers</span>' : '') +
+    '</div></a>';
+}
+
+function empty(title,msg){
+  return '<div class="empty">'+crest()+'<b>'+esc(title)+'</b>'+esc(msg)+'</div>';
+}
+
+/* ---- shell ---- */
+function chips(){
+  var all = ['All'].concat(DATA.grades || []);
+  document.getElementById('grades').innerHTML = all.map(function(g){
+    return '<button class="chip" aria-pressed="'+(g===grade)+'" data-g="'+esc(g)+'">'+esc(g)+'</button>';
+  }).join('');
+}
+function draw(){
+  /* The team filter means nothing on the news tab, so it steps out of the way. */
+  var news = view === 'news';
+  document.getElementById('grades').hidden = news;
+  document.getElementById('tabs').className = 'tabs' + (news ? ' solo' : '');
+  document.getElementById('out').innerHTML =
+    view==='fixtures' ? renderFixtures() :
+    view==='results'  ? renderResults()  :
+    view==='tables'   ? renderTables()   : renderNews();
+  window.scrollTo(0,0);
+}
+document.getElementById('grades').addEventListener('click', function(e){
+  var b = e.target.closest('.chip'); if(!b) return;
+  grade = b.dataset.g; chips(); draw();
+});
+document.querySelectorAll('.tab').forEach(function(t){
+  t.addEventListener('click', function(){
+    view = t.dataset.view;
+    document.querySelectorAll('.tab').forEach(function(x){
+      x.setAttribute('aria-selected', String(x===t)); });
+    draw();
+  });
+});
+function stamp(){
+  var u = new Date(DATA.updated);
+  var same = u.toDateString() === new Date().toDateString();
+  document.getElementById('stamp').textContent = 'Updated ' +
+    (same ? 'today at ' + u.toTimeString().slice(0,5) : shortDate(DATA.updated.slice(0,10)));
+  document.getElementById('src').href = DATA.source;
+}
+function boot(){ chips(); renderNext(); draw(); stamp(); }
+boot();
+
+fetch('killeshin.json?t=' + Date.now(), {cache:'no-store'})
+  .then(function(r){ if(!r.ok) throw 0; return r.json(); })
+  .then(function(j){ if(j && j.fixtures && j.results){ DATA = j; boot(); } })
+  .catch(function(){ /* keep the built-in copy */ });
+
+})();
+</script>
+</body>
+</html>
