@@ -141,18 +141,25 @@ def parse_match(block, date, club, branch):
     the pieces rather than by class names, so a theme tweak doesn't break it.
     """
     bits = [t.strip() for t in block.stripped_strings if t.strip()]
-    teams, comp, venue, ref = [], None, None, None
+    teams, comp, venue, ref, conceder = [], None, None, None, None
 
     for a in block.find_all("a"):
         href, text = a.get("href", ""), clean(a)
         if not text:
             continue
         if "/team/" in href:
-            teams.append(re.sub(r"\s*\(C\)$", "", text))
+            name = re.sub(r"\s*\(C\)\s*$", "", text)
+            if name != text:
+                conceder = name
+            teams.append(name)
         elif "/venue/" in href:
             venue = text
-        elif "/fixtures-results/" in href and comp is None and len(text) > 8:
+        elif COMP_RE.search(href) and comp is None and len(text) > 8:
             comp = text
+
+    if not venue:                       # "Venue: TBC" has no venue link at all
+        m = re.search(r"Venue:\s*([^\n]{2,60})", " ".join(bits))
+        venue = m.group(1).strip() if m else "TBC"
 
     if len(teams) < 2:          # BYE entries carry a single team
         return None
@@ -179,31 +186,72 @@ def parse_match(block, date, club, branch):
         "venue": venue or "TBC",
         "referee": ref or "TBC",
         "conceded": conceded,
+        "conceder": conceder,
         "isHome": home == club,
         "opponent": away if home == club else home,
     }
 
 
+COMP_RE = re.compile(r"/fixtures-results/(?!team/|venue/)")
+TEAM_RE = re.compile(r"/team/")
+VENUE_RE = re.compile(r"/venue/")
+
+
+def match_blocks(soup):
+    """
+    Find each block that holds one match.
+
+    Take the smallest elements carrying two team links, then climb until the
+    block also carries its competition link. Climbing matters: the tightest
+    wrapper around the two teams usually excludes the competition and venue,
+    which sit in sibling elements.
+    """
+    seed = []
+    for el in soup.find_all(True):
+        if len(el.find_all("a", href=TEAM_RE)) >= 2:
+            seed.append(el)
+
+    ids = {id(e) for e in seed}
+    minimal = [el for el in seed
+               if not any(id(c) in ids for c in el.find_all(True))]
+
+    blocks, seen = [], set()
+    for el in minimal:
+        node = el
+        for _ in range(4):
+            if node.find("a", href=COMP_RE):
+                break
+            if node.parent is None:
+                break
+            node = node.parent
+        if id(node) not in seen:
+            seen.add(id(node))
+            blocks.append(node)
+    return blocks
+
+
+def nearest_date(block):
+    """Walk back to the date heading this match sits under."""
+    for prev in block.find_all_previous(["h1", "h2", "h3", "h4", "h5"]):
+        got = heading_date(clean(prev))
+        if got:
+            return got
+    return None
+
+
 def parse_page(html, club, branch):
     soup = BeautifulSoup(html, "html.parser")
-    fixtures, results, seen, date = [], [], set(), None
+    fixtures, results, seen = [], [], set()
+    blocks = match_blocks(soup)
+    skipped_nodate = 0
 
-    for el in soup.find_all(["h2", "h3", "h4", "div", "section", "article", "li"]):
-        text = clean(el)
-        if el.name in ("h2", "h3", "h4") and len(text) < 40:
-            got = heading_date(text)
-            if got:
-                date = got
-            continue
-        if not date or not el.find("a", href=re.compile(r"/team/")):
-            continue
-        # take only the innermost block holding a match
-        if el.find(lambda t: t is not el and t.find("a", href=re.compile(r"/venue/"))):
-            continue
-        if not el.find("a", href=re.compile(r"/venue/")):
+    for block in blocks:
+        date = nearest_date(block)
+        if not date:
+            skipped_nodate += 1
             continue
 
-        m = parse_match(el, date, club, branch)
+        m = parse_match(block, date, club, branch)
         if not m or club not in (m["home"], m["away"]):
             continue
 
@@ -215,18 +263,30 @@ def parse_page(html, club, branch):
         ht, at = total(m["homeScore"]), total(m["awayScore"])
         played = (ht is not None and at is not None and (ht > 0 or at > 0)) or m["conceded"]
 
-        if played and ht is not None and at is not None:
+        if m["conceded"] and (ht is None or at is None):
+            # Walkover: no score, but it counts. Whoever is marked (C) lost.
+            m["homeScore"] = m["awayScore"] = "\u2014"
+            m["homeTotal"] = m["awayTotal"] = 0
+            m["ourTotal"] = m["theirTotal"] = 0
+            m["outcome"] = "L" if m["conceder"] == club else "W"
+            m["competition"] += " (walkover)"
+            m.pop("conceded", None); m.pop("conceder", None)
+            results.append(m)
+        elif played and ht is not None and at is not None:
             our, their = (ht, at) if m["isHome"] else (at, ht)
             m["homeTotal"], m["awayTotal"] = ht, at
             m["ourTotal"], m["theirTotal"] = our, their
             m["outcome"] = "W" if our > their else ("L" if our < their else "D")
-            m.pop("conceded", None)
+            m.pop("conceded", None); m.pop("conceder", None)
             results.append(m)
         elif not played:
-            for k in ("homeScore", "awayScore", "conceded"):
+            for k in ("homeScore", "awayScore", "conceded", "conceder"):
                 m.pop(k, None)
             fixtures.append(m)
 
+    print("    blocks %d, ours %d%s" % (
+        len(blocks), len(fixtures) + len(results),
+        ", %d had no date heading" % skipped_nodate if skipped_nodate else ""))
     return fixtures, results, soup
 
 
