@@ -1,183 +1,210 @@
 #!/usr/bin/env python3
 """
-Pull every Killeshin (Gleann Uiseann) fixture, result and league table from the
-Laois GAA county board site and write data/killeshin.json for the app.
+Pull every Killeshin fixture, result and league table from both county boards.
 
-Killeshin is listed on the county system as "Gleann Uiseann". The county board
-publishes one page carrying every grade the club fields, which is what we read.
+The men's club runs on laoisgaa.ie as "Gleann Uiseann"; the ladies club runs on
+laoislgfa.ie as "Killeshin". Both sites are built on the same Club & County
+platform, so one parser handles the pair — only the URL and club name differ.
 
     pip install requests beautifulsoup4
-    python scrape.py
+    python scrape.py        # writes killeshin.json, then the .ics feeds
 
-Exits non-zero if it finds nothing, so a scheduled run fails loudly instead of
-quietly overwriting good data with an empty file.
+Exits non-zero if a branch comes back empty, so a scheduled run fails loudly
+rather than quietly replacing good data with nothing.
 """
 
 import json
 import os
 import re
+import subprocess
 import sys
 from datetime import datetime, timezone, timedelta
 
 import requests
 from bs4 import BeautifulSoup
 
-TEAM_URL = ("https://laoisgaa.ie/fixtures-results/team/gleann-uiseann/"
-            "6547884c-ea64-5502-8472-8eb26b092437/")
-CLUB = "Gleann Uiseann"
-OUT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "killeshin.json")
-HEADERS = {"User-Agent": "KilleshinGAA-Fixtures/1.0 (club fixtures app; contact: Killeshin GAA)"}
+HERE = os.path.dirname(os.path.abspath(__file__))
+OUT = os.path.join(HERE, "killeshin.json")
+HEADERS = {
+    "User-Agent": ("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 "
+                   "(KHTML, like Gecko) Chrome/124.0 Safari/537.36"),
+    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+    "Accept-Language": "en-IE,en;q=0.9",
+    "Connection": "keep-alive",
+}
+TRIES = 3          # county sites drop the odd connection; don't fail on the first
+TIMEOUT = 60
 
+BRANCHES = {
+    "men": {
+        "name": "Men's",
+        "team": "Gleann Uiseann",
+        "crest": "crest.png",
+        "source": ("https://laoisgaa.ie/fixtures-results/team/gleann-uiseann/"
+                   "6547884c-ea64-5502-8472-8eb26b092437/"),
+    },
+    "ladies": {
+        "name": "Ladies",
+        "team": "Killeshin",
+        "crest": "crest-ladies.png",
+        "source": ("https://laoislgfa.ie/fixtures-results/team/killeshin/"
+                   "6063df22-0a35-9537-87e6-5276dfa17357/"),
+    },
+}
+
+GROUND = "Seamus Hearns Park"
 MONTHS = {m: i for i, m in enumerate(
     ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"], 1)}
 
-GRADE_ORDER = ["Senior", "Junior", "Adult League", "U20", "U17", "U15", "U13", "Féile"]
+# Order the grade chips appear in, oldest age group first.
+GRADE_ORDER = ["Senior", "Intermediate", "Junior", "Adult League", "Minor",
+               "U20", "U17", "U16", "U15", "U14", "U13", "U12", "Féile"]
+
+SCORE_RE = re.compile(r"^\d+-\d+$")
+TIME_RE = re.compile(r"^\d{1,2}:\d{2}$")
 
 
-# --------------------------------------------------------------------------
-# helpers
-# --------------------------------------------------------------------------
+def fetch(url):
+    """Retry a few times before giving up — a single dropped connection is normal."""
+    import time
+    last = None
+    for attempt in range(1, TRIES + 1):
+        try:
+            r = requests.get(url, headers=HEADERS, timeout=TIMEOUT)
+            r.raise_for_status()
+            return r
+        except requests.RequestException as e:
+            last = e
+            print("    attempt %d/%d failed: %s" % (attempt, TRIES, type(e).__name__))
+            if attempt < TRIES:
+                time.sleep(attempt * 10)
+    print("    giving up: %s" % type(last).__name__)
+    return None
+
+
 def grade_of(comp):
-    """Work out which club team a competition belongs to."""
+    """Which club team a competition belongs to. Covers both codes."""
     c = comp.lower()
-    for n in ("20", "17", "15", "13"):
+    for n in ("20", "17", "16", "15", "14", "13", "12"):
         if re.search(r"\bu-?%s\b|under[\s-]*%s\b" % (n, n), c):
             return "U" + n
     if "féile" in c or "feile" in c:
         return "Féile"
+    if "minor" in c:
+        return "Minor"
+    if "intermediate" in c:
+        return "Intermediate"
     if "junior" in c:
         return "Junior"
-    if "acfl" in c or "kelly cup" in c:
+    if "acfl" in c or "kelly cup" in c or "division" in c or "adult league" in c:
         return "Adult League"
-    if "senior" in c or "intermediate" in c:
+    if "senior" in c:
         return "Senior"
     return "Other"
 
 
 def total(score):
     """GAA score to points: 1-13 -> 16."""
-    if not score:
-        return None
-    m = re.match(r"^\s*(\d+)\s*-\s*(\d+)\s*$", score)
+    m = SCORE_RE.match((score or "").strip())
     if not m:
         return None
-    return int(m.group(1)) * 3 + int(m.group(2))
+    g, p = score.split("-")
+    return int(g) * 3 + int(p)
 
 
-def tidy_comp(comp):
-    """Drop the sponsor prefix so it fits a phone screen."""
-    comp = re.sub(r"^(Laois Shopping Centre|Midlands Park Hotel|Laois Hire)\s+", "", comp.strip())
+def tidy(comp):
+    """Drop sponsor prefixes so it fits a phone screen."""
+    comp = re.sub(r"^(LOETB|Laois Shopping Centre|Midlands Park Hotel|Laois Hire|"
+                  r"John West LGFA)\s+", "", (comp or "").strip())
     return re.sub(r"\s+", " ", comp)
-
-
-def parse_heading_date(text):
-    """'Sunday 6th Sep 2026' -> '2026-09-06'."""
-    m = re.search(r"(\d{1,2})(?:st|nd|rd|th)?\s+([A-Za-z]{3})[a-z]*\s+(\d{4})", text)
-    if not m:
-        return None
-    day, mon, year = int(m.group(1)), m.group(2)[:3].title(), int(m.group(3))
-    if mon not in MONTHS:
-        return None
-    return "%04d-%02d-%02d" % (year, MONTHS[mon], day)
 
 
 def clean(node):
     return re.sub(r"\s+", " ", node.get_text(" ", strip=True)) if node else ""
 
 
-# --------------------------------------------------------------------------
-# parsing
-# --------------------------------------------------------------------------
-SCORE_RE = re.compile(r"^\d+-\d+$")
-TIME_RE = re.compile(r"^\d{1,2}:\d{2}$")
+def heading_date(text):
+    """'Sunday 6th Sep 2026' -> '2026-09-06'."""
+    m = re.search(r"(\d{1,2})(?:st|nd|rd|th)?\s+([A-Za-z]{3})[a-z]*\s+(\d{4})", text)
+    if not m:
+        return None
+    mon = m.group(2)[:3].title()
+    if mon not in MONTHS:
+        return None
+    return "%s-%02d-%02d" % (m.group(3), MONTHS[mon], int(m.group(1)))
 
 
-def parse_match_block(block, date):
+def parse_match(block, date, club, branch):
     """
-    Read one match. The county theme lays each match out as:
-      competition link, home team link, home score, time, away score, away team link,
-      then a venue link and a referee name.
-    We read it by picking out the pieces rather than by relying on class names,
-    so a theme tweak doesn't break the whole thing.
+    Read one match. Both sites lay a match out as competition link, home team,
+    scores and time, away team, then venue and referee. Read it by picking out
+    the pieces rather than by class names, so a theme tweak doesn't break it.
     """
-    text_bits = [t.strip() for t in block.stripped_strings if t.strip()]
-
+    bits = [t.strip() for t in block.stripped_strings if t.strip()]
     teams, comp, venue, ref = [], None, None, None
+
     for a in block.find_all("a"):
-        href = a.get("href", "")
-        label = clean(a)
-        if not label:
+        href, text = a.get("href", ""), clean(a)
+        if not text:
             continue
         if "/team/" in href:
-            teams.append(label)
+            teams.append(re.sub(r"\s*\(C\)$", "", text))
         elif "/venue/" in href:
-            venue = label
-        elif "/fixtures-results/" in href and comp is None and len(label) > 8:
-            comp = label
+            venue = text
+        elif "/fixtures-results/" in href and comp is None and len(text) > 8:
+            comp = text
 
-    # BYE entries have a single team
-    if len(teams) < 2:
+    if len(teams) < 2:          # BYE entries carry a single team
         return None
 
-    scores = [t for t in text_bits if SCORE_RE.match(t)]
-    times = [t for t in text_bits if TIME_RE.match(t)]
-    conceded = "CONC" in text_bits
+    scores = [t for t in bits if SCORE_RE.match(t)]
+    times = [t for t in bits if TIME_RE.match(t)]
+    conceded = "CONC" in bits
 
-    m = re.search(r"Referee:\s*(.+?)(?:\s{2,}|$)", " ".join(text_bits))
+    m = re.search(r"Referee:\s*(.+?)(?:\s{2,}|$)", " ".join(bits))
     if m:
         ref = m.group(1).strip()
 
     home, away = teams[0], teams[1]
-    hs = scores[0] if len(scores) >= 2 else None
-    as_ = scores[1] if len(scores) >= 2 else None
-    time = times[0] if times else "TBC"
-
     return {
         "date": date,
-        "time": time,
-        "competition": tidy_comp(comp or ""),
+        "time": times[0] if times else "TBC",
+        "competition": tidy(comp or ""),
         "grade": grade_of(comp or ""),
+        "branch": branch,
         "home": home,
         "away": away,
-        "homeScore": hs,
-        "awayScore": as_,
+        "homeScore": scores[0] if len(scores) >= 2 else None,
+        "awayScore": scores[1] if len(scores) >= 2 else None,
         "venue": venue or "TBC",
         "referee": ref or "TBC",
         "conceded": conceded,
-        "isHome": home == CLUB,
-        "opponent": away if home == CLUB else home,
+        "isHome": home == club,
+        "opponent": away if home == club else home,
     }
 
 
-def parse_page(html):
+def parse_page(html, club, branch):
     soup = BeautifulSoup(html, "html.parser")
-    fixtures, results, seen = [], [], set()
+    fixtures, results, seen, date = [], [], set(), None
 
-    # The page runs two streams: upcoming fixtures, then played results, each
-    # introduced by a date heading. Anything with a real score is a result.
-    date = None
     for el in soup.find_all(["h2", "h3", "h4", "div", "section", "article", "li"]):
-        heading = clean(el)
-        if el.name in ("h2", "h3", "h4") and len(heading) < 40:
-            got = parse_heading_date(heading)
+        text = clean(el)
+        if el.name in ("h2", "h3", "h4") and len(text) < 40:
+            got = heading_date(text)
             if got:
                 date = got
             continue
-
-        if not date:
+        if not date or not el.find("a", href=re.compile(r"/team/")):
             continue
-        if not el.find("a", href=re.compile(r"/team/")):
-            continue
-        # only take the innermost block holding a match
+        # take only the innermost block holding a match
         if el.find(lambda t: t is not el and t.find("a", href=re.compile(r"/venue/"))):
             continue
         if not el.find("a", href=re.compile(r"/venue/")):
             continue
 
-        m = parse_match_block(el, date)
-        if not m:
-            continue
-        if CLUB not in (m["home"], m["away"]):
+        m = parse_match(el, date, club, branch)
+        if not m or club not in (m["home"], m["away"]):
             continue
 
         key = (m["date"], m["time"], m["home"], m["away"])
@@ -188,16 +215,14 @@ def parse_page(html):
         ht, at = total(m["homeScore"]), total(m["awayScore"])
         played = (ht is not None and at is not None and (ht > 0 or at > 0)) or m["conceded"]
 
-        if played:
-            our = ht if m["isHome"] else at
-            their = at if m["isHome"] else ht
-            if our is None or their is None:
-                continue
+        if played and ht is not None and at is not None:
+            our, their = (ht, at) if m["isHome"] else (at, ht)
             m["homeTotal"], m["awayTotal"] = ht, at
             m["ourTotal"], m["theirTotal"] = our, their
             m["outcome"] = "W" if our > their else ("L" if our < their else "D")
+            m.pop("conceded", None)
             results.append(m)
-        else:
+        elif not played:
             for k in ("homeScore", "awayScore", "conceded"):
                 m.pop(k, None)
             fixtures.append(m)
@@ -205,12 +230,11 @@ def parse_page(html):
     return fixtures, results, soup
 
 
-def parse_tables(soup):
-    """League tables. Keep only the ones Killeshin actually appears in."""
-    tables = []
+def parse_tables(soup, club, branch):
+    """League tables. Keep only the ones Killeshin appears in."""
+    out = []
     for tbl in soup.find_all("table"):
-        head = tbl.find_previous(["h3", "h4"])
-        name = clean(head)
+        name = clean(tbl.find_previous(["h3", "h4"]))
         if not name:
             continue
         rows = []
@@ -218,88 +242,113 @@ def parse_tables(soup):
             cells = [clean(td) for td in tr.find_all("td")]
             if len(cells) < 9:
                 continue
-            try:
-                # #, Team, Pts, P, W, L, D, F, A, Pts
-                nums = [c for c in cells if re.match(r"^-?\d+$", c)]
-                team = next((c for c in cells if not re.match(r"^-?\d+$", c)), None)
-                if not team or len(nums) < 8:
-                    continue
-                _, p, w, l, dr, f, a, pts = nums[0], nums[2], nums[3], nums[4], nums[5], nums[6], nums[7], nums[-1]
-                rows.append({"team": team, "p": int(p), "w": int(w), "l": int(l),
-                             "d": int(dr), "f": int(f), "a": int(a), "pts": int(pts)})
-            except (ValueError, StopIteration, IndexError):
+            nums = [c for c in cells if re.match(r"^-?\d+$", c)]
+            team = next((c for c in cells if not re.match(r"^-?\d+$", c)), None)
+            if not team or len(nums) < 8:
                 continue
-        if rows and any(r["team"] == CLUB for r in rows):
-            tables.append({"competition": tidy_comp(name), "grade": grade_of(name), "rows": rows})
-    return tables
+            try:
+                rows.append({"team": team, "p": int(nums[2]), "w": int(nums[3]),
+                             "l": int(nums[4]), "d": int(nums[5]), "f": int(nums[6]),
+                             "a": int(nums[7]), "pts": int(nums[-1])})
+            except (ValueError, IndexError):
+                continue
+        if rows and any(r["team"] == club for r in rows):
+            out.append({"competition": tidy(name), "grade": grade_of(name),
+                        "branch": branch, "rows": rows})
+    return out
 
 
-# --------------------------------------------------------------------------
+def merge_news(payload):
+    """news.py writes news.json separately; fold it in so the phone fetches once."""
+    try:
+        with open(os.path.join(HERE, "news.json"), encoding="utf-8") as fh:
+            blob = json.load(fh)
+    except (OSError, ValueError):
+        print("  news:    none yet (run news.py)")
+        return payload
+    payload["news"] = blob.get("news", [])
+    payload["newsSources"] = blob.get("sources", [])
+    free = sum(1 for n in payload["news"] if n.get("access") != "subscriber")
+    print("  news:    %d (free %d, subscriber %d)"
+          % (len(payload["news"]), free, len(payload["news"]) - free))
+    return payload
+
+
 def main():
-    print("Fetching", TEAM_URL)
-    r = requests.get(TEAM_URL, headers=HEADERS, timeout=45)
-    r.raise_for_status()
+    fixtures, results, tables, failed = [], [], [], []
 
-    fixtures, results, soup = parse_page(r.text)
-    tables = parse_tables(soup)
+    for branch, cfg in BRANCHES.items():
+        print("%s \u2014 %s" % (cfg["name"], cfg["source"].split("/")[2]))
+        r = fetch(cfg["source"])
+        if r is None:
+            failed.append(branch)
+            continue
+
+        fx, rs, soup = parse_page(r.text, cfg["team"], branch)
+        tb = parse_tables(soup, cfg["team"], branch)
+        print("  fixtures %d, results %d, tables %d" % (len(fx), len(rs), len(tb)))
+        if not fx and not rs:
+            failed.append(branch)
+        fixtures += fx
+        results += rs
+        tables += tb
+
+    if failed:
+        # One board being down must not wipe the other. Carry the failed
+        # branch's last-known data forward and keep going.
+        try:
+            with open(OUT, encoding="utf-8") as fh:
+                prev = json.load(fh)
+        except (OSError, ValueError):
+            prev = None
+
+        if prev is None:
+            print("\nNo data for %s and no previous file to fall back on."
+                  % ", ".join(failed), file=sys.stderr)
+            sys.exit(1)
+
+        for b in failed:
+            kept = 0
+            for key, bucket in (("fixtures", fixtures), ("results", results), ("tables", tables)):
+                old_items = [x for x in prev.get(key, []) if x.get("branch") == b]
+                bucket += old_items
+                kept += len(old_items)
+            print("  %s: kept %d previous entries" % (b, kept))
+
+        if len(failed) == len(BRANCHES):
+            print("\nBoth boards unreachable. Nothing new written.", file=sys.stderr)
+            sys.exit(1)
+        print("\nWarning: %s could not be reached this run." % ", ".join(failed))
 
     fixtures.sort(key=lambda x: (x["date"], x["time"]))
     results.sort(key=lambda x: (x["date"], x["time"]), reverse=True)
 
-    grades = [g for g in GRADE_ORDER
-              if any(m["grade"] == g for m in fixtures + results)]
+    items = fixtures + results + tables
+    grades_by = {b: [g for g in GRADE_ORDER
+                     if any(m["grade"] == g for m in items if m["branch"] == b)]
+                 for b in BRANCHES}
 
-    dub = timezone(timedelta(hours=1))
     payload = {
         "club": "Killeshin GAA",
-        "clubIrish": "CLG Gleann Uiseann",
-        "teamName": CLUB,
         "county": "Laois",
-        "source": TEAM_URL,
-        "updated": datetime.now(dub).isoformat(timespec="seconds"),
-        "grades": grades,
-        "venueHome": "Killeshin GAA Grounds",
-        "ground": "Seamus Hearns Park",
+        "ground": GROUND,
+        "branches": BRANCHES,
+        "gradesBy": grades_by,
+        "source": BRANCHES["men"]["source"],
+        "updated": datetime.now(timezone(timedelta(hours=1))).isoformat(timespec="seconds"),
         "fixtures": fixtures,
         "results": results,
         "tables": tables,
     }
-
-    print("  fixtures: %d\n  results:  %d\n  tables:   %d\n  grades:   %s"
-          % (len(fixtures), len(results), len(tables), ", ".join(grades) or "none"))
-
-    if not fixtures and not results:
-        print("\nNothing scraped. The page layout has probably changed — check "
-              "parse_match_block() against the live HTML before trusting this.",
-              file=sys.stderr)
-        sys.exit(1)
-
     payload = merge_news(payload)
 
     with open(OUT, "w", encoding="utf-8") as fh:
         json.dump(payload, fh, ensure_ascii=False, separators=(",", ":"))
     print("Wrote", OUT)
 
+    print("Calendar feeds:")
+    subprocess.run([sys.executable, os.path.join(HERE, "make_ics.py")], check=True)
+
 
 if __name__ == "__main__":
     main()
-
-
-# ---------------------------------------------------------------------------
-# News is gathered by news.py into data/news.json. This folds it into the same
-# file the app reads, so there is only ever one fetch from the phone.
-# ---------------------------------------------------------------------------
-def merge_news(payload):
-    path = os.path.join(os.path.dirname(OUT) or ".", "news.json")
-    try:
-        with open(path, encoding="utf-8") as fh:
-            blob = json.load(fh)
-    except (OSError, ValueError):
-        print("  news:     none yet (run news.py)")
-        return payload
-    payload["news"] = blob.get("news", [])
-    payload["newsSources"] = blob.get("sources", [])
-    free = sum(1 for n in payload["news"] if n.get("access") != "subscriber")
-    print("  news:     %d (free %d, subscriber %d)"
-          % (len(payload["news"]), free, len(payload["news"]) - free))
-    return payload
