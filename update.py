@@ -48,6 +48,23 @@ BRANCHES = {
 }
 GROUND = "Seamus Hearns Park"
 
+# Club links shown on the Club tab. Edit here; the app picks them up on the
+# next run. "mark" is the letter in the circle.
+CLUB_LINKS = [
+    {"group": "Support the club", "mark": "\u20ac", "title": "Play the club lotto",
+     "note": "Pick your numbers online \u2014 Clubforce",
+     "url": "https://killeshingaa.clubforce.com/products/lotto/killeshin-gaa"},
+    {"group": "Support the club", "mark": "M", "title": "Pay your membership",
+     "note": "Sign in to Foireann, then find Killeshin",
+     "url": "https://www.foireann.ie/"},
+    {"group": "Follow the club", "mark": "L", "title": "Laois GAA",
+     "note": "County board \u2014 men's fixtures and results",
+     "url": "https://laoisgaa.ie/"},
+    {"group": "Follow the club", "mark": "L", "title": "Laois LGFA",
+     "note": "County board \u2014 ladies fixtures and results",
+     "url": "https://laoislgfa.ie/"},
+]
+
 GRADE_ORDER = ["Senior", "Intermediate", "Junior", "Adult League", "Minor",
                "U20", "U17", "U16", "U15", "U14", "U13", "U12", "Féile"]
 MONTHS = {m: i for i, m in enumerate(
@@ -514,6 +531,7 @@ def main():
         "source": BRANCHES["men"]["source"],
         "updated": now.isoformat(timespec="seconds"),
         "fixtures": fixtures, "results": results, "tables": tables, "news": news,
+        "club": {"links": CLUB_LINKS},
     }
 
     print("Calendars")
