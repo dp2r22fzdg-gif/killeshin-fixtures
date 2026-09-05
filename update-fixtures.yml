@@ -1,0 +1,61 @@
+name: Update fixtures
+
+on:
+  schedule:
+    # Every hour, ten past. GitHub often runs these late, so treat it as
+    # "roughly hourly" rather than on the dot.
+    - cron: '10 * * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+# Never let two runs overlap - the second would be pushing stale work.
+concurrency:
+  group: update-fixtures
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install requests beautifulsoup4
+
+      - name: Update everything
+        run: python update.py
+
+      - name: Commit if anything changed
+        run: |
+          git config user.name  "Killeshin GAA bot"
+          git config user.email "actions@github.com"
+          git add index.html killeshin-all.ics killeshin-men.ics killeshin-ladies.ics killeshin-home.ics
+
+          if git diff --staged --quiet; then
+            echo "Nothing changed."
+            exit 0
+          fi
+          git commit -m "Update $(date -u +'%Y-%m-%d %H:%M')"
+
+          # If anything was committed to the repo while this job was running -
+          # an upload from a phone, say - the push is rejected. Rebase onto
+          # whatever arrived and try again.
+          for attempt in 1 2 3; do
+            if git push; then
+              echo "Pushed on attempt $attempt."
+              exit 0
+            fi
+            echo "Push rejected, someone else committed first. Rebasing..."
+            git fetch origin main
+            if ! git rebase origin/main; then
+              git rebase --abort
+              echo "The app file changed underneath this run, so its work is dropped."
+              echo "The next hourly run starts fresh and will pick it all up."
+              exit 0
+            fi
+          done
+          echo "Could not push after 3 tries. The next run will catch up."
+          exit 0
