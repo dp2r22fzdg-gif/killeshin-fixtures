@@ -65,7 +65,8 @@ CLUB_LINKS = [
      "url": "https://laoislgfa.ie/"},
 ]
 
-GRADE_ORDER = ["Senior", "Intermediate", "Junior", "Adult League", "Minor",
+GRADE_ORDER = ["Senior", "Intermediate", "Junior A", "Junior C", "Junior",
+               "Kelly Cup", "Adult League", "Minor",
                "U20", "U17", "U16", "U15", "U14", "U13", "U12", "Féile"]
 MONTHS = {m: i for i, m in enumerate(
     ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"], 1)}
@@ -120,18 +121,47 @@ def clean(node):
     return re.sub(r"\s+", " ", node.get_text(" ", strip=True)) if node else ""
 
 
-def grade_of(comp):
+def grade_of(comp, branch="men"):
+    """
+    Which club team a competition belongs to.
+
+    Each adult team plays a championship and a league, and they need to count
+    as one team, not two:
+        Senior    - Senior Championship  + ACFL Division 2
+        Junior A  - Junior Championship  + ACFL Division 4
+        Junior C  - Junior C Championship + ACFL Division 7
+    """
     c = (comp or "").lower()
+
     for n in ("20", "17", "16", "15", "14", "13", "12"):
         if re.search(r"\bu-?%s\b|under[\s-]*%s\b" % (n, n), c):
             return "U" + n
     if "féile" in c or "feile" in c:
         return "Féile"
-    for word, grade in (("minor", "Minor"), ("intermediate", "Intermediate"),
-                        ("junior", "Junior"), ("senior", "Senior")):
-        if word in c:
-            return grade
-    if "acfl" in c or "kelly cup" in c or "division" in c or "league" in c:
+    if "minor" in c:
+        return "Minor"
+
+    if branch == "men":
+        if "junior c" in c or re.search(r"acfl division 7\b", c):
+            return "Junior C"
+        if re.search(r"acfl division 4\b", c):
+            return "Junior A"
+        if "junior" in c:
+            return "Junior A"
+        if re.search(r"acfl division 2\b", c) or "senior" in c:
+            return "Senior"
+        if "kelly cup" in c:
+            return "Kelly Cup"
+    else:
+        # Ladies: first team is Intermediate, second is Junior B.
+        if re.search(r"division 2\b", c) or "intermediate" in c:
+            return "Intermediate"
+        if re.search(r"division 4\b", c) or "junior" in c:
+            return "Junior"
+        if "senior" in c:
+            return "Senior"
+
+    if "division" in c or "league" in c or "cup" in c:
         return "Adult League"
     return "Other"
 
@@ -211,7 +241,7 @@ def parse_match(block, date, club, branch):
     home, away = teams[0], teams[1]
 
     return {"date": date, "time": times[0] if times else "TBC",
-            "competition": tidy(comp), "grade": grade_of(comp), "branch": branch,
+            "competition": tidy(comp), "grade": grade_of(comp, branch), "branch": branch,
             "home": home, "away": away,
             "homeScore": scores[0] if len(scores) >= 2 else None,
             "awayScore": scores[1] if len(scores) >= 2 else None,
@@ -289,7 +319,7 @@ def parse_tables(soup, club, branch):
             except (ValueError, IndexError):
                 continue
         if rows and any(r["team"] == club for r in rows):
-            out.append({"competition": tidy(name), "grade": grade_of(name),
+            out.append({"competition": tidy(name), "grade": grade_of(name, branch),
                         "branch": branch, "rows": rows})
     return out
 
