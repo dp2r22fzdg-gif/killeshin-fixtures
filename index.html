@@ -374,7 +374,17 @@ function br(b){ var B = DATA.branches || {}; return B[b] || B.men ||
 function ourName(b){ return br(b).team; }
 function label(n,b){ return n===ourName(b) ? 'Killeshin' : n; }
 function atHome(m){ return (m.venue||'').indexOf('Killeshin') > -1; }
-function upcoming(){ return DATA.fixtures.filter(function(f){ return daysAway(f.date) >= 0; }); }
+/* A match stays up while it is being played, then drops off about two hours
+   after throw-in. Comparing dates alone left this morning's game sitting
+   there as "next match" until midnight. */
+function startOf(m){
+  var p = m.date.split('-');
+  var t = /^\d{1,2}:\d{2}$/.test(m.time) ? m.time.split(':') : ['23','59'];
+  return new Date(+p[0], p[1]-1, +p[2], +t[0], +t[1]).getTime();
+}
+/* Once throw-in passes, that game is no longer "next" - move straight on. */
+function stillOn(m){ return Date.now() < startOf(m); }
+function upcoming(){ return DATA.fixtures.filter(stillOn); }
 function mixed(){ return branch === 'all'; }
 function crestOf(b){ return br(b).crest; }
 
@@ -428,8 +438,10 @@ function renderNext(){
     hero.style.setProperty('--crest', 'url(' + crestOf(f.branch) + ')');
     document.getElementById('heroLbl').textContent =
       mixed() ? (f.branch==='men' ? "Next match \u00b7 Men's" : 'Next match \u00b7 Ladies') : 'Next match';
+    var mins = Math.round((startOf(f) - Date.now()) / 60000);
     document.getElementById('heroCd').textContent =
-      n===0 ? 'Today' : n===1 ? 'Tomorrow' : 'In ' + n + ' days';
+      mins <= 60 ? (mins <= 1 ? 'Starting now' : 'In ' + mins + ' min') :
+      n === 0 ? 'Today' : n === 1 ? 'Tomorrow' : 'In ' + n + ' days';
 
     document.getElementById('sideA').innerHTML =
       '<img src="'+esc(crestOf(f.branch))+'" alt=""><b>Killeshin</b>';
@@ -869,6 +881,12 @@ function boot(){
 }
 boot();
 counter();
+
+/* Tick every half minute: refreshes the countdown, and rolls straight on to
+   the following game the moment throw-in passes - no reload needed. */
+setInterval(function(){
+  try { renderNext(); if(view === 'fixtures') draw(); } catch(err){ console.error(err); }
+}, 30000);
 
 /* Data lives in the seed block above. update.py rewrites it in place, so
    there is no second file to fall out of step with this one. */
