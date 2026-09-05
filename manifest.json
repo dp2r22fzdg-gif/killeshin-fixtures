@@ -1,0 +1,17 @@
+{
+  "name": "Killeshin GAA \u2014 Fixtures, Results & News",
+  "short_name": "Killeshin GAA",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#0B3D24",
+  "description": "Every Killeshin fixture, result, table and news story \u2014 men's and ladies.",
+  "icons": [
+    {
+      "src": "crest.png",
+      "sizes": "583x600",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}
