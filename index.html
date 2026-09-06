@@ -1,0 +1,893 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Killeshin GAA — Fixtures, Results &amp; News</title>
+<meta name="description" content="Every Killeshin fixture, result, league table and news story — men's and ladies, senior down to U12. Updated hourly.">
+<meta name="theme-color" content="#1A7A48">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Killeshin GAA">
+<link rel="apple-touch-icon" href="crest.png">
+<link rel="icon" href="crest.png">
+<link rel="manifest" href="manifest.json">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<!-- GoatCounter: visitor stats at https://killeshin.goatcounter.com
+     No cookies, so no consent banner needed. -->
+<script data-goatcounter="https://killeshin.goatcounter.com/count"
+        async src="//gc.zgo.at/count.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Archivo:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>:root{--forest:#073d25;--forest-2:#0b5a35;--green:#19c36a;--green-2:#0d8f4c;--mint:#eaf8f0;--ink:#102019;--muted:#64736b;--paper:#fff;--bg:#f4f7f5;--line:#dce6e0;--shadow:0 14px 35px rgba(6,55,32,.10);--shadow-sm:0 5px 18px rgba(6,55,32,.08);--r:24px;--r-sm:16px;--crest:url(crest.png)}
+*{box-sizing:border-box}[hidden]{display:none!important}html{-webkit-text-size-adjust:100%;scroll-behavior:smooth}body{margin:0;background:var(--bg);color:var(--ink);font-family:Archivo,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased;padding-bottom:env(safe-area-inset-bottom)}body:before{content:"";position:fixed;inset:0;pointer-events:none;background:radial-gradient(circle at 90% 5%,rgba(25,195,106,.08),transparent 26%),radial-gradient(circle at 0% 40%,rgba(7,61,37,.05),transparent 25%);z-index:-1}h1,h2,h3{margin:0}button{font:inherit;color:inherit;cursor:pointer;border:0;background:none}a{color:inherit;text-decoration:none}:focus-visible{outline:3px solid var(--green);outline-offset:3px;border-radius:12px}.dsp{font-family:'Bricolage Grotesque',Archivo,sans-serif;font-weight:800;letter-spacing:-.045em;line-height:1.02}.lbl{font-size:11px;font-weight:800;letter-spacing:.14em;text-transform:uppercase}.num{font-variant-numeric:tabular-nums;font-feature-settings:"tnum" 1}
+.mast{position:relative;isolation:isolate;overflow:hidden;background:linear-gradient(135deg,#052d1c 0%,#07512f 58%,#0c7040 100%);color:#fff;padding:calc(24px + env(safe-area-inset-top)) 20px 58px;border-radius:0 0 34px 34px;display:flex;align-items:center;gap:16px;box-shadow:0 18px 35px rgba(3,47,27,.18)}.mast:before{content:"";position:absolute;right:-90px;top:-110px;width:330px;height:330px;border:55px solid rgba(255,255,255,.045);border-radius:50%;box-shadow:0 0 0 28px rgba(255,255,255,.025),0 0 0 90px rgba(255,255,255,.018);z-index:-1}.mast:after{content:"";position:absolute;right:18px;bottom:-34px;width:145px;height:210px;background:var(--crest) center/contain no-repeat;filter:brightness(0) invert(1);opacity:.07;transform:rotate(-7deg);z-index:-1}.mast .badge{width:74px;height:74px;flex:none;background:#fff;border:4px solid rgba(255,255,255,.25);border-radius:50%;display:grid;place-items:center;padding:7px;box-shadow:0 8px 22px rgba(0,0,0,.18)}.mast .badge img{width:100%;height:100%;object-fit:contain}.mast h1{font-size:27px;font-weight:800;letter-spacing:-.035em}.mast span{display:block;font-size:11px;font-weight:800;letter-spacing:.19em;text-transform:uppercase;color:#bdebd1;margin-top:7px}.mast div:before{content:"MATCH CENTRE";display:block;font-size:10px;letter-spacing:.2em;font-weight:800;color:#56e596;margin-bottom:6px}
+.branch{position:relative;z-index:3;display:flex;gap:10px;padding:0 16px 5px;margin-top:-28px}.br{flex:1;min-height:92px;background:rgba(255,255,255,.96);border:1px solid #d8e6de;border-radius:20px;padding:12px 7px 10px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;font-size:14px;font-weight:800;color:var(--forest-2);box-shadow:var(--shadow-sm);transition:.18s ease}.br:active{transform:translateY(2px)}.br img{width:38px;height:38px;object-fit:contain;opacity:.58}.br .dual{display:flex;width:42px;height:38px;align-items:center;justify-content:center}.br .dual img{width:28px;height:28px;margin:0 -4px}.br[aria-pressed="true"]{background:linear-gradient(145deg,#08663a,#063b24);border-color:#063b24;color:#fff;box-shadow:0 10px 24px rgba(5,74,42,.24),inset 0 1px 0 rgba(255,255,255,.12);transform:translateY(-2px)}.br[aria-pressed="true"] img{opacity:1;filter:brightness(0) invert(1)}
+.wrap{padding:16px 16px 0}.hero{background:linear-gradient(145deg,#063b24 0%,#075a34 55%,#07351f 100%);color:#fff;border-radius:var(--r);padding:22px;position:relative;overflow:hidden;box-shadow:0 18px 36px rgba(5,69,39,.2)}.hero:before{content:"";position:absolute;right:-95px;top:-95px;width:280px;height:280px;border:1px solid rgba(255,255,255,.11);border-radius:50%;box-shadow:0 0 0 34px rgba(255,255,255,.035),0 0 0 72px rgba(255,255,255,.02)}.hero:after{content:"";position:absolute;right:-28px;bottom:-50px;width:220px;height:220px;background:var(--crest) center/contain no-repeat;filter:brightness(0) invert(1);opacity:.065;transform:rotate(-8deg);pointer-events:none}.hero>*{position:relative;z-index:1}.hero .cap{display:flex;justify-content:space-between;align-items:center;gap:10px}.hero .cap .lbl{color:#8feab8}.hero .cap .cd{background:#1ac56b;color:#052d1b;font-size:11px;font-weight:900;padding:7px 12px;border-radius:999px;white-space:nowrap;letter-spacing:.04em;box-shadow:0 5px 14px rgba(0,0,0,.14)}.vs{margin:22px 0 0}.vs .side{display:flex;align-items:center;gap:13px;padding:7px 0}.vs .side img{width:42px;height:42px;object-fit:contain;flex:none;filter:brightness(0) invert(1);opacity:.98}.vs .side .dot{width:42px;height:42px;flex:none;border-radius:50%;background:rgba(255,255,255,.13);display:grid;place-items:center;font-size:12px;font-weight:900;color:#bcefd2}.vs .side b{font-size:28px;font-family:'Bricolage Grotesque',Archivo,sans-serif;font-weight:800;letter-spacing:-.045em;line-height:1.02}.vs .side.them b{font-weight:600;color:#d9f2e4}.hero .facts{margin-top:19px;padding-top:17px;border-top:1px solid rgba(255,255,255,.16);display:grid;grid-template-columns:1fr;gap:10px}.fact{display:flex;gap:10px;align-items:flex-start;font-size:14px;line-height:1.45}.fact .k{width:22px;flex:none;text-align:center;opacity:.82;font-size:14px}.fact b{font-weight:800}.fact a{text-decoration:underline;text-underline-offset:3px}.hero .dir{background:#eaf8f0;color:#08663a;margin-top:15px}.hero .wx{margin-top:15px;background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.13);border-radius:15px;padding:12px 14px;font-size:14px;display:flex;gap:10px;align-items:center;line-height:1.4}.hero .wx[hidden]{display:none}.hero .wx .ico{font-size:20px;flex:none}.hero .wx .soft{opacity:.72}
+.athome{margin:12px 16px 0;background:#fff;border:1px solid #e0ebe5;border-radius:var(--r);padding:16px;display:flex;gap:14px;align-items:center;box-shadow:var(--shadow-sm)}.athome:after{content:"›";margin-left:auto;font-size:30px;color:var(--green-2)}.athome img{width:48px;height:48px;object-fit:contain;flex:none}.athome .lbl{color:var(--green-2)}.athome .l{font-size:17px;font-weight:800;margin-top:3px}.athome .s{font-size:13.5px;color:var(--muted);font-weight:500;margin-top:1px}
+.nav{position:sticky;top:0;z-index:30;background:rgba(244,247,245,.94);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);padding-top:12px;border-bottom:1px solid rgba(220,230,224,.75)}.tabs{display:flex;gap:8px;margin:0 16px;padding:0 0 10px;overflow-x:auto;scrollbar-width:none}.tabs::-webkit-scrollbar{display:none}.tab{flex:none;white-space:nowrap;padding:10px 15px;border-radius:999px;font-size:13px;font-weight:800;letter-spacing:.01em;background:#fff;color:var(--forest-2);border:1px solid #d9e5df;box-shadow:0 3px 9px rgba(6,55,32,.06);transition:.16s}.tab[aria-selected="true"]{background:var(--forest);color:#fff;border-color:var(--forest);box-shadow:0 5px 14px rgba(6,61,37,.18)}.filters{display:flex;gap:8px;overflow-x:auto;padding:1px 16px 11px;scrollbar-width:none;align-items:center}.filters::-webkit-scrollbar{display:none}.filters[hidden]{display:none}.chip,.home-t{flex:none;font-size:13px;font-weight:700;color:var(--forest-2);white-space:nowrap;padding:7px 13px;border-radius:999px;background:var(--mint);border:1px solid #cce3d6}.chip[aria-pressed="true"]{background:#d0f0dc;color:#064c2b;border-color:#a9d8bc}.home-t{background:#fff;box-shadow:0 2px 7px rgba(6,55,32,.05)}.home-t[aria-pressed="true"]{background:var(--green-2);color:#fff;border-color:var(--green-2)}
+main{padding:8px 16px 28px}.dayhead{font-size:11px;font-weight:900;letter-spacing:.13em;text-transform:uppercase;color:#718078;padding:20px 4px 9px}.dayhead.soon{color:var(--green-2)}.card{background:#fff;border:1px solid #e1eae5;border-radius:18px;padding:15px 16px;margin-bottom:10px;box-shadow:var(--shadow-sm);position:relative;overflow:hidden;transition:.15s}.card:active{transform:scale(.995)}.card.hm:before,.card.win:before,.card.loss:before,.card.draw:before{content:"";position:absolute;left:0;top:0;bottom:0;width:5px}.card.hm:before,.card.win:before{background:var(--green)}.card.loss:before{background:#cfd9d4}.card.draw:before{background:#7c8982}.card.hm,.card.win,.card.loss,.card.draw{padding-left:19px}.row{display:flex;gap:15px}.row .time{font-size:16px;font-weight:900;min-width:48px;flex:none;padding-top:1px}.row .mid{flex:1;min-width:0}.row .mid .tt{font-size:16.5px;font-weight:600;line-height:1.4}.row .mid .tt b{font-weight:900}.row .mid .sub{font-size:13px;color:var(--muted);margin-top:5px;line-height:1.5}.dir{display:inline-flex;align-items:center;gap:5px;color:#08703c;font-weight:800;background:var(--mint);padding:5px 10px;border-radius:999px;margin-top:8px;font-size:12.5px}.bm{display:inline-block;font-size:10px;font-weight:900;letter-spacing:.07em;padding:3px 8px;border-radius:999px;margin-right:7px;vertical-align:1px}.bm.men{background:var(--forest);color:#fff}.bm.ladies{background:var(--green-2);color:#fff}.sl{display:flex;justify-content:space-between;align-items:baseline;gap:14px;padding:3px 0}.sl .n{font-size:16px;font-weight:600;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.sl.w .n{color:var(--ink);font-weight:800}.sl .s{font-size:21px;flex:none;color:var(--muted);font-weight:600}.sl.w .s{color:var(--ink);font-weight:800}.sl .s em{font-style:normal;font-size:12px;font-weight:700;color:#8a9791;margin-left:7px}.form{display:flex;align-items:center;gap:7px;margin-top:5px}.form .lbl{color:#89968f;font-size:10px}.form i{width:24px;height:24px;border-radius:50%;font-style:normal;font-size:11px;font-weight:900;display:grid;place-items:center;color:#fff}.form i.W{background:var(--green-2)}.form i.L{background:#d5ddd8;color:#627068}.form i.D{background:#7b8982}
+.tbl{background:#fff;border:1px solid #e0e9e4;border-radius:20px;margin-bottom:11px;overflow:hidden;box-shadow:var(--shadow-sm)}.tbl .hd{padding:18px 18px 13px}.tbl .hd h3{font-size:18px;line-height:1.3}.tbl .hd .lbl{color:var(--green-2);margin-bottom:7px;display:block}table{width:100%;border-collapse:collapse;font-size:14px}th{font-size:10.5px;font-weight:900;letter-spacing:.06em;text-transform:uppercase;color:#87948d;text-align:right;padding:9px 3px;background:#f4f7f5}th.t,td.t{text-align:left;width:100%;padding-left:18px}td.t{font-weight:600}th.p,td.p{padding-right:18px}td{padding:12px 3px;text-align:right;border-top:1px solid #e8eeeb;color:#6b7771}td.t,td.p{color:var(--ink)}td.p{font-weight:900}tr.us td{background:#eaf8f0;color:#0b5732;font-weight:900}
+.sb{background:linear-gradient(145deg,#063b24,#0a6940);color:#fff;border-radius:var(--r);padding:20px;margin-bottom:11px;position:relative;overflow:hidden;box-shadow:0 16px 30px rgba(6,73,41,.18)}.sb:after{content:"";position:absolute;right:-50px;bottom:-55px;width:205px;height:205px;background:var(--crest) center/contain no-repeat;filter:brightness(0) invert(1);opacity:.065}.sb>*{position:relative;z-index:1}.sb .lbl{color:#9ce9bd;display:block;margin-bottom:14px}.sb .big{display:flex;gap:9px}.sb .big div{flex:1;background:rgba(255,255,255,.11);border-radius:16px;padding:14px 8px;text-align:center}.sb .big div.wins{background:#fff;color:#08663a}.sb .big u{display:block;font-family:'Bricolage Grotesque',Archivo,sans-serif;font-weight:800;font-size:35px;line-height:1;text-decoration:none}.sb .big span{display:block;font-size:10px;font-weight:900;letter-spacing:.12em;text-transform:uppercase;margin-top:7px;opacity:.82}.sb .tot{margin-top:14px;font-size:13.5px;color:#ccefdc}.sb .tot b{color:#fff}.gr{cursor:pointer;background:#fff;border:1px solid #e0e9e4;border-radius:18px;padding:15px 17px;margin-bottom:9px;box-shadow:var(--shadow-sm);display:flex;align-items:center;gap:14px}.gr .nm{flex:1;min-width:0}.gr .nm b{display:block;font-size:16.5px;font-weight:800}.gr .nm span{display:block;font-size:13px;color:var(--muted);margin-top:2px}.gr .w{flex:none;text-align:center;min-width:56px}.gr .w u{display:block;font-family:'Bricolage Grotesque',Archivo,sans-serif;font-weight:800;font-size:28px;line-height:1;text-decoration:none;color:var(--green-2)}.gr .w span{display:block;font-size:9.5px;font-weight:900;letter-spacing:.11em;text-transform:uppercase;color:#8a9791;margin-top:3px}.gr .go{flex:none;display:flex;align-items:center;gap:5px;font-size:10.5px;font-weight:900;letter-spacing:.05em;text-transform:uppercase;color:#08703c;background:var(--mint);border-radius:999px;padding:6px 10px}.gr .go em{font-style:normal;font-size:14px;transition:transform .15s}.gr[aria-expanded="true"] .go{background:var(--forest);color:#fff}.gr[aria-expanded="true"] .go em{transform:rotate(90deg)}.an{background:#fff;border:1px solid #e0e9e4;border-top:0;border-radius:0 0 18px 18px;padding:2px 17px 18px;margin:-10px 0 9px;box-shadow:var(--shadow-sm)}.an .rate{display:flex;align-items:center;gap:13px;padding:14px 0 16px;border-top:1px solid #edf2ef}.an .rate u{font-family:'Bricolage Grotesque',Archivo,sans-serif;font-weight:800;font-size:31px;text-decoration:none;line-height:1;color:var(--green-2)}.an .rate u i{font-style:normal;font-size:15px;color:#8a9791}.an .rate .bar{flex:1;height:9px;border-radius:999px;background:#e8efeb;overflow:hidden}.an .rate .bar span{display:block;height:100%;background:var(--green-2);border-radius:999px}.an .grid{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:15px}.an .cell{background:#f4f7f5;border-radius:14px;padding:11px 13px}.an .cell b{display:block;font-family:'Bricolage Grotesque',Archivo,sans-serif;font-weight:800;font-size:19px}.an .cell span{display:block;font-size:10.5px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:#8a9791;margin-top:4px}.an h4{font-size:11px;font-weight:900;letter-spacing:.1em;text-transform:uppercase;color:var(--green-2);margin:0 0 8px}.an p{margin:0 0 15px;font-size:14px;line-height:1.6}.an .note,.an .standing{font-size:12.5px;color:#7c8982;line-height:1.55;margin:0}.an .standing{font-size:14px;color:var(--muted);margin-bottom:15px}.an .standing b{color:var(--ink)}.an .pill{display:inline-block;font-size:11.5px;font-weight:800;padding:4px 9px;border-radius:999px;background:var(--mint);color:#08663a;margin:0 5px 5px 0}.an .pill.bad{background:#f3eee6;color:#795d28}
+.sec{padding:20px 4px 10px}.sec h2{font-size:20px}.sec .lbl{color:var(--green-2);display:block;margin-bottom:8px}.sec p{margin:8px 0 0;font-size:14px;color:var(--muted)}.story{display:block;background:#fff;border:1px solid #e0e9e4;border-radius:18px;padding:16px 18px;margin-bottom:10px;box-shadow:var(--shadow-sm)}.story h3{font-size:17px;font-weight:650;line-height:1.45}.story.lead h3{font-size:22px;font-weight:800;line-height:1.22;letter-spacing:-.03em;font-family:'Bricolage Grotesque',Archivo,sans-serif}.story .by{margin-top:10px;font-size:12px;color:#7d8983;font-weight:600}.story .by b{color:var(--green-2);font-weight:800}.story .by s{text-decoration:none;color:#9aa59f}.paid .story{background:#edf3ef;box-shadow:none}.panel{background:#fff;border:1px solid #e0e9e4;border-radius:20px;padding:20px;margin-bottom:11px;box-shadow:var(--shadow-sm)}.panel .lbl{color:var(--green-2);display:block;margin-bottom:9px}.panel h2{font-size:21px;margin-bottom:9px}.panel p{margin:0 0 16px;font-size:14px;color:var(--muted);line-height:1.6}.panel p b{color:var(--ink)}.btn{display:block;background:var(--forest);color:#fff;text-align:center;padding:15px;font-size:15px;font-weight:800;border-radius:13px;margin-bottom:11px;box-shadow:0 4px 0 #032d1b}.btn.alt{background:var(--mint);color:#08663a;border:1px solid #cde4d7;box-shadow:none}.fine{font-size:12.5px;color:#89958f;line-height:1.6}.act{display:flex;align-items:center;gap:14px;background:#fff;border:1px solid #e0e9e4;border-radius:18px;padding:15px 17px;margin-bottom:10px;box-shadow:var(--shadow-sm)}.act .ic{width:45px;height:45px;flex:none;border-radius:14px;background:var(--mint);display:grid;place-items:center;font-size:17px;font-weight:900;color:#08703c}.act .tx{flex:1;min-width:0}.act .tx b{display:block;font-size:16px;font-weight:800}.act .tx span{display:block;font-size:13px;color:var(--muted);margin-top:2px;line-height:1.4}.act .go{flex:none;font-size:21px;color:var(--green-2)}.sub{display:flex;gap:8px;padding:14px 4px 6px}.sub button{flex:1;padding:10px 6px;border-radius:12px;font-size:13px;font-weight:800;background:#fff;color:#08703c;border:1px solid #d6e5dc}.sub button[aria-pressed="true"]{background:var(--forest);color:#fff;border-color:var(--forest)}.mgroup{padding:20px 4px 8px}.mgroup .lbl{color:var(--green-2);display:block;margin-bottom:4px}.mgroup p{margin:5px 0 0;font-size:13px;color:var(--muted)}.clubfacts{background:#fff;border:1px solid #e0e9e4;border-radius:20px;padding:18px;margin-bottom:10px;box-shadow:var(--shadow-sm)}.clubfacts dl{margin:0;display:grid;grid-template-columns:auto 1fr;gap:8px 16px}.clubfacts dt{font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#8b9791}.clubfacts dd{margin:0;font-size:15px;font-weight:650}.clubfacts h4{font-size:11px;font-weight:900;letter-spacing:.1em;text-transform:uppercase;color:var(--green-2);margin:18px 0 9px}.clubfacts ul{margin:0;padding:0;list-style:none}.clubfacts li{font-size:14px;line-height:1.5;padding:8px 0 8px 20px;position:relative;border-top:1px solid #e7eee9}.clubfacts li:before{content:"";position:absolute;left:2px;top:15px;width:7px;height:7px;border-radius:50%;background:var(--green)}.empty{padding:50px 25px 58px;text-align:center;color:var(--muted)}.empty img{width:60px;height:60px;object-fit:contain;opacity:.18;margin:0 auto 16px;display:block}.empty b{display:block;color:var(--ink);font-size:18px;margin-bottom:7px;font-family:'Bricolage Grotesque',Archivo,sans-serif}.empty span{font-size:14px;line-height:1.55;display:block;max-width:300px;margin:0 auto}.foot{position:relative;overflow:hidden;background:linear-gradient(145deg,#052f1d,#063d25);color:#cfeedd;margin:8px 0 0;padding:30px 20px calc(34px + env(safe-area-inset-bottom));border-radius:30px 30px 0 0;font-size:12.5px;line-height:1.7;display:flex;gap:15px;align-items:flex-start}.foot:after{content:"";position:absolute;right:-30px;bottom:-55px;width:180px;height:180px;border:35px solid rgba(25,195,106,.15);transform:rotate(20deg)}.foot img{width:48px;height:48px;object-fit:contain;flex:none;filter:brightness(0) invert(1);opacity:.75}.foot a,.foot b{color:#fff;font-weight:700}.count{display:inline-flex;align-items:center;gap:7px;background:rgba(255,255,255,.12);border-radius:999px;padding:5px 12px;margin-top:9px;font-size:12px;font-weight:700;color:#fff}.count[hidden]{display:none}.count img{height:19px;display:block;border-radius:4px}@media(min-width:620px){body{max-width:680px;margin:0 auto;box-shadow:0 0 60px rgba(6,55,32,.06)}.mast{padding-left:28px;padding-right:28px}.branch,.wrap{padding-left:22px;padding-right:22px}.branch{margin-top:-30px}.vs .side b{font-size:32px}.tabs,.filters{margin-left:22px;margin-right:22px}main{padding-left:22px;padding-right:22px}.athome{margin-left:22px;margin-right:22px}}
+</style>
+</head>
+<body>
+
+<header class="mast">
+  <span class="badge"><img id="mastCrest" src="crest.png" alt="Killeshin GAA crest"></span>
+  <div><h1>Killeshin GAA<span id="mastSub">Men and Ladies</span></h1></div>
+</header>
+
+<nav class="branch" id="branch" aria-label="Choose a branch">
+  <button class="br" data-b="all" aria-pressed="true">
+    <span class="dual"><img src="crest.png" alt=""><img src="crest-ladies.png" alt=""></span>All</button>
+  <button class="br" data-b="men" aria-pressed="false">
+    <img src="crest.png" alt="">Men</button>
+  <button class="br" data-b="ladies" aria-pressed="false">
+    <img src="crest-ladies.png" alt="">Ladies</button>
+</nav>
+
+<div class="wrap">
+  <section class="hero" id="hero" hidden>
+    <div class="cap"><span class="lbl" id="heroLbl">Next match</span><span class="cd" id="heroCd"></span></div>
+    <div class="vs">
+      <div class="side" id="sideA"></div>
+      <div class="side them" id="sideB"></div>
+    </div>
+    <div class="facts" id="heroFacts"></div>
+    <div class="wx" id="heroWx" hidden></div>
+  </section>
+</div>
+
+<section class="athome" id="athome" hidden>
+  <img id="ahCrest" src="crest.png" alt="">
+  <div>
+    <span class="lbl">Next at home</span>
+    <div class="l" id="ahLine"></div>
+    <div class="s num" id="ahSub"></div>
+    <div class="s" id="ahWx" style="margin-top:4px"></div>
+  </div>
+</section>
+
+<div class="nav">
+  <div class="tabs" role="tablist">
+    <button class="tab" role="tab" aria-selected="true"  data-view="fixtures">Fixtures</button>
+    <button class="tab" role="tab" aria-selected="false" data-view="results">Results</button>
+    <button class="tab" role="tab" aria-selected="false" data-view="tables">Tables</button>
+    <button class="tab" role="tab" aria-selected="false" data-view="record">Record</button>
+    <button class="tab" role="tab" aria-selected="false" data-view="news">News</button>
+    <button class="tab" role="tab" aria-selected="false" data-view="alerts">Alerts</button>
+    <button class="tab" role="tab" aria-selected="false" data-view="club">Club</button>
+  </div>
+  <div class="filters" id="filters"></div>
+</div>
+
+<main id="out"></main>
+
+<div class="foot">
+  <img src="crest.png" alt="">
+  <div>
+    <span id="stamp"></span>
+    <br><span class="count" id="count" hidden></span>
+    <br><span style="opacity:.55;font-size:11.5px">Build 2 • Sport Edition</span>
+  </div>
+</div>
+
+<script id="seed" type="application/json">{"club":{"links":[{"group":"Support the club","mark":"€","title":"Play the club lotto","note":"Pick your numbers online — Clubforce","url":"https://killeshingaa.clubforce.com/products/lotto/killeshin-gaa"},{"group":"Support the club","mark":"M","title":"Pay your membership","note":"Sign in to Foireann, then find Killeshin","url":"https://www.foireann.ie/"},{"group":"Follow the club","mark":"L","title":"Laois GAA","note":"County board — men's fixtures and results","url":"https://laoisgaa.ie/"},{"group":"Follow the club","mark":"L","title":"Laois LGFA","note":"County board — ladies fixtures and results","url":"https://laoislgfa.ie/"}],"media":[{"kind":"video","title":"Clubber TV — every Killeshin game","note":"Highlights of every championship match they film, newest first","url":"https://www.youtube.com/@clubbertvsports/search?query=Killeshin"},{"kind":"video","title":"Killeshin on TikTok","note":"@killeshin.gaa — the club’s own videos, 1,900 followers","url":"https://www.tiktok.com/@killeshin.gaa"},{"kind":"video","title":"Clubber.ie — full matches","note":"The complete games, not just highlights. Subscription needed.","url":"https://www.clubber.ie/"},{"kind":"video","title":"Killeshin v Rosenallis — SFC Round 2","note":"Highlights, 7 August 2026","url":"https://www.youtube.com/watch?v=quXSGaRA0gg"},{"kind":"video","title":"Killeshin v Stradbally — SFC Round 1","note":"Highlights, 22 July 2026","url":"https://www.youtube.com/watch?v=WIAOJlITbOM"},{"kind":"video","title":"Anything else on YouTube","note":"A wider search, newest first","url":"https://www.youtube.com/results?search_query=%22Killeshin%22+GAA&sp=CAI%253D"},{"kind":"read","title":"All Killeshin news, every paper","note":"One list, newest first, across every title that covers the club","url":"https://news.google.com/search?q=Killeshin%20GAA%20OR%20%22Killeshin%22%20Laois&hl=en-IE&gl=IE&ceid=IE:en"},{"kind":"read","title":"LaoisToday — Killeshin archive","note":"Years of match reports","url":"https://www.laoistoday.ie/tag/killeshin/"},{"kind":"read","title":"LaoisToday — Killeshin GAA archive","note":"Club news rather than match reports","url":"https://www.laoistoday.ie/tag/killeshin-gaa/"},{"kind":"read","title":"Leinster Express — Killeshin only","note":"Free to read. Covers the ladies team too.","url":"https://www.google.com/search?q=site%3Aleinsterexpress.ie+Killeshin&tbs=sbd%3A1"},{"kind":"read","title":"Laois Nationalist — Killeshin only","note":"Free to read","url":"https://www.google.com/search?q=site%3Alaois-nationalist.ie+Killeshin&tbs=sbd%3A1"},{"kind":"read","title":"Carlow Nationalist — Killeshin only","note":"The club sits on the border, so worth watching","url":"https://www.google.com/search?q=site%3Acarlow-nationalist.ie+Killeshin&tbs=sbd%3A1"},{"kind":"social","title":"Killeshin GAA on Facebook","note":"2,400 followers — club news lands here first","url":"https://www.facebook.com/KilleshinGaa/"},{"kind":"social","title":"Killeshin GAA on TikTok","note":"@killeshin.gaa — 35,000 likes","url":"https://www.tiktok.com/@killeshin.gaa"},{"kind":"social","title":"Killeshin GAA on Instagram","note":"@killeshingaa","url":"https://www.instagram.com/killeshingaa/"},{"kind":"social","title":"@GaaKilleshin on X","note":"Club account, quiet since 2018","url":"https://x.com/GaaKilleshin"},{"kind":"about","title":"Killeshin GAA on Wikipedia","note":"Club history, honours and notable years","url":"https://en.wikipedia.org/wiki/Killeshin_GAA"},{"kind":"about","title":"2019 Laois Senior Championship","note":"The year Killeshin reached a first ever senior county final","url":"https://en.wikipedia.org/wiki/2019_Laois_Senior_Football_Championship"}],"facts":{"founded":"1921","ground":"Seamus Hearns Park, also called Páirc Uiseán","colours":"Green and white","honours":["Laois Intermediate Championship — 1958, 1974, 1993, 2011","Laois Junior Championship — 1957, 1969, 1981, 2008","First ever Laois Senior Championship final — 2019","Winners of RTÉ’s Celebrity Bainisteoir, 2011, managed by Tony Cascarino"]}},"clubIrish":"CLG Gleann Uiseann","county":"Laois","source":"https://laoisgaa.ie/fixtures-results/team/gleann-uiseann/6547884c-ea64-5502-8472-8eb26b092437/","updated":"2026-09-02T21:00:00+01:00","fixtures":[{"date":"2026-09-04","time":"18:30","competition":"U12 Go Games Phase 2 - White - Round 3","grade":"U12","branch":"ladies","home":"Killeshin","away":"An Fraoch","venue":"TBC","referee":"TBC","isHome":true,"opponent":"An Fraoch"},{"date":"2026-09-04","time":"19:30","competition":"Intermediate Championship - Round 4","grade":"Intermediate","branch":"ladies","home":"Ballyfin","away":"Killeshin","venue":"Ballyfin GAA","referee":"TBC","isHome":false,"opponent":"Ballyfin"},{"date":"2026-09-05","time":"12:00","competition":"U14 B League Knockout Stages - Final","grade":"U14","branch":"ladies","home":"Graiguecullen","away":"Killeshin","venue":"Annanough GAA","referee":"TBC","isHome":false,"opponent":"Graiguecullen"},{"date":"2026-09-06","time":"12:30","competition":"U17 Football \"B\" Championship - League Division 1 - Round 6","grade":"U17","home":"Ballyfin CLG","away":"Gleann Uiseann","venue":"Ballyfin GAA","referee":"Eamonn O'Connell","isHome":false,"opponent":"Ballyfin CLG","branch":"men"},{"date":"2026-09-06","time":"17:00","competition":"U13 Football \"C\" Competition - League Division 1 - Round 7","grade":"U13","home":"Gleann Uiseann","away":"Colt Shanahoe","venue":"Killeshin GAA Grounds","referee":"Pat Moran","isHome":true,"opponent":"Colt Shanahoe","branch":"men"},{"date":"2026-09-08","time":"18:30","competition":"U16 B Championship - Round 6","grade":"U16","branch":"ladies","home":"Killeshin","away":"Ballyfin","venue":"TBC","referee":"TBC","isHome":true,"opponent":"Ballyfin"},{"date":"2026-09-10","time":"18:30","competition":"U14 B Championship Knockout - Shield Semi Final 2","grade":"U14","branch":"ladies","home":"Killeshin","away":"Ballyfin","venue":"TBC","referee":"TBC","isHome":true,"opponent":"Ballyfin"},{"date":"2026-09-12","time":"11:30","competition":"U15 Football \"B\" Championship - Cup Division 1 - Semi-final","grade":"U15","home":"Ballylinan","away":"Gleann Uiseann","venue":"Ballylinan GAA Grounds","referee":"TBC","isHome":false,"opponent":"Ballylinan","branch":"men"},{"date":"2026-09-12","time":"19:00","competition":"Senior Football Championship - Quarter-final","grade":"Senior","home":"Portlaoise","away":"Gleann Uiseann","venue":"Laois Hire O'Moore Park, Portlaoise","referee":"Clifford Ward","isHome":false,"opponent":"Portlaoise","branch":"men"},{"date":"2026-09-13","time":"12:00","competition":"Junior Football Championship - Quarter-final","grade":"Junior A","home":"The Rock GAA Club","away":"Gleann Uiseann","venue":"The Rock GAA","referee":"TBC","isHome":false,"opponent":"The Rock GAA Club","branch":"men"},{"date":"2026-09-20","time":"11:30","competition":"U17 Football \"B\" Championship - League Division 1 - Round 7","grade":"U17","home":"Gleann Uiseann","away":"St Joseph's","venue":"Killeshin GAA Grounds","referee":"TBC","isHome":true,"opponent":"St Joseph's","branch":"men"},{"date":"2026-10-16","time":"19:30","competition":"Under 20 Football Championship - League Division 2 - Round 1","grade":"U20","home":"Stradbally Parish Gaels","away":"Gleann Uiseann","venue":"TBC","referee":"TBC","isHome":false,"opponent":"Stradbally Parish Gaels","branch":"men"},{"date":"2026-10-24","time":"19:00","competition":"Under 20 Football Championship - League Division 2 - Round 2","grade":"U20","home":"Gleann Uiseann","away":"Portarlington","venue":"Killeshin GAA Grounds","referee":"TBC","isHome":true,"opponent":"Portarlington","branch":"men"},{"date":"2026-11-06","time":"19:30","competition":"Under 20 Football Championship - League Division 2 - Round 3","grade":"U20","home":"Portlaoise","away":"Gleann Uiseann","venue":"TBC","referee":"TBC","isHome":false,"opponent":"Portlaoise","branch":"men"}],"results":[{"date":"2026-09-01","time":"18:30","competition":"U16 B Championship - Round 5","grade":"U16","branch":"ladies","home":"Killeshin","away":"Clonaslee St Manman's","homeScore":"3-15","awayScore":"4-12","homeTotal":24,"awayTotal":24,"venue":"Killeshin GAA","referee":"TBC","isHome":true,"opponent":"Clonaslee St Manman's","ourTotal":24,"theirTotal":24,"outcome":"D"},{"date":"2026-08-27","time":"18:30","competition":"U14 B Championship Group B - Round 2","grade":"U14","branch":"ladies","home":"Shanahoe","away":"Killeshin","homeScore":"3-13","awayScore":"2-8","homeTotal":22,"awayTotal":14,"venue":"Mountrath Community School","referee":"TBC","isHome":false,"opponent":"Shanahoe","ourTotal":14,"theirTotal":22,"outcome":"L"},{"date":"2026-08-26","time":"19:30","competition":"Junior Football Championship Group B - Round 5","grade":"Junior A","home":"St Joseph's","away":"Gleann Uiseann","homeScore":"4-12","awayScore":"1-12","homeTotal":24,"awayTotal":15,"venue":"Tony Byrne Park","referee":"Colin Bailey","isHome":false,"opponent":"St Joseph's","ourTotal":15,"theirTotal":24,"outcome":"L","branch":"men"},{"date":"2026-08-25","time":"19:00","competition":"Intermediate Championship - Round 3","grade":"Intermediate","branch":"ladies","home":"St Paul's","away":"Killeshin","homeScore":"1-8","awayScore":"4-18","homeTotal":11,"awayTotal":30,"venue":"Emo GAA","referee":"TBC","isHome":false,"opponent":"St Paul's","ourTotal":30,"theirTotal":11,"outcome":"W"},{"date":"2026-08-23","time":"16:00","competition":"Senior Football Championship - Round 3","grade":"Senior","home":"Graiguecullen GAA","away":"Gleann Uiseann","homeScore":"1-14","awayScore":"0-21","homeTotal":17,"awayTotal":21,"venue":"Laois Hire O'Moore Park, Portlaoise","referee":"Colin Bailey","isHome":false,"opponent":"Graiguecullen GAA","ourTotal":21,"theirTotal":17,"outcome":"W","branch":"men"},{"date":"2026-08-22","time":"14:00","competition":"U15 Football \"B\" Championship - League Division 1 - Round 5","grade":"U15","home":"Graiguecullen GAA","away":"Gleann Uiseann","homeScore":"4-5","awayScore":"1-11","homeTotal":17,"awayTotal":14,"venue":"Graiguecullen GAA","referee":"Johnnie Brennan","isHome":false,"opponent":"Graiguecullen GAA","ourTotal":14,"theirTotal":17,"outcome":"L","branch":"men"},{"date":"2026-08-20","time":"19:30","competition":"Junior B Championship - Group B - Round 3","grade":"Junior","branch":"ladies","home":"Killeshin","away":"St Brigids","homeScore":"3-3","awayScore":"2-11","homeTotal":12,"awayTotal":17,"venue":"Killeshin GAA","referee":"TBC","isHome":true,"opponent":"St Brigids","ourTotal":12,"theirTotal":17,"outcome":"L"},{"date":"2026-08-20","time":"18:30","competition":"U14 B Championship Group B - Round 5","grade":"U14","branch":"ladies","home":"St Paul's","away":"Killeshin","homeScore":"1-7","awayScore":"9-13","homeTotal":10,"awayTotal":40,"venue":"TBC","referee":"TBC","isHome":false,"opponent":"St Paul's","ourTotal":40,"theirTotal":10,"outcome":"W"},{"date":"2026-08-19","time":"19:15","competition":"Junior C Football Championship Group E - Round 3","grade":"Junior C","home":"Gleann Uiseann","away":"Portarlington","homeScore":"1-9","awayScore":"7-11","homeTotal":12,"awayTotal":32,"venue":"Killeshin GAA Grounds","referee":"Dominic Braonain","isHome":true,"opponent":"Portarlington","ourTotal":12,"theirTotal":32,"outcome":"L","branch":"men"},{"date":"2026-08-17","time":"19:00","competition":"U13 Football \"C\" Competition - League Division 1 - Round 6","grade":"U13","home":"Gleann Uiseann","away":"Camross GAA Club","homeScore":"9-7","awayScore":"3-1","homeTotal":34,"awayTotal":10,"venue":"Killeshin GAA Grounds","referee":"Robbie Moran","isHome":true,"opponent":"Camross GAA Club","ourTotal":34,"theirTotal":10,"outcome":"W","branch":"men"},{"date":"2026-08-17","time":"18:45","competition":"U17 Football \"B\" Championship - League Division 1 - Round 5","grade":"U17","home":"Gleann Uiseann","away":"The Harps","homeScore":"1-13","awayScore":"1-8","homeTotal":16,"awayTotal":11,"venue":"Killeshin GAA Grounds","referee":"Clifford Ward","isHome":true,"opponent":"The Harps","ourTotal":16,"theirTotal":11,"outcome":"W","branch":"men"},{"date":"2026-08-15","time":"19:00","competition":"Junior B Championship - Group B - Round 2","grade":"Junior","branch":"ladies","home":"Timahoe","away":"Killeshin","homeScore":"7-20","awayScore":"0-5","homeTotal":41,"awayTotal":5,"venue":"Timahoe GAA","referee":"TBC","isHome":false,"opponent":"Timahoe","ourTotal":5,"theirTotal":41,"outcome":"L"},{"date":"2026-08-13","time":"18:45","competition":"U15 Football \"B\" Championship - League Division 1 - Round 4","grade":"U15","home":"Gleann Uiseann","away":"Barrow Gaels","homeScore":"6-12","awayScore":"2-9","homeTotal":30,"awayTotal":15,"venue":"Killeshin GAA Grounds","referee":"Eugene Dowdall","isHome":true,"opponent":"Barrow Gaels","ourTotal":30,"theirTotal":15,"outcome":"W","branch":"men"},{"date":"2026-08-09","time":"12:00","competition":"U17 Football \"B\" Championship - League Division 1 - Round 4","grade":"U17","home":"Heath Colt Shanahoe","away":"Gleann Uiseann","homeScore":"3-5","awayScore":"8-15","homeTotal":14,"awayTotal":39,"venue":"The Heath GAA Club","referee":"Pat Moran","isHome":false,"opponent":"Heath Colt Shanahoe","ourTotal":39,"theirTotal":14,"outcome":"W","branch":"men"},{"date":"2026-08-09","time":"11:30","competition":"U13 Football \"C\" Competition - League Division 1 - Round 5","grade":"U13","home":"Portlaoise","away":"Gleann Uiseann","homeScore":"2-9","awayScore":"4-8","homeTotal":15,"awayTotal":20,"venue":"Rathleague","referee":"TBC","isHome":false,"opponent":"Portlaoise","ourTotal":20,"theirTotal":15,"outcome":"W","branch":"men"},{"date":"2026-08-07","time":"19:30","competition":"Senior Football Championship - Round 2 Qualifier","grade":"Senior","home":"Gleann Uiseann","away":"Rosenallis","homeScore":"0-13","awayScore":"1-8","homeTotal":13,"awayTotal":11,"venue":"Annanough GAA","referee":"Colin Bailey","isHome":true,"opponent":"Rosenallis","ourTotal":13,"theirTotal":11,"outcome":"W","branch":"men"},{"date":"2026-08-05","time":"19:30","competition":"Junior Football Championship Group B - Round 3","grade":"Junior A","home":"Gleann Uiseann","away":"O'Dempseys","homeScore":"2-9","awayScore":"2-15","homeTotal":15,"awayTotal":21,"venue":"Killeshin GAA Grounds","referee":"Johnnie Brennan","isHome":true,"opponent":"O'Dempseys","ourTotal":15,"theirTotal":21,"outcome":"L","branch":"men"},{"date":"2026-08-04","time":"19:30","competition":"Junior C Football Championship Group E - Round 2","grade":"Junior C","home":"Annanough","away":"Gleann Uiseann","homeScore":"3-10","awayScore":"2-3","homeTotal":19,"awayTotal":9,"venue":"Annanough GAA","referee":"Eugene Dowdall","isHome":false,"opponent":"Annanough","ourTotal":9,"theirTotal":19,"outcome":"L","branch":"men"},{"date":"2026-08-03","time":"12:30","competition":"U17 Football \"B\" Championship - League Division 1 - Round 3","grade":"U17","home":"Gleann Uiseann","away":"Ballylinan","homeScore":"4-13","awayScore":"1-3","homeTotal":25,"awayTotal":6,"venue":"Killeshin GAA Grounds","referee":"Des Cooney","isHome":true,"opponent":"Ballylinan","ourTotal":25,"theirTotal":6,"outcome":"W","branch":"men"},{"date":"2026-08-03","time":"11:00","competition":"U13 Football \"C\" Competition - League Division 1 - Round 4","grade":"U13","home":"Gleann Uiseann","away":"The Harps","homeScore":"4-14","awayScore":"0-5","homeTotal":26,"awayTotal":5,"venue":"Killeshin GAA Grounds","referee":"Robbie Moran","isHome":true,"opponent":"The Harps","ourTotal":26,"theirTotal":5,"outcome":"W","branch":"men"},{"date":"2026-07-29","time":"19:00","competition":"U15 Football \"B\" Championship - League Division 1 - Round 3","grade":"U15","home":"The Harps","away":"Gleann Uiseann","homeScore":"3-14","awayScore":"3-9","homeTotal":23,"awayTotal":18,"venue":"Cullohill","referee":"Craig Haslam","isHome":false,"opponent":"The Harps","ourTotal":18,"theirTotal":23,"outcome":"L","branch":"men"},{"date":"2026-07-28","time":"19:30","competition":"Junior C Football Championship Group E - Round 1","grade":"Junior C","home":"Gleann Uiseann","away":"Ard Lios Cill Chruis","homeScore":"1-11","awayScore":"0-10","homeTotal":14,"awayTotal":10,"venue":"Killeshin GAA Grounds","referee":"Seamus O'Shea","isHome":true,"opponent":"Ard Lios Cill Chruis","ourTotal":14,"theirTotal":10,"outcome":"W","branch":"men"},{"date":"2026-07-26","time":"10:00","competition":"U13 Football \"C\" Competition - League Division 1 - Round 3","grade":"U13","home":"Stradbally Parish Gaels","away":"Gleann Uiseann","homeScore":"2-4","awayScore":"9-8","homeTotal":10,"awayTotal":35,"venue":"Annanough GAA","referee":"Johnnie Brennan","isHome":false,"opponent":"Stradbally Parish Gaels","ourTotal":35,"theirTotal":10,"outcome":"W","branch":"men"},{"date":"2026-07-24","time":"19:30","competition":"Junior Football Championship Group B - Round 2","grade":"Junior A","home":"Stradbally","away":"Gleann Uiseann","homeScore":"1-15","awayScore":"1-13","homeTotal":18,"awayTotal":16,"venue":"Stradbally GAA","referee":"Eugene Dowdall","isHome":false,"opponent":"Stradbally","ourTotal":16,"theirTotal":18,"outcome":"L","branch":"men"},{"date":"2026-07-22","time":"19:30","competition":"Senior Football Championship - Round 1","grade":"Senior","home":"Gleann Uiseann","away":"Stradbally","homeScore":"2-16","awayScore":"2-22","homeTotal":22,"awayTotal":28,"venue":"Ratheniska","referee":"Brendan McCann","isHome":true,"opponent":"Stradbally","ourTotal":22,"theirTotal":28,"outcome":"L","branch":"men"},{"date":"2026-07-20","time":"19:00","competition":"U17 Football \"B\" Championship - League Division 1 - Round 2","grade":"U17","home":"Graiguecullen GAA","away":"Gleann Uiseann","homeScore":"1-20","awayScore":"2-6","homeTotal":23,"awayTotal":12,"venue":"Graiguecullen GAA","referee":"Johnnie Brennan","isHome":false,"opponent":"Graiguecullen GAA","ourTotal":12,"theirTotal":23,"outcome":"L","branch":"men"},{"date":"2026-07-19","time":"11:30","competition":"U13 Football \"C\" Competition - League Division 1 - Round 2","grade":"U13","home":"Gleann Uiseann","away":"Barrow Gaels","homeScore":"5-11","awayScore":"1-6","homeTotal":26,"awayTotal":9,"venue":"Killeshin GAA Grounds","referee":"Pat Moran","isHome":true,"opponent":"Barrow Gaels","ourTotal":26,"theirTotal":9,"outcome":"W","branch":"men"},{"date":"2026-07-15","time":"19:00","competition":"U15 Football \"B\" Championship - League Division 1 - Round 2","grade":"U15","home":"Gleann Uiseann","away":"Ballyfin CLG","homeScore":"8-8","awayScore":"7-5","homeTotal":32,"awayTotal":26,"venue":"Killeshin GAA Grounds","referee":"Robbie Moran","isHome":true,"opponent":"Ballyfin CLG","ourTotal":32,"theirTotal":26,"outcome":"W","branch":"men"},{"date":"2026-07-13","time":"18:30","competition":"U13 Football \"C\" Competition - League Division 1 - Round 1","grade":"U13","home":"Naomh Fiontáin Maighean Rátha","away":"Gleann Uiseann","homeScore":"2-4","awayScore":"4-15","homeTotal":10,"awayTotal":27,"venue":"St. Fintan's GAA Grounds","referee":"Peter O'Neill","isHome":false,"opponent":"Naomh Fiontáin Maighean Rátha","ourTotal":27,"theirTotal":10,"outcome":"W","branch":"men"},{"date":"2026-07-10","time":"19:30","competition":"Junior Football Championship Group B - Round 1","grade":"Junior A","home":"Gleann Uiseann","away":"An Fraoch","homeScore":"2-17","awayScore":"0-13","homeTotal":23,"awayTotal":13,"venue":"Killeshin GAA Grounds","referee":"Frank Ryder","isHome":true,"opponent":"An Fraoch","ourTotal":23,"theirTotal":13,"outcome":"W","branch":"men"},{"date":"2026-06-27","time":"19:00","competition":"ACFL Division 2 - Relegation Final","grade":"Senior","home":"Gleann Uiseann","away":"Ballyfin CLG","homeScore":"3-7","awayScore":"0-13","homeTotal":16,"awayTotal":13,"venue":"Killeshin GAA Grounds","referee":"Eamonn O'Connell","isHome":true,"opponent":"Ballyfin CLG","ourTotal":16,"theirTotal":13,"outcome":"W","branch":"men"},{"date":"2026-06-19","time":"20:00","competition":"ACFL Division 4 - Round 7","grade":"Junior A","home":"Gleann Uiseann","away":"Stradbally","homeScore":"1-17","awayScore":"1-11","homeTotal":20,"awayTotal":14,"venue":"Killeshin GAA Grounds","referee":"Seamus O'Shea","isHome":true,"opponent":"Stradbally","ourTotal":20,"theirTotal":14,"outcome":"W","branch":"men"},{"date":"2026-06-19","time":"18:30","competition":"U13 Football League Division 2A - Shield Final","grade":"U13","home":"Gleann Uiseann","away":"Mountmellick","homeScore":"6-15","awayScore":"1-8","homeTotal":33,"awayTotal":11,"venue":"Killeshin GAA Grounds","referee":"Pat Moran","isHome":true,"opponent":"Mountmellick","ourTotal":33,"theirTotal":11,"outcome":"W","branch":"men"},{"date":"2026-06-12","time":"20:00","competition":"ACFL Division 2 - Round 7","grade":"Senior","home":"O'Dempseys","away":"Gleann Uiseann","homeScore":"3-16","awayScore":"1-4","homeTotal":25,"awayTotal":7,"venue":"O'Dempsey's GAA","referee":"Brendan McCann","isHome":false,"opponent":"O'Dempseys","ourTotal":7,"theirTotal":25,"outcome":"L","branch":"men"},{"date":"2026-06-11","time":"19:30","competition":"ACFL Division 7 Group B - Round 6","grade":"Junior C","home":"Barrowhouse GAA","away":"Gleann Uiseann","homeScore":"2-12","awayScore":"0-4","homeTotal":18,"awayTotal":4,"venue":"Barrowhouse GAA","referee":"Brendan Hickey","isHome":false,"opponent":"Barrowhouse GAA","ourTotal":4,"theirTotal":18,"outcome":"L","branch":"men"},{"date":"2026-06-04","time":"18:30","competition":"U13 Football League Division 2A - Round 5","grade":"U13","home":"Gleann Uiseann","away":"St Joseph's","homeScore":"4-9","awayScore":"1-6","homeTotal":21,"awayTotal":9,"venue":"Killeshin GAA Grounds","referee":"Robbie Moran","isHome":true,"opponent":"St Joseph's","ourTotal":21,"theirTotal":9,"outcome":"W","branch":"men"},{"date":"2026-05-28","time":"18:30","competition":"U15 Football League Division 1A - Shield Final","grade":"U15","home":"Stradbally Parish Gaels","away":"Gleann Uiseann","homeScore":"8-10","awayScore":"0-7","homeTotal":34,"awayTotal":7,"venue":"Stradbally GAA","referee":"Frank Ryder","isHome":false,"opponent":"Stradbally Parish Gaels","ourTotal":7,"theirTotal":34,"outcome":"L","branch":"men"},{"date":"2026-05-26","time":"19:30","competition":"ACFL Division 4 - Round 6","grade":"Junior A","home":"Gleann Uiseann","away":"Timahoe","homeScore":"3-10","awayScore":"2-15","homeTotal":19,"awayTotal":21,"venue":"Killeshin GAA Grounds","referee":"Des Cooney","isHome":true,"opponent":"Timahoe","ourTotal":19,"theirTotal":21,"outcome":"L","branch":"men"},{"date":"2026-05-25","time":"19:00","competition":"U17 Football Academy League Division 1B - Round 5","grade":"U17","home":"Gleann Uiseann","away":"St Pauls","homeScore":"6-8","awayScore":"1-19","homeTotal":26,"awayTotal":22,"venue":"Killeshin GAA Grounds","referee":"Johnnie Brennan","isHome":true,"opponent":"St Pauls","ourTotal":26,"theirTotal":22,"outcome":"W","branch":"men"},{"date":"2026-05-22","time":"18:30","competition":"U13 Football League Division 2A - Round 4","grade":"U13","home":"Barrow Gaels","away":"Gleann Uiseann","homeScore":"0-7","awayScore":"9-4","homeTotal":7,"awayTotal":31,"venue":"Rosenallis GAA","referee":"Michael Tarpey","isHome":false,"opponent":"Barrow Gaels","ourTotal":31,"theirTotal":7,"outcome":"W","branch":"men"},{"date":"2026-05-21","time":"19:30","competition":"ACFL Division 2 - Round 6","grade":"Senior","home":"Portarlington","away":"Gleann Uiseann","homeScore":"1-17","awayScore":"1-14","homeTotal":20,"awayTotal":17,"venue":"McCann Park, Portarlington","referee":"Séamus Mulhare","isHome":false,"opponent":"Portarlington","ourTotal":17,"theirTotal":20,"outcome":"L","branch":"men"},{"date":"2026-05-20","time":"18:30","competition":"U15 Football League Division 1A - Round 5","grade":"U15","home":"Gleann Uiseann","away":"Stradbally Parish Gaels","homeScore":"0-11","awayScore":"6-16","homeTotal":11,"awayTotal":34,"venue":"Killeshin GAA Grounds","referee":"Robbie Moran","isHome":true,"opponent":"Stradbally Parish Gaels","ourTotal":11,"theirTotal":34,"outcome":"L","branch":"men"},{"date":"2026-05-14","time":"19:30","competition":"ACFL Division 7 Group B - Round 4","grade":"Junior C","home":"Graiguecullen GAA","away":"Gleann Uiseann","homeScore":"3-20","awayScore":"1-4","homeTotal":29,"awayTotal":7,"venue":"Graiguecullen GAA","referee":"Johnny Holland","isHome":false,"opponent":"Graiguecullen GAA","ourTotal":7,"theirTotal":29,"outcome":"L","branch":"men"},{"date":"2026-05-12","time":"20:00","competition":"ACFL Division 4 - Round 5","grade":"Junior A","home":"Annanough","away":"Gleann Uiseann","homeScore":"4-13","awayScore":"1-7","homeTotal":25,"awayTotal":10,"venue":"Annanough GAA","referee":"Johnnie Brennan","isHome":false,"opponent":"Annanough","ourTotal":10,"theirTotal":25,"outcome":"L","branch":"men"},{"date":"2026-05-11","time":"19:00","competition":"U17 Football Academy League Division 1B - Round 4","grade":"U17","home":"O'Dempseys","away":"Gleann Uiseann","homeScore":"1-12","awayScore":"2-11","homeTotal":15,"awayTotal":17,"venue":"O'Dempsey's GAA","referee":"Eamonn O'Connell","isHome":false,"opponent":"O'Dempseys","ourTotal":17,"theirTotal":15,"outcome":"W","branch":"men"},{"date":"2026-05-10","time":"11:30","competition":"ACFL Division 2 - Round 5","grade":"Senior","home":"Gleann Uiseann","away":"Emo","homeScore":"1-11","awayScore":"1-18","homeTotal":14,"awayTotal":21,"venue":"Killeshin GAA Grounds","referee":"Colin Bailey","isHome":true,"opponent":"Emo","ourTotal":14,"theirTotal":21,"outcome":"L","branch":"men"},{"date":"2026-05-08","time":"18:30","competition":"U13 Football League Division 2A - Round 3","grade":"U13","home":"Gleann Uiseann","away":"St Pauls","homeScore":"4-5","awayScore":"6-12","homeTotal":17,"awayTotal":30,"venue":"Killeshin GAA Grounds","referee":"Robbie Moran","isHome":true,"opponent":"St Pauls","ourTotal":17,"theirTotal":30,"outcome":"L","branch":"men"},{"date":"2026-05-06","time":"18:30","competition":"U15 Football League Division 1A - Round 4","grade":"U15","home":"Portlaoise","away":"Gleann Uiseann","homeScore":"5-12","awayScore":"0-7","homeTotal":27,"awayTotal":7,"venue":"Killeshin GAA Grounds","referee":"Des Cooney","isHome":false,"opponent":"Portlaoise","ourTotal":7,"theirTotal":27,"outcome":"L","branch":"men"},{"date":"2026-04-30","time":"19:15","competition":"ACFL Division 7 Group B - Round 3","grade":"Junior C","home":"Gleann Uiseann","away":"The Rock GAA Club","homeScore":"3-6","awayScore":"1-13","homeTotal":15,"awayTotal":16,"venue":"Killeshin GAA Grounds","referee":"Des Cooney","isHome":true,"opponent":"The Rock GAA Club","ourTotal":15,"theirTotal":16,"outcome":"L","branch":"men"},{"date":"2026-04-28","time":"19:15","competition":"ACFL Division 4 - Round 4","grade":"Junior A","home":"Gleann Uiseann","away":"Portarlington","homeScore":"3-5","awayScore":"2-15","homeTotal":14,"awayTotal":21,"venue":"Killeshin GAA Grounds","referee":"Eugene Dowdall","isHome":true,"opponent":"Portarlington","ourTotal":14,"theirTotal":21,"outcome":"L","branch":"men"},{"date":"2026-04-26","time":"12:00","competition":"ACFL Division 2 - Round 4","grade":"Senior","home":"Rosenallis","away":"Gleann Uiseann","homeScore":"3-12","awayScore":"1-9","homeTotal":21,"awayTotal":12,"venue":"Rosenallis GAA","referee":"Clifford Ward","isHome":false,"opponent":"Rosenallis","ourTotal":12,"theirTotal":21,"outcome":"L","branch":"men"},{"date":"2026-04-26","time":"11:15","competition":"Féile Peile na nÓg - Division 1 Group 4 - Round 2","grade":"Féile","home":"Gleann Uiseann","away":"Ballylinan","homeScore":"3-2","awayScore":"3-6","homeTotal":11,"awayTotal":15,"venue":"Ballylinan GAA Grounds","referee":"Sean McDonald","isHome":true,"opponent":"Ballylinan","ourTotal":11,"theirTotal":15,"outcome":"L","branch":"men"},{"date":"2026-04-26","time":"10:30","competition":"Féile Peile na nÓg - Division 1 Group 4 - Round 1","grade":"Féile","home":"O'Dempseys","away":"Gleann Uiseann","homeScore":"3-7","awayScore":"2-4","homeTotal":16,"awayTotal":10,"venue":"Ballylinan GAA Grounds","referee":"Sean McDonald","isHome":false,"opponent":"O'Dempseys","ourTotal":10,"theirTotal":16,"outcome":"L","branch":"men"}],"tables":[{"competition":"U13 Football \"C\" Competition - League Division 1","grade":"U13","rows":[{"team":"Gleann Uiseann","p":6,"w":6,"l":0,"d":0,"f":168,"a":59,"pts":12},{"team":"Portlaoise","p":6,"w":5,"l":1,"d":0,"f":97,"a":67,"pts":10},{"team":"Barrow Gaels","p":7,"w":5,"l":2,"d":0,"f":99,"a":68,"pts":10},{"team":"Camross GAA Club","p":6,"w":3,"l":3,"d":0,"f":82,"a":93,"pts":6},{"team":"Naomh Fiontáin Maighean Rátha","p":6,"w":2,"l":4,"d":0,"f":51,"a":85,"pts":4},{"team":"Stradbally Parish Gaels","p":6,"w":2,"l":4,"d":0,"f":76,"a":109,"pts":4},{"team":"The Harps","p":7,"w":1,"l":6,"d":0,"f":32,"a":89,"pts":2},{"team":"Colt Shanahoe","p":6,"w":1,"l":5,"d":0,"f":26,"a":61,"pts":2}],"branch":"men"},{"competition":"U15 Football \"B\" Championship - League Division 1","grade":"U15","rows":[{"team":"Graiguecullen GAA","p":4,"w":4,"l":0,"d":0,"f":78,"a":50,"pts":8},{"team":"Gleann Uiseann","p":4,"w":2,"l":2,"d":0,"f":94,"a":81,"pts":4},{"team":"Ballyfin CLG","p":4,"w":2,"l":2,"d":0,"f":88,"a":88,"pts":4},{"team":"The Harps","p":4,"w":1,"l":2,"d":1,"f":73,"a":83,"pts":3},{"team":"Barrow Gaels","p":4,"w":0,"l":3,"d":1,"f":60,"a":91,"pts":1}],"branch":"men"},{"competition":"U17 Football \"B\" Championship - League Division 1","grade":"U17","rows":[{"team":"Graiguecullen GAA","p":4,"w":4,"l":0,"d":0,"f":91,"a":47,"pts":8},{"team":"St Joseph's","p":5,"w":4,"l":1,"d":0,"f":99,"a":79,"pts":8},{"team":"Gleann Uiseann","p":4,"w":3,"l":1,"d":0,"f":92,"a":54,"pts":6},{"team":"Ballyfin CLG","p":4,"w":2,"l":2,"d":0,"f":108,"a":87,"pts":4},{"team":"The Harps","p":4,"w":1,"l":3,"d":0,"f":64,"a":82,"pts":2},{"team":"Ballylinan","p":4,"w":1,"l":3,"d":0,"f":53,"a":105,"pts":2},{"team":"Heath Colt Shanahoe","p":5,"w":0,"l":5,"d":0,"f":44,"a":97,"pts":0}],"branch":"men"},{"competition":"U17 Football Academy League Division 1B","grade":"U17","rows":[{"team":"Graiguecullen GAA","p":5,"w":4,"l":1,"d":0,"f":82,"a":45,"pts":8},{"team":"Mainistir Béal Atha an Róine/Ballyroan Abbey","p":5,"w":4,"l":1,"d":0,"f":91,"a":66,"pts":8},{"team":"Gleann Uiseann","p":5,"w":4,"l":1,"d":0,"f":61,"a":65,"pts":8},{"team":"St Pauls","p":5,"w":2,"l":3,"d":0,"f":82,"a":102,"pts":4},{"team":"O'Dempseys","p":5,"w":1,"l":4,"d":0,"f":79,"a":98,"pts":2},{"team":"St Joseph's","p":5,"w":0,"l":5,"d":0,"f":78,"a":97,"pts":0}],"branch":"men"},{"competition":"U15 Football League Division 1A","grade":"U15","rows":[{"team":"Portlaoise","p":6,"w":5,"l":1,"d":0,"f":113,"a":76,"pts":10},{"team":"Mountmellick Parish Gaels","p":6,"w":4,"l":1,"d":1,"f":187,"a":70,"pts":9},{"team":"Stradbally Parish Gaels","p":6,"w":4,"l":1,"d":1,"f":158,"a":73,"pts":9},{"team":"Gleann Uiseann","p":6,"w":1,"l":5,"d":0,"f":67,"a":158,"pts":2},{"team":"Ballyfin CLG","p":5,"w":1,"l":4,"d":0,"f":64,"a":126,"pts":2},{"team":"Ballylinan","p":5,"w":1,"l":4,"d":0,"f":50,"a":136,"pts":2}],"branch":"men"},{"competition":"U13 Football League Division 2A","grade":"U13","rows":[{"team":"St Pauls","p":5,"w":5,"l":0,"d":0,"f":131,"a":61,"pts":10},{"team":"An Fraoch","p":5,"w":4,"l":1,"d":0,"f":103,"a":38,"pts":8},{"team":"Gleann Uiseann","p":5,"w":2,"l":3,"d":0,"f":91,"a":77,"pts":4},{"team":"Mountmellick","p":5,"w":2,"l":3,"d":0,"f":65,"a":96,"pts":4},{"team":"St Joseph's","p":5,"w":2,"l":3,"d":0,"f":60,"a":110,"pts":4},{"team":"Barrow Gaels","p":5,"w":0,"l":5,"d":0,"f":41,"a":109,"pts":0}],"branch":"men"},{"competition":"Junior Football Championship Group B","grade":"Junior A","rows":[{"team":"St Joseph's","p":4,"w":4,"l":0,"d":0,"f":90,"a":52,"pts":8},{"team":"O'Dempseys","p":4,"w":3,"l":1,"d":0,"f":73,"a":55,"pts":6},{"team":"Gleann Uiseann","p":4,"w":1,"l":3,"d":0,"f":69,"a":76,"pts":2},{"team":"Stradbally","p":4,"w":1,"l":3,"d":0,"f":65,"a":78,"pts":2},{"team":"An Fraoch","p":4,"w":1,"l":3,"d":0,"f":52,"a":88,"pts":2}],"branch":"men"},{"competition":"Junior C Football Championship Group E","grade":"Junior C","rows":[{"team":"Portarlington","p":3,"w":3,"l":0,"d":0,"f":85,"a":36,"pts":6},{"team":"Annanough","p":3,"w":2,"l":1,"d":0,"f":29,"a":37,"pts":4},{"team":"Gleann Uiseann","p":3,"w":1,"l":2,"d":0,"f":35,"a":61,"pts":2},{"team":"Ard Lios Cill Chruis","p":3,"w":0,"l":3,"d":0,"f":24,"a":39,"pts":0}],"branch":"men"},{"competition":"ACFL Division 2","grade":"Senior","rows":[{"team":"O'Dempseys","p":7,"w":7,"l":0,"d":0,"f":149,"a":83,"pts":14},{"team":"Portarlington","p":7,"w":6,"l":1,"d":0,"f":131,"a":86,"pts":12},{"team":"Rosenallis","p":7,"w":4,"l":3,"d":0,"f":103,"a":102,"pts":8},{"team":"An Fraoch","p":7,"w":2,"l":3,"d":2,"f":111,"a":119,"pts":6},{"team":"Emo","p":7,"w":3,"l":4,"d":0,"f":94,"a":112,"pts":6},{"team":"Mountmellick","p":7,"w":2,"l":4,"d":1,"f":110,"a":122,"pts":5},{"team":"Gleann Uiseann","p":7,"w":1,"l":5,"d":1,"f":100,"a":139,"pts":3},{"team":"Ballyfin CLG","p":7,"w":1,"l":6,"d":0,"f":74,"a":109,"pts":2}],"branch":"men"},{"competition":"ACFL Division 4","grade":"Junior A","rows":[{"team":"Annanough","p":7,"w":6,"l":1,"d":0,"f":148,"a":79,"pts":12},{"team":"Portarlington","p":7,"w":5,"l":2,"d":0,"f":149,"a":110,"pts":10},{"team":"Graiguecullen GAA","p":7,"w":4,"l":3,"d":0,"f":124,"a":134,"pts":8},{"team":"Barrowhouse GAA","p":7,"w":3,"l":3,"d":1,"f":102,"a":115,"pts":7},{"team":"Timahoe","p":7,"w":3,"l":4,"d":0,"f":100,"a":119,"pts":6},{"team":"Gleann Uiseann","p":7,"w":2,"l":4,"d":1,"f":105,"a":127,"pts":5},{"team":"Stradbally","p":7,"w":2,"l":4,"d":1,"f":106,"a":118,"pts":5},{"team":"The Rock GAA Club","p":7,"w":1,"l":5,"d":1,"f":90,"a":122,"pts":3}],"branch":"men"},{"competition":"ACFL Division 7 Group B","grade":"Junior C","rows":[{"team":"Crettyard","p":7,"w":7,"l":0,"d":0,"f":115,"a":56,"pts":14},{"team":"Annanough","p":7,"w":5,"l":1,"d":1,"f":121,"a":71,"pts":11},{"team":"Graiguecullen GAA","p":7,"w":5,"l":2,"d":0,"f":102,"a":80,"pts":10},{"team":"The Rock GAA Club","p":7,"w":4,"l":3,"d":0,"f":78,"a":89,"pts":8},{"team":"Barrowhouse GAA","p":7,"w":3,"l":3,"d":1,"f":101,"a":87,"pts":7},{"team":"Gleann Uiseann","p":7,"w":2,"l":5,"d":0,"f":54,"a":98,"pts":4},{"team":"Stradbally","p":7,"w":1,"l":6,"d":0,"f":74,"a":139,"pts":2},{"team":"Timahoe","p":7,"w":0,"l":7,"d":0,"f":38,"a":63,"pts":0}],"branch":"men"},{"competition":"Kelly Cup Group C","grade":"Kelly Cup","rows":[{"team":"Crettyard","p":2,"w":2,"l":0,"d":0,"f":34,"a":21,"pts":4},{"team":"Gleann Uiseann","p":2,"w":1,"l":1,"d":0,"f":8,"a":17,"pts":2},{"team":"Rosenallis","p":2,"w":0,"l":2,"d":0,"f":13,"a":17,"pts":0}],"branch":"men"},{"competition":"Féile Peile na nÓg - Division 1 Group 4","grade":"Féile","rows":[{"team":"O'Dempseys","p":2,"w":2,"l":0,"d":0,"f":31,"a":20,"pts":4},{"team":"Ballylinan","p":2,"w":1,"l":1,"d":0,"f":25,"a":26,"pts":2},{"team":"Gleann Uiseann","p":2,"w":0,"l":2,"d":0,"f":21,"a":31,"pts":0}],"branch":"men"},{"competition":"Under 20 Football Championship - League Division 2","grade":"U20","rows":[{"team":"Portlaoise","p":0,"w":0,"l":0,"d":0,"f":0,"a":0,"pts":0},{"team":"Gleann Uiseann","p":0,"w":0,"l":0,"d":0,"f":0,"a":0,"pts":0},{"team":"Stradbally Parish Gaels","p":0,"w":0,"l":0,"d":0,"f":0,"a":0,"pts":0},{"team":"Portarlington","p":0,"w":0,"l":0,"d":0,"f":0,"a":0,"pts":0}],"branch":"men"},{"competition":"Adult Division 4 League","grade":"Junior","branch":"ladies","rows":[{"team":"Killeshin","p":4,"w":4,"l":0,"d":0,"f":62,"a":26,"pts":12},{"team":"Timahoe","p":4,"w":3,"l":1,"d":0,"f":71,"a":24,"pts":9},{"team":"St Brigids","p":4,"w":2,"l":2,"d":0,"f":27,"a":45,"pts":6},{"team":"Graiguecullen","p":4,"w":1,"l":3,"d":0,"f":55,"a":42,"pts":3},{"team":"Baile na Coille CLG","p":4,"w":0,"l":4,"d":0,"f":27,"a":105,"pts":0}]},{"competition":"U14 B League - Group B","grade":"U14","branch":"ladies","rows":[{"team":"Killeshin","p":4,"w":4,"l":0,"d":0,"f":52,"a":30,"pts":12},{"team":"St Joseph's","p":4,"w":2,"l":1,"d":1,"f":57,"a":63,"pts":7},{"team":"St Conleths","p":4,"w":1,"l":2,"d":1,"f":102,"a":67,"pts":4},{"team":"Shanahoe","p":4,"w":1,"l":2,"d":1,"f":83,"a":74,"pts":4},{"team":"Clonaslee St Manman's","p":4,"w":0,"l":3,"d":1,"f":44,"a":104,"pts":1}]},{"competition":"Adult Division 2 League","grade":"Intermediate","branch":"ladies","rows":[{"team":"Ballyfin","p":5,"w":5,"l":0,"d":0,"f":101,"a":54,"pts":15},{"team":"Shanahoe","p":5,"w":3,"l":1,"d":1,"f":89,"a":61,"pts":10},{"team":"Killeshin","p":5,"w":3,"l":1,"d":1,"f":85,"a":66,"pts":10},{"team":"Portlaoise","p":5,"w":2,"l":3,"d":0,"f":66,"a":67,"pts":6},{"team":"Railyard LGFC","p":5,"w":1,"l":4,"d":0,"f":74,"a":94,"pts":3},{"team":"St Conleths","p":5,"w":0,"l":5,"d":0,"f":54,"a":127,"pts":0}]},{"competition":"Intermediate Championship","grade":"Intermediate","branch":"ladies","rows":[{"team":"Ballyfin","p":3,"w":3,"l":0,"d":0,"f":76,"a":36,"pts":9},{"team":"St Brigids","p":3,"w":2,"l":1,"d":0,"f":58,"a":46,"pts":6},{"team":"Killeshin","p":3,"w":2,"l":1,"d":0,"f":60,"a":37,"pts":6},{"team":"Shanahoe","p":3,"w":1,"l":2,"d":0,"f":47,"a":39,"pts":3},{"team":"Crettyard","p":3,"w":1,"l":2,"d":0,"f":36,"a":65,"pts":3},{"team":"St Paul's","p":3,"w":0,"l":3,"d":0,"f":33,"a":87,"pts":0}]},{"competition":"U14 B Championship Group B","grade":"U14","branch":"ladies","rows":[{"team":"St Brigids","p":4,"w":4,"l":0,"d":0,"f":90,"a":48,"pts":12},{"team":"Shanahoe","p":4,"w":3,"l":1,"d":0,"f":84,"a":56,"pts":9},{"team":"Killeshin","p":4,"w":2,"l":2,"d":0,"f":86,"a":78,"pts":6},{"team":"Park Ratheniska","p":4,"w":1,"l":3,"d":0,"f":74,"a":78,"pts":3},{"team":"St Paul's","p":4,"w":0,"l":4,"d":0,"f":29,"a":103,"pts":0}]},{"competition":"U16 B League","grade":"U16","branch":"ladies","rows":[{"team":"Clonaslee St Manman's","p":6,"w":6,"l":0,"d":0,"f":212,"a":71,"pts":18},{"team":"Ballyfin","p":6,"w":3,"l":3,"d":0,"f":95,"a":91,"pts":9},{"team":"Killeshin","p":6,"w":3,"l":3,"d":0,"f":130,"a":131,"pts":9},{"team":"An Fraoch","p":6,"w":2,"l":3,"d":1,"f":136,"a":104,"pts":7},{"team":"St Paul's","p":6,"w":2,"l":3,"d":1,"f":100,"a":99,"pts":7},{"team":"Shanahoe","p":6,"w":2,"l":4,"d":0,"f":97,"a":204,"pts":6},{"team":"Timahoe","p":6,"w":2,"l":4,"d":0,"f":79,"a":149,"pts":6}]},{"competition":"U16 B Championship","grade":"U16","branch":"ladies","rows":[{"team":"Clonaslee St Manman's","p":4,"w":2,"l":1,"d":1,"f":94,"a":78,"pts":7},{"team":"Timahoe","p":3,"w":2,"l":1,"d":0,"f":71,"a":46,"pts":6},{"team":"St Brigids","p":3,"w":2,"l":1,"d":0,"f":67,"a":55,"pts":6},{"team":"St Joseph's","p":4,"w":2,"l":2,"d":0,"f":62,"a":59,"pts":6},{"team":"Ballyfin","p":3,"w":2,"l":1,"d":0,"f":52,"a":54,"pts":6},{"team":"Killeshin","p":3,"w":1,"l":1,"d":1,"f":59,"a":70,"pts":4},{"team":"Ballyroan","p":4,"w":0,"l":4,"d":0,"f":43,"a":86,"pts":0}]},{"competition":"Junior B Championship - Group B","grade":"Junior","branch":"ladies","rows":[{"team":"Timahoe","p":2,"w":2,"l":0,"d":0,"f":67,"a":9,"pts":6},{"team":"St Brigids","p":2,"w":1,"l":1,"d":0,"f":21,"a":38,"pts":3},{"team":"Killeshin","p":2,"w":0,"l":2,"d":0,"f":17,"a":58,"pts":0}]},{"competition":"Minor B Championship - Group A","grade":"Minor","branch":"ladies","rows":[{"team":"St Brigids","p":2,"w":2,"l":0,"d":0,"f":59,"a":13,"pts":6},{"team":"Ballyfin","p":2,"w":2,"l":0,"d":0,"f":80,"a":35,"pts":6},{"team":"Killeshin","p":2,"w":0,"l":2,"d":0,"f":20,"a":38,"pts":0},{"team":"Mountrath","p":2,"w":0,"l":2,"d":0,"f":28,"a":101,"pts":0}]}],"venueHome":"Killeshin GAA Grounds","ground":"Seamus Hearns Park","newsSources":[{"name":"Leinster Express","url":"https://www.leinsterexpress.ie/sport/gaa","access":"free"},{"name":"Laois Nationalist","url":"https://www.laois-nationalist.ie/","access":"free"},{"name":"Carlow Nationalist","url":"https://www.carlow-nationalist.ie/sport/gaa/","access":"free"},{"name":"Laois GAA","url":"https://laoisgaa.ie/news/","access":"free"},{"name":"LaoisToday","url":"https://www.laoistoday.ie/tag/killeshin/","access":"subscriber"}],"news":[{"date":"2026-08-23","title":"Laois SFC: History made as Killeshin defeat neighbours Graiguecullen for the first time ever","source":"LaoisToday","tag":"GAA","access":"free","url":"https://www.laoistoday.ie/2026/08/23/laois-sfc-history-made-as-killeshin-defeat-neighbours-graiguecullen-for-the-first-time-ever/","branch":"men"},{"date":"2026-07-22","title":"Killeshin and Stradbally kick off this year's championship","source":"Laois Nationalist","tag":"GAA","access":"free","url":"https://www.laois-nationalist.ie/killeshin-and-stradbally-kick-off-this-years-championship_arid-105805.html","branch":"men"},{"date":"2026-07-22","title":"Stradbally make winning start against Killeshin in Laois GAA SFC","source":"Leinster Express","tag":"GAA","access":"free","url":"https://www.leinsterexpress.ie/sport/gaa/stradbally-make-winning-start-against-killeshin-in-laois-gaa-sfc-8816841","branch":"men"},{"date":"2026-06-26","title":"Parents question Killeshin NS's 'problematic' admissions policy","source":"Carlow Nationalist","tag":"Community","access":"free","url":"https://www.carlow-nationalist.ie/news/parents-question-killeshin-nss-problematic-admissions-policy_arid-103072.html","branch":"men"},{"date":"2025-10-18","title":"Killeshin progress to Leinster semi-final after strong win over Wicklow's ABG","source":"Leinster Express","tag":"Ladies","access":"free","url":"https://www.leinsterexpress.ie/news/gaa/1922191/killeshin-progress-to-leinster-semi-final-after-strong-win-over-wicklows-abg.html","branch":"men"},{"date":"2025-07-27","title":"Clinical Killeshin cut down Clonaslee in Laois GAA opener in Portlaoise","source":"Leinster Express","tag":"GAA","access":"free","url":"https://www.leinsterexpress.ie/news/gaa/1857662/clinical-killeshin-cut-down-clonaslee-in-laois-gaa-opener-in-portlaoise.html","branch":"men"},{"date":"2026-08-18","title":"Killeshin Waterworks celebrates heritage and biodiversity with unveiling of restored sluice gate","source":"LaoisToday","tag":"Community","access":"subscriber","url":"https://www.laoistoday.ie/2026/08/18/killeshin-waterworks-celebrates-heritage-and-biodiversity-with-unveiling-of-restored-sluice-gate/","branch":"men"},{"date":"2026-08-07","title":"Laois SFC: Killeshin survive late Rosenallis revival to go through","source":"LaoisToday","tag":"GAA","access":"subscriber","url":"https://www.laoistoday.ie/2026/08/07/laois-sfc-killeshin-survive-late-rosenallis-revival-to-go-through/","branch":"men"},{"date":"2026-06-27","title":"ACFL Division 2: Finlay strikes late as O'Dempsey's reach final | Killeshin send Ballyfin packing","source":"LaoisToday","tag":"GAA","access":"subscriber","url":"https://www.laoistoday.ie/2026/06/27/acfl-division-2-finlay-strikes-late-as-odempseys-reach-final-killeshin-send-ballyfin-packing/","branch":"men"},{"date":"2025-09-04","title":"Killeshin GAA score €15,000 after Electric Picnic can and bottle collection","source":"LaoisToday","tag":"Club","access":"subscriber","url":"https://www.laoistoday.ie/2025/09/04/killeshin-gaa-score-e15000-after-electric-picnic-can-and-bottle-collection/","branch":"men"}],"gradesBy":{"men":["Senior","Junior A","Junior C","Kelly Cup","U20","U17","U15","U13","Féile"],"ladies":["Intermediate","Junior","Minor","U16","U14","U12"]},"branches":{"men":{"name":"Men","team":"Gleann Uiseann","crest":"crest.png","source":"https://laoisgaa.ie/fixtures-results/team/gleann-uiseann/6547884c-ea64-5502-8472-8eb26b092437/"},"ladies":{"name":"Ladies","team":"Killeshin","crest":"crest-ladies.png","source":"https://laoislgfa.ie/fixtures-results/team/killeshin/6063df22-0a35-9537-87e6-5276dfa17357/"}}}</script>
+<script>
+(function(){
+"use strict";
+
+var DATA;
+try { DATA = JSON.parse(document.getElementById('seed').textContent); }
+catch(err){
+  console.error('built-in data unreadable', err);
+  DATA = {fixtures:[],results:[],tables:[],news:[],branches:{},gradesBy:{},ground:''};
+}
+
+/* Both is the landing view - most people want the whole parish, not one branch. */
+var branch = 'all', grade = 'All', homeOnly = false, view = 'fixtures';
+var MON = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+var DAY = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+
+function d(s){ var p=s.split('-'); return new Date(+p[0], p[1]-1, +p[2]); }
+function longDate(s){ var x=d(s); return DAY[x.getDay()]+' '+x.getDate()+' '+MON[x.getMonth()]; }
+function shortDate(s){ var x=d(s); return DAY[x.getDay()].slice(0,3)+' '+x.getDate()+' '+MON[x.getMonth()]; }
+function esc(t){ return String(t==null?'':t).replace(/[&<>"]/g,function(c){
+  return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
+function daysAway(s){ var t=new Date(); t.setHours(0,0,0,0); return Math.round((d(s)-t)/86400000); }
+function br(b){ var B = DATA.branches || {}; return B[b] || B.men ||
+  {name:"Men", team:'Gleann Uiseann', crest:'crest.png', source:'#'}; }
+function ourName(b){ return br(b).team; }
+function label(n,b){ return n===ourName(b) ? 'Killeshin' : n; }
+/* Killeshin listed first means we are hosting, even before the county board
+   fills in the ground - most ladies fixtures sit as TBC until days out. */
+function atHome(m){
+  var v = m.venue || '';
+  if(v.indexOf('Killeshin') > -1) return true;
+  return !!m.isHome && (v === 'TBC' || v === '');
+}
+function venueOf(m){
+  var v = m.venue || 'TBC';
+  return (v === 'TBC' && m.isHome) ? (DATA.ground || 'Killeshin') + ' (to be confirmed)' : v;
+}
+/* A match stays up while it is being played, then drops off about two hours
+   after throw-in. Comparing dates alone left this morning's game sitting
+   there as "next match" until midnight. */
+function startOf(m){
+  var p = m.date.split('-');
+  var t = /^\d{1,2}:\d{2}$/.test(m.time) ? m.time.split(':') : ['23','59'];
+  return new Date(+p[0], p[1]-1, +p[2], +t[0], +t[1]).getTime();
+}
+/* Once throw-in passes, that game is no longer "next" - move straight on. */
+function stillOn(m){ return Date.now() < startOf(m); }
+function upcoming(){ return DATA.fixtures.filter(stillOn); }
+function mixed(){ return branch === 'all'; }
+function crestOf(b){ return br(b).crest; }
+
+/* Directions: a maps search by venue name is more reliable than storing
+   coordinates for thirty grounds, and opens the phone's own maps app. */
+function mapUrl(venue){
+  if(!venue || venue === 'TBC') return null;
+  var q = venue.indexOf('Ireland') > -1 ? venue : venue + ', Ireland';
+  return 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(q);
+}
+/* Only on away games - nobody needs directions to their own pitch. */
+function directions(match){
+  if(atHome(match)) return '';
+  var u = mapUrl(match.venue);
+  if(!u) return '';
+  return '<a class="dir" href="'+u+'" target="_blank" rel="noopener">\u2192 Directions</a>';
+}
+
+function pick(list){
+  return list.filter(function(m){
+    if(branch !== 'all' && m.branch !== branch) return false;
+    if(grade !== 'All' && m.grade !== grade) return false;
+    if(homeOnly && !atHome(m)) return false;
+    return true;
+  });
+}
+function mark(m){
+  return mixed() ? '<span class="bm '+m.branch+'">'+(m.branch==='men'?"MEN":'LADIES')+'</span>' : '';
+}
+
+/* ---- form guide: last five for a branch and grade ---- */
+function formFor(b, g){
+  var list = DATA.results.filter(function(r){
+    return r.branch === b && (!g || r.grade === g); });
+  return list.slice(0, 5).reverse();          /* results are newest first */
+}
+function formStrip(b, g, label_){
+  var f = formFor(b, g);
+  if(f.length < 2) return '';
+  return '<div class="form"><span class="lbl">'+esc(label_ || 'Form')+'</span>' +
+    f.map(function(r){ return '<i class="'+r.outcome+'">'+r.outcome+'</i>'; }).join('') + '</div>';
+}
+
+/* ---- hero ---- */
+function renderNext(){
+  var hero = document.getElementById('hero');
+  var pool = upcoming().filter(function(f){ return branch==='all' || f.branch===branch; });
+  if(!pool.length){ hero.hidden = true; } else {
+    var f = pool[0], n = daysAway(f.date);
+    hero.hidden = false;
+    hero.style.setProperty('--crest', 'url(' + crestOf(f.branch) + ')');
+    document.getElementById('heroLbl').textContent =
+      mixed() ? (f.branch==='men' ? "Next match \u00b7 Men" : 'Next match \u00b7 Ladies') : 'Next match';
+    var mins = Math.round((startOf(f) - Date.now()) / 60000);
+    document.getElementById('heroCd').textContent =
+      mins <= 60 ? (mins <= 1 ? 'Starting now' : 'In ' + mins + ' min') :
+      n === 0 ? 'Today' : n === 1 ? 'Tomorrow' : 'In ' + n + ' days';
+
+    document.getElementById('sideA').innerHTML =
+      '<img src="'+esc(crestOf(f.branch))+'" alt=""><b>Killeshin</b>';
+    document.getElementById('sideB').innerHTML =
+      '<span class="dot">v</span><b>'+esc(label(f.opponent, f.branch))+'</b>';
+
+    var facts = [
+      ['\u25CF', '<b>' + esc(f.time) + '</b> \u00b7 ' + esc(longDate(f.date))],
+      ['\u25B3', esc(f.grade) + ' \u00b7 ' + esc(f.competition)]
+    ];
+      var mu = atHome(f) ? null : mapUrl(f.venue);
+    facts.push(['\u25C6', (atHome(f) ? '<b>At home</b> \u00b7 ' + esc(venueOf(f)) : '') +
+      (mu ? '<a href="'+mu+'" target="_blank" rel="noopener">'+esc(f.venue)+'</a>' : '')]);
+    if(f.referee && f.referee !== 'TBC') facts.push(['\u25CB', 'Referee ' + esc(f.referee)]);
+    document.getElementById('heroFacts').innerHTML = facts.map(function(x){
+      return '<div class="fact"><span class="k">'+x[0]+'</span><span>'+x[1]+'</span></div>'; }).join('') +
+      (mu ? '<div><a class="dir" href="'+mu+'" target="_blank" rel="noopener">' +
+            '\u2192 Directions</a></div>' : '');
+
+    weather(f, document.getElementById('heroWx'), true);
+  }
+
+  /* Show the next home game that is not already the hero, so the panel
+     always has something in it rather than vanishing. */
+  var hm = upcoming().filter(function(f){
+    return (branch==='all' || f.branch===branch) && atHome(f) && f !== pool[0]; })[0];
+  var box = document.getElementById('athome');
+  if(!hm){ box.hidden = true; return; }
+  box.hidden = false;
+  document.getElementById('ahCrest').src = crestOf(hm.branch);
+  document.getElementById('ahLine').textContent =
+    (mixed() ? (hm.branch==='men' ? "Men " : 'Ladies ') : '') +
+    hm.grade + '  v  ' + label(hm.opponent, hm.branch);
+  document.getElementById('ahSub').textContent =
+    shortDate(hm.date) + '  \u00b7  ' + hm.time + '  \u00b7  ' + venueOf(hm);
+  weather(hm, document.getElementById('ahWx'), false);
+}
+
+/* ---- weather: Killeshin, from the free open-meteo service ---- */
+var WX = {0:'Clear',1:'Mostly clear',2:'Partly cloudy',3:'Overcast',45:'Fog',48:'Fog',
+  51:'Light drizzle',53:'Drizzle',55:'Heavy drizzle',61:'Light rain',63:'Rain',65:'Heavy rain',
+  66:'Freezing rain',67:'Freezing rain',71:'Light snow',73:'Snow',75:'Heavy snow',
+  80:'Showers',81:'Showers',82:'Heavy showers',95:'Thunderstorms',96:'Thunderstorms',
+  99:'Thunderstorms'};
+function weather(match, el, big){
+  if(!el) return;
+  var n = daysAway(match.date);
+  var timed = /^\d{1,2}:\d{2}$/.test(match.time);
+
+  if(n < 0 || !timed){ el.hidden = true; return; }
+  if(n > 14){                                   /* forecasts do not reach that far */
+    if(!big){ el.hidden = true; return; }
+    el.hidden = false;
+    el.innerHTML = '<span class="ico">\u2601</span><span class="soft">' +
+      'Forecast appears about two weeks out.</span>';
+    return;
+  }
+
+  el.hidden = false;
+  el.innerHTML = big
+    ? '<span class="ico">\u2601</span><span class="soft">Checking the forecast\u2026</span>'
+    : '<span class="soft">Checking the forecast\u2026</span>';
+
+  var when = match.date + 'T' + (match.time.length === 4 ? '0' : '') + match.time;
+  var want = when.slice(0, 13) + ':00';
+
+  fetch('https://api.open-meteo.com/v1/forecast?latitude=52.85&longitude=-7.02' +
+        '&hourly=temperature_2m,precipitation_probability,weather_code' +
+        '&timezone=Europe%2FDublin&forecast_days=16')
+    .then(function(r){ if(!r.ok) throw 0; return r.json(); })
+    .then(function(j){
+      var i = j.hourly.time.indexOf(want);
+      if(i < 0) throw 0;
+      var t = Math.round(j.hourly.temperature_2m[i]);
+      var rain = j.hourly.precipitation_probability[i];
+      var sky = WX[j.hourly.weather_code[i]] || 'Forecast';
+      var line = sky + ' \u00b7 ' + t + '\u00b0C \u00b7 ' + rain + '% chance of rain';
+      if(big){
+        el.innerHTML = '<span class="ico">' + icon(j.hourly.weather_code[i]) + '</span>' +
+          '<span><b>At throw-in</b><br><span class="soft">' + esc(line) + '</span></span>';
+      } else {
+        el.textContent = icon(j.hourly.weather_code[i]) + '  ' + line;
+      }
+    })
+    .catch(function(){
+      /* No forecast is better than a wrong one - say so rather than guess. */
+      if(big){ el.innerHTML = '<span class="ico">\u2601</span>' +
+        '<span class="soft">Forecast not available right now.</span>'; }
+      else { el.hidden = true; }
+    });
+}
+function icon(code){
+  if(code === 0 || code === 1) return '\u2600';
+  if(code === 2) return '\u26C5';
+  if(code === 3 || code === 45 || code === 48) return '\u2601';
+  if(code >= 71 && code <= 77) return '\u2744';
+  if(code >= 95) return '\u26C8';
+  if(code >= 51) return '\u2614';
+  return '\u2601';
+}
+
+/* ---- fixtures ---- */
+function renderFixtures(){
+  var list = pick(upcoming());
+  if(!list.length) return empty('Nothing down yet', emptyWhy('fixtures'));
+  var html='', day=null;
+  list.forEach(function(f){
+    if(f.date!==day){
+      day=f.date; var n=daysAway(f.date);
+      html += '<div class="dayhead'+(n<=2?' soon':'')+'">' + esc(longDate(f.date)) +
+              (n===0?' \u2014 today':n===1?' \u2014 tomorrow':'') + '</div>';
+    }
+    html += '<div class="card'+(atHome(f)?' hm':'')+'"><div class="row">' +
+      '<div class="time num">'+esc(f.time)+'</div><div class="mid">' +
+      '<div class="tt">'+mark(f)+teamLine(f)+'</div>' +
+      '<div class="sub">'+esc(f.grade)+' \u00b7 '+esc(f.competition)+'<br>'+esc(venueOf(f))+
+        (atHome(f)?' \u00b7 home':'')+'</div>' + directions(f) +
+      '</div></div></div>';
+  });
+  return html;
+}
+function teamLine(m){
+  var us = ourName(m.branch), H = m.home===us, A = m.away===us;
+  return (H?'<b>':'')+esc(label(m.home,m.branch))+(H?'</b>':'') + ' v ' +
+         (A?'<b>':'')+esc(label(m.away,m.branch))+(A?'</b>':'');
+}
+
+/* ---- results ---- */
+function renderResults(){
+  var list = pick(DATA.results);
+  if(!list.length) return empty('No results yet', emptyWhy('results'));
+  var html = '';
+  if(branch !== 'all'){
+    var f = formStrip(branch, grade === 'All' ? null : grade, 'Last 5');
+    if(f) html += '<div class="card">' + f + '</div>';
+  }
+  var day=null;
+  list.forEach(function(r){
+    if(r.date!==day){ day=r.date; html += '<div class="dayhead">'+esc(longDate(r.date))+'</div>'; }
+    var cls = r.outcome==='W' ? ' win' : r.outcome==='L' ? ' loss' : ' draw';
+    html += '<div class="card'+cls+'">' +
+      (mixed() ? '<div style="margin-bottom:7px">'+mark(r)+'</div>' : '') +
+      scoreLine(r, r.home, r.homeScore, r.homeTotal, r.homeTotal>r.awayTotal) +
+      scoreLine(r, r.away, r.awayScore, r.awayTotal, r.awayTotal>r.homeTotal) +
+      '<div class="sub" style="font-size:13.5px;color:var(--grey);margin-top:8px">' +
+      esc(r.grade)+' \u00b7 '+esc(r.competition)+'<br>'+esc(r.venue)+'</div></div>';
+  });
+  return html;
+}
+function scoreLine(m,n,sc,tot,won){
+  return '<div class="sl'+(won?' w':'')+'"><div class="n">'+esc(label(n,m.branch))+'</div>' +
+         '<div class="s dsp num">'+esc(sc)+'<em>'+tot+'</em></div></div>';
+}
+
+/* ---- tables ---- */
+function renderTables(){
+  var list = DATA.tables.filter(function(t){
+    if(branch !== 'all' && t.branch !== branch) return false;
+    return grade === 'All' || t.grade === grade;
+  });
+  if(!list.length) return empty('No table here',
+    'Knockout and championship groups do not always run a league table.');
+  return list.map(function(t){
+    var us = ourName(t.branch);
+    var rows = t.rows.map(function(r,i){
+      return '<tr'+(r.team===us?' class="us"':'')+'><td class="t">' +
+        '<span class="num" style="color:var(--grey-lt);margin-right:11px">'+(i+1)+'</span>' +
+        esc(label(r.team,t.branch))+'</td><td class="num">'+r.p+'</td><td class="num">'+r.w+'</td>' +
+        '<td class="num">'+r.d+'</td><td class="num">'+r.l+'</td><td class="num">'+r.f+'</td>' +
+        '<td class="num">'+r.a+'</td><td class="p num">'+r.pts+'</td></tr>';
+    }).join('');
+    return '<section class="tbl"><div class="hd"><span class="lbl">' +
+      (mixed() ? (t.branch==='men'?"Men \u00b7 ":'Ladies \u00b7 ') : '') + esc(t.grade) + '</span>' +
+      '<h3 class="dsp">'+esc(t.competition)+'</h3>' + formStrip(t.branch, t.grade) + '</div>' +
+      '<table><thead><tr><th class="t">Team</th><th>P</th><th>W</th><th>D</th><th>L</th>' +
+      '<th>F</th><th>A</th><th class="p">Pts</th></tr></thead><tbody>'+rows+'</tbody></table></section>';
+  }).join('');
+}
+
+/* ---- record: wins by age group, adult down to U12 ---- */
+/* The county board's league tables are the complete record - the team page
+   only lists recent matches, so counting those alone badly undercounts.
+   Tables first, then any knockout competition that has no table. */
+function normComp(x){ return String(x||'').toLowerCase().replace(/[^a-z0-9]/g,''); }
+
+function tally(b){
+  var by = {}, tabs = [];
+  function bucket(g){
+    return by[g] || (by[g] = {p:0,W:0,D:0,L:0,f:0,a:0}); }
+
+  DATA.tables.forEach(function(t){
+    if(t.branch !== b) return;
+    var us = ourName(b);
+    var row = null;
+    for(var i=0;i<t.rows.length;i++) if(t.rows[i].team === us) row = t.rows[i];
+    if(!row || !row.p) return;
+    tabs.push(normComp(t.competition));
+    var g = bucket(t.grade);
+    g.p += row.p; g.W += row.w; g.D += row.d; g.L += row.l;
+    g.f += row.f; g.a += row.a;
+  });
+
+  /* Knockout rounds sit outside the tables, so add them from the results. */
+  DATA.results.forEach(function(r){
+    if(r.branch !== b) return;
+    var rn = normComp(r.competition);
+    for(var i=0;i<tabs.length;i++){
+      if(rn.indexOf(tabs[i]) === 0 || tabs[i].indexOf(rn) === 0) return;
+    }
+    var g = bucket(r.grade);
+    g.p++; g[r.outcome]++;
+    g.f += r.ourTotal || 0; g.a += r.theirTotal || 0;
+  });
+  return by;
+}
+
+function branchRecord(b){
+  var by = tally(b), order = (DATA.gradesBy || {})[b] || [];
+  var have = order.filter(function(g){ return by[g]; });
+  Object.keys(by).forEach(function(g){ if(have.indexOf(g) === -1) have.push(g); });
+  if(!have.length) return '';
+
+  var t = {p:0,W:0,D:0,L:0,f:0,a:0};
+  have.forEach(function(g){
+    ['p','W','D','L','f','a'].forEach(function(k){ t[k] += by[g][k]; }); });
+  var pct = t.p ? Math.round(t.W / t.p * 100) : 0;
+
+  var head = mixed()
+    ? '<div class="bhead"><img src="'+esc(crestOf(b))+'" alt=""><b>' +
+      esc(br(b).name) + '</b></div>'
+    : '';
+
+  var board = '<section class="sb"><span class="lbl">Season so far</span>' +
+    '<div class="big">' +
+      '<div class="wins"><u>'+t.W+'</u><span>Won</span></div>' +
+      '<div><u>'+t.D+'</u><span>Drawn</span></div>' +
+      '<div><u>'+t.L+'</u><span>Lost</span></div>' +
+    '</div>' +
+    '<div class="tot"><b>'+t.p+'</b> games \u00b7 <b>'+pct+'%</b> won \u00b7 ' +
+    '<b>'+t.f+'</b> points scored, <b>'+t.a+'</b> conceded' +
+    '<br><span style="opacity:.7;font-size:12.5px">Counted from the county board league tables' +
+    ', plus knockout rounds.</span></div></section>';
+
+  var rows = have.map(function(g){
+    var r = by[g], gp = r.p ? Math.round(r.W / r.p * 100) : 0;
+    var key = b + '|' + g, open = OPEN[key];
+    return '<div class="gr'+(r.W===0?' none':'')+'" data-key="'+esc(key)+'" ' +
+      'role="button" tabindex="0" aria-expanded="'+(open?'true':'false')+'">' +
+      '<div class="nm"><b>'+esc(g)+'</b>' +
+      '<span>'+r.p+' played \u00b7 '+r.W+'W '+r.D+'D '+r.L+'L \u00b7 '+gp+'% \u00b7 ' +
+      r.f+'\u2013'+r.a+'</span></div>' +
+      '<div class="w"><u>'+r.W+'</u><span>Wins</span></div>' +
+      '<span class="go">' + (open ? 'Close' : 'Stats') + '<em>\u203A</em></span></div>' +
+      (open ? analyse(b, g) : '');
+  }).join('');
+
+  return head + board + rows;
+}
+/* ---- the analysis behind each age group ----
+   Worked out from the live data every time it is opened, so it can never
+   go stale the way a written-once paragraph would. */
+function analyse(b, g){
+  var t = tally(b)[g];
+  if(!t) return '';
+
+  var played = t.p, won = t.W, drawn = t.D, lost = t.L;
+  var winPct = Math.round((won + 0.5*drawn) / played * 100);
+  var per = (t.f - t.a) / played;
+  var scored = (t.f / played), let_in = (t.a / played);
+
+  /* league placings across every competition this team plays */
+  var places = [];
+  DATA.tables.forEach(function(tb){
+    if(tb.branch !== b || tb.grade !== g) return;
+    var us = ourName(b);
+    for(var i=0;i<tb.rows.length;i++){
+      if(tb.rows[i].team === us && tb.rows[i].p)
+        places.push({comp:tb.competition, pos:i+1, of:tb.rows.length, pts:tb.rows[i].pts});
+    }
+  });
+
+  /* rating: mostly winning, then how heavily, then where they sit */
+  var winScore = (won + 0.5*drawn) / played * 10;
+  var margScore = Math.max(0, Math.min(10, 5 + per/3));
+  var posScore = places.length
+    ? places.reduce(function(a,p){ return a + (p.of-p.pos)/(p.of-1); }, 0) / places.length * 10
+    : winScore;
+  var rating = Math.round((0.45*winScore + 0.35*margScore + 0.20*posScore) * 10) / 10;
+
+  /* detail from the matches we hold */
+  var games = DATA.results.filter(function(r){ return r.branch===b && r.grade===g; });
+  var home = games.filter(function(r){ return atHome(r); });
+  var away = games.filter(function(r){ return !atHome(r); });
+  function wl(list){
+    return list.filter(function(r){return r.outcome==='W';}).length + 'W-' +
+           list.filter(function(r){return r.outcome==='L';}).length + 'L'; }
+  var best = null, worst = null;
+  games.forEach(function(r){
+    var m = r.ourTotal - r.theirTotal;
+    if(!best || m > best.ourTotal - best.theirTotal) best = r;
+    if(!worst || m < worst.ourTotal - worst.theirTotal) worst = r;
+  });
+  var goals = 0;
+  games.forEach(function(r){
+    var sc = r.isHome ? r.homeScore : r.awayScore;
+    if(sc && sc.indexOf('-') > -1) goals += parseInt(sc.split('-')[0], 10) || 0;
+  });
+
+  /* a verdict, assembled from what the numbers actually say */
+  var v = [];
+  v.push(rating >= 7 ? 'One of the strongest teams in the club this season.'
+       : rating >= 5.5 ? 'A solid season, winning more than losing.'
+       : rating >= 4   ? 'Around the middle \u2014 competitive without pulling away.'
+       : 'A hard season by the numbers.');
+
+  if(per >= 8) v.push('They win comfortably rather than narrowly, averaging ' +
+      Math.round(scored) + ' points to ' + Math.round(let_in) + '.');
+  else if(per <= -8) v.push('Defeats have been heavy, conceding ' + Math.round(let_in) +
+      ' a game against ' + Math.round(scored) + ' scored.');
+  else if(Math.abs(per) < 3) v.push('Games are tight either way \u2014 an average margin of ' +
+      (per >= 0 ? '+' : '') + per.toFixed(1) + ' points.');
+  else if(per > 0) v.push('Winning by a working margin rather than a hammering, ' +
+      scored.toFixed(1) + ' scored to ' + let_in.toFixed(1) + '.');
+  else v.push('Losing narrowly more often than heavily \u2014 ' + scored.toFixed(1) +
+      ' scored to ' + let_in.toFixed(1) + ' a game, so the gap is closeable.');
+
+  if(home.length >= 2 && away.length >= 2){
+    var hw = home.filter(function(r){return r.outcome==='W';}).length / home.length;
+    var aw = away.filter(function(r){return r.outcome==='W';}).length / away.length;
+    if(hw - aw >= 0.34) v.push('Noticeably better at home (' + wl(home) + ') than away (' + wl(away) + ').');
+    else if(aw - hw >= 0.34) v.push('Travelling well \u2014 ' + wl(away) + ' away against ' + wl(home) + ' at home.');
+  }
+
+  var recent = games.slice(0, 3), older = games.slice(3, 6);
+  if(recent.length === 3 && older.length === 3){
+    var rw = recent.filter(function(r){return r.outcome==='W';}).length;
+    var ow = older.filter(function(r){return r.outcome==='W';}).length;
+    if(rw - ow >= 2) v.push('Form is on the way up.');
+    else if(ow - rw >= 2) v.push('Form has slipped from earlier in the season.');
+  }
+
+  if(goals >= games.length * 3 && games.length >= 3)
+    v.push('A goal-hungry side \u2014 ' + goals + ' goals in ' + games.length + ' recorded games.');
+
+  if(played < 5) v.push('Only ' + played + ' games so far, so treat all of this lightly.');
+
+  var standing = places.map(function(p){
+    var good = p.pos <= Math.ceil(p.of/2);
+    return '<span class="pill' + (good ? '' : ' bad') + '">' + esc(p.comp) +
+           ' \u2014 ' + p.pos + ordinal(p.pos) + ' of ' + p.of + '</span>';
+  }).join('');
+
+  return '<div class="an">' +
+    '<div class="rate"><u>' + rating.toFixed(1) + '<i>/10</i></u>' +
+      '<span class="bar"><span style="width:' + (rating*10) + '%"></span></span></div>' +
+    '<div class="grid">' +
+      cell(winPct + '%', 'Win rate') +
+      cell((per>=0?'+':'') + per.toFixed(1), 'Margin a game') +
+      cell(scored.toFixed(1), 'Scored a game') +
+      cell(let_in.toFixed(1), 'Conceded a game') +
+    '</div>' +
+    (standing ? '<h4>Where they stand</h4><p class="standing">' + standing + '</p>' : '') +
+    '<h4>The season in short</h4><p>' + v.join(' ') + '</p>' +
+    (best && worst && games.length >= 2 ?
+      '<h4>Best and worst</h4><p class="standing">' +
+      '<b>Biggest win</b> \u2014 ' + esc(scoreText(best)) + '<br>' +
+      '<b>Heaviest defeat</b> \u2014 ' + esc(scoreText(worst)) + '</p>' : '') +
+    '<p class="note">Record from the county board league tables. The detail above ' +
+    'is drawn from the ' + games.length + ' matches the board has published in full.</p></div>';
+}
+function cell(a,b){ return '<div class="cell"><b>'+a+'</b><span>'+b+'</span></div>'; }
+function ordinal(n){
+  return n===1?'st':n===2?'nd':n===3?'rd':'th'; }
+function scoreText(r){
+  return label(r.opponent, r.branch) + ' ' + (r.isHome ? '(h)' : '(a)') + ' ' +
+    (r.isHome ? r.homeScore + ' v ' + r.awayScore : r.awayScore + ' v ' + r.homeScore) +
+    '  \u00b7  ' + shortDate(r.date);
+}
+
+var OPEN = {};
+function renderRecord(){
+  var out = branch === 'all'
+    ? branchRecord('men') + branchRecord('ladies')
+    : branchRecord(branch);
+  if(!out) return empty('No record yet', 'Once games are played the wins add up here.');
+  return '<p class="hint">Tap any team for a full breakdown \u2014 rating, form, ' +
+         'where they stand and how the season has gone.</p>' + out;
+}
+
+/* ---- news ---- */
+function renderNews(){
+  var all = DATA.news || [];
+  if(!all.length) return empty('Nothing in the papers',
+    'Anything the local papers publish about Killeshin lands here within a day.');
+  var free = all.filter(function(n){ return n.access !== 'subscriber'; });
+  var paid = all.filter(function(n){ return n.access === 'subscriber'; });
+  var html = '';
+  if(free.length){
+    html += sec('Free to read','Open these and read the whole story, no account needed.') +
+      free.map(function(n,i){ return story(n, i===0); }).join('');
+  } else {
+    html += empty('Nothing free this week','The subscriber stories below are all that came up.');
+  }
+  if(paid.length){
+    html += '<div class="paid">' +
+      sec('Behind a subscription','You will hit a paywall on these. Headline and link only.') +
+      paid.map(function(n){ return story(n,false); }).join('') + '</div>';
+  }
+  return html;
+}
+function sec(t,p){ return '<div class="sec"><span class="lbl">'+esc(t)+'</span><p>'+esc(p)+'</p></div>'; }
+function story(n, lead){
+  var age = -daysAway(n.date), when = shortDate(n.date);
+  if(age === 0) when = 'Today'; else if(age === 1) when = 'Yesterday';
+  else if(age > 1 && age < 7) when = age + ' days ago';
+  return '<a class="story'+(lead?' lead':'')+'" href="'+esc(n.url)+'" target="_blank" rel="noopener">' +
+    '<h3>'+esc(n.title)+'</h3><div class="by"><b>'+esc(n.source)+'</b> <s>\u00b7</s> '+esc(when) +
+    (n.tag ? ' <s>\u00b7</s> '+esc(n.tag) : '') +
+    (n.access==='subscriber' ? ' <s>\u00b7</s> Subscribers' : '') + '</div></a>';
+}
+
+/* ---- alerts ---- */
+function renderAlerts(){
+  var host = location.host + location.pathname.replace(/[^/]*$/,'');
+  var feeds = [['all','Every Killeshin match'],['men',"Men's fixtures only"],
+               ['ladies','Ladies fixtures only'],['home','Home games only']];
+  return '<div class="panel"><span class="lbl">Match alerts</span>' +
+    '<h2 class="dsp">Get a reminder before every game</h2>' +
+    '<p>Tap one below and your phone adds a Killeshin calendar. Every fixture appears ' +
+    'automatically with <b>an alert two hours before throw-in</b>. New fixtures land in it ' +
+    'on their own \u2014 you only do this once.</p>' +
+    feeds.map(function(f,i){
+      return '<a class="btn'+(i?' alt':'')+'" href="webcal://'+esc(host)+'killeshin-'+f[0]+'.ics">' +
+             esc(f[1]) + '</a>'; }).join('') +
+    '<p class="fine"><b>iPhone:</b> tap a button, then Subscribe. <b>Android:</b> copy the link ' +
+    'into Google Calendar under Other calendars \u2192 From URL.<br><br>' +
+    'Times come from the county boards. If a game is moved the calendar moves with it \u2014 ' +
+    'but always check with the manager on the day.</p></div>';
+}
+
+/* ---- club ---- */
+var CLUBVIEW = 'links';
+function renderMedia(){
+  var media = (DATA.club && DATA.club.media) || [];
+  var facts = (DATA.club && DATA.club.facts) || null;
+  if(!media.length && !facts) return empty('Nothing here yet', 'Media links can be added to the data block.');
+
+  var groups = [
+    ['video',  'Watch',  'Clubber TV put highlights on YouTube; the full games are on clubber.ie behind a subscription.'],
+    ['read',   'Read',   'Where the papers keep their Killeshin coverage.'],
+    ['social', 'Follow', 'The club\u2019s own channels.'],
+    ['about',  'History','Where the club\u2019s story is written down.']
+  ];
+  var mark = {video:'\u25B6', read:'\u2630', social:'\u25C9', about:'\u2691'};
+
+  var html = '';
+  groups.forEach(function(g){
+    var items = media.filter(function(m){ return m.kind === g[0]; });
+    if(!items.length) return;
+    html += '<div class="mgroup"><span class="lbl">' + esc(g[1]) + '</span>' +
+            '<p>' + esc(g[2]) + '</p></div>' +
+      items.map(function(m){
+        return '<a class="act" href="'+esc(m.url)+'" target="_blank" rel="noopener">' +
+          '<span class="ic">'+mark[m.kind]+'</span><span class="tx"><b>'+esc(m.title)+'</b>' +
+          '<span>'+esc(m.note)+'</span></span><span class="go">\u2192</span></a>';
+      }).join('');
+  });
+
+  if(facts){
+    html += '<div class="mgroup"><span class="lbl">About the club</span></div>' +
+      '<div class="clubfacts"><dl>' +
+      (facts.founded ? '<dt>Founded</dt><dd>'+esc(facts.founded)+'</dd>' : '') +
+      (facts.ground  ? '<dt>Ground</dt><dd>'+esc(facts.ground)+'</dd>' : '') +
+      (facts.colours ? '<dt>Colours</dt><dd>'+esc(facts.colours)+'</dd>' : '') +
+      '</dl>' +
+      (facts.honours && facts.honours.length
+        ? '<h4>Roll of honour</h4><ul>' +
+          facts.honours.map(function(x){ return '<li>'+esc(x)+'</li>'; }).join('') + '</ul>'
+        : '') +
+      '</div>';
+  }
+  return html;
+}
+
+function renderClub(){
+  var nav = '<div class="sub">' +
+    '<button data-cv="links"  aria-pressed="'+(CLUBVIEW==='links')+'">Club</button>' +
+    '<button data-cv="media"  aria-pressed="'+(CLUBVIEW==='media')+'">Media</button></div>';
+  return nav + (CLUBVIEW === 'media' ? renderMedia() : clubLinks());
+}
+function clubLinks(){
+  var links = (DATA.club && DATA.club.links) || [];
+  if(!links.length) return empty('Nothing here yet', 'Club links can be added to the data block.');
+  var groups = {}, order = [];
+  links.forEach(function(l){
+    if(!groups[l.group]){ groups[l.group] = []; order.push(l.group); }
+    groups[l.group].push(l);
+  });
+  return order.map(function(g){
+    return '<div class="sec"><span class="lbl">'+esc(g)+'</span></div>' +
+      groups[g].map(function(l){
+        return '<a class="act" href="'+esc(l.url)+'" target="_blank" rel="noopener">' +
+          '<span class="ic">'+esc(l.mark)+'</span><span class="tx"><b>'+esc(l.title)+'</b>' +
+          '<span>'+esc(l.note)+'</span></span><span class="go">\u2192</span></a>';
+      }).join('');
+  }).join('') +
+  '<p class="fine" style="padding:0 4px">These open the club\u2019s own pages in a new tab. ' +
+  'Payments are handled there, never in this app.</p>';
+}
+
+function emptyWhy(kind){
+  var who = branch==='men' ? "the men's teams" : branch==='ladies' ? 'the ladies teams' : 'any team';
+  if(homeOnly) return 'No home ' + kind + ' match that filter. Turn off Home only to see away games too.';
+  if(grade !== 'All') return 'Nothing for ' + grade + ' right now. Try another team above.';
+  return kind === 'fixtures'
+    ? 'Nothing down for ' + who + ' yet. New fixtures appear within an hour of the county board publishing them.'
+    : 'Once ' + who + ' play, the scores show up here.';
+}
+function empty(title,msg){
+  return '<div class="empty"><img src="'+crestOf(branch==='ladies'?'ladies':'men')+'" alt="">' +
+         '<b>'+esc(title)+'</b><span>'+esc(msg)+'</span></div>';
+}
+
+/* ---- shell ---- */
+function grades(){
+  var G = DATA.gradesBy || {};
+  if(branch === 'all'){
+    var seen = {}, out = [];
+    ['men','ladies'].forEach(function(b){
+      (G[b]||[]).forEach(function(g){ if(!seen[g]){ seen[g]=1; out.push(g); } }); });
+    return out;
+  }
+  return G[branch] || [];
+}
+function filters(){
+  var box = document.getElementById('filters');
+  if(view === 'news' || view === 'alerts' || view === 'club' || view === 'record'){
+    box.hidden = true; return; }
+  box.hidden = false;
+  var chips = ['All'].concat(grades()).map(function(g){
+    return '<button class="chip" aria-pressed="'+(g===grade)+'" data-g="'+esc(g)+'">'+esc(g)+'</button>';
+  }).join('');
+  box.innerHTML = chips + (view === 'tables' ? '' :
+    '<button class="home-t" id="homeT" aria-pressed="'+homeOnly+'">Home only</button>');
+}
+function drawInner(){
+  document.getElementById('out').innerHTML =
+    view==='fixtures' ? renderFixtures() :
+    view==='results'  ? renderResults()  :
+    view==='tables'   ? renderTables()   :
+    view==='record'   ? renderRecord()   :
+    view==='news'     ? renderNews()     :
+    view==='alerts'   ? renderAlerts()   : renderClub();
+}
+/* Jumping to the very top meant scrolling back past the hero every time a
+   tab was tapped. Instead, land on the tab bar - or stay put if already
+   above it. Expanding a row or a background refresh must not move at all. */
+/* Switching tab puts you at the top of the new list, with the hero and
+   next-at-home panels scrolled out of the way. Opening the app still
+   shows them. */
+function toNav(){
+  try {
+    var nav = document.querySelector('.nav');
+    if(nav) window.scrollTo(0, nav.offsetTop);
+  } catch(err){ /* scrolling is never worth an error */ }
+}
+function draw(scroll){
+  try { drawInner(); filters(); }
+  catch(err){
+    console.error(err);
+    document.getElementById('out').innerHTML =
+      empty('Something went wrong', 'Pull down to refresh.');
+  }
+  if(scroll !== false) toNav();
+}
+document.getElementById('branch').addEventListener('click', function(e){
+  var b = e.target.closest('.br'); if(!b) return;
+  branch = b.dataset.b;
+  count('/branch/' + branch);
+  if(grade !== 'All' && grades().indexOf(grade) === -1) grade = 'All';
+  document.querySelectorAll('.br').forEach(function(x){
+    x.setAttribute('aria-pressed', String(x.dataset.b === branch)); });
+  document.getElementById('mastCrest').src = crestOf(branch==='ladies'?'ladies':'men');
+  document.getElementById('mastSub').textContent =
+    branch==='men' ? 'CLG Gleann Uiseann' : branch==='ladies' ? 'Killeshin Ladies' : "Men and Ladies";
+  renderNext(); draw((window.pageYOffset || 0) >= 40);
+});
+document.getElementById('out').addEventListener('click', function(e){
+  var sub = e.target.closest('.sub button');
+  if(sub){ CLUBVIEW = sub.dataset.cv; count('/club/' + CLUBVIEW); draw(false); return; }
+  var row = e.target.closest('.gr'); if(!row) return;
+  var k = row.dataset.key;
+  OPEN[k] = !OPEN[k];
+  count('/record/' + k.replace('|', '/'));
+  draw(false);
+});
+document.getElementById('filters').addEventListener('click', function(e){
+  var c = e.target.closest('.chip');
+  if(c){ grade = c.dataset.g; draw(); return; }
+  if(e.target.closest('#homeT')){ homeOnly = !homeOnly; draw(); }
+});
+document.querySelector('.tabs').addEventListener('click', function(e){
+  var t = e.target.closest('.tab'); if(!t) return;
+  view = t.dataset.view;
+  count('/' + view);
+  document.querySelectorAll('.tab').forEach(function(x){
+    x.setAttribute('aria-selected', String(x === t)); });
+  draw();
+});
+function stamp(){
+  var u = new Date(DATA.updated);
+  var same = u.toDateString() === new Date().toDateString();
+  document.getElementById('stamp').textContent = 'Updated ' +
+    (same ? 'today at ' + u.toTimeString().slice(0,5) : shortDate(DATA.updated.slice(0,10)));
+}
+
+/* ---- visitor counter ----
+   A free third-party tally. If it is ever unreachable the badge simply
+   stays hidden rather than showing a broken number. */
+/* Tell GoatCounter which tab was opened, so the dashboard shows what people
+   actually use, not just that they arrived. Silent if the script is blocked. */
+function count(path){
+  try {
+    if(window.goatcounter && window.goatcounter.count){
+      window.goatcounter.count({path: path, event: false});
+    }
+  } catch(err){ /* stats must never break the app */ }
+}
+
+function counter(){
+  var el = document.getElementById('count');
+  if(!el) return;
+
+  function show(n){
+    var v = Number(n);
+    if(!isFinite(v)) return false;
+    el.hidden = false;
+    el.textContent = '\u25C9 ' + v.toLocaleString() + (v === 1 ? ' visit' : ' visits');
+    return true;
+  }
+
+  /* Two JSON counters, then an image badge that needs no CORS at all.
+     Whichever answers first wins; if none do, nothing is shown. */
+  var tries = [
+    { url: 'https://api.counterapi.dev/v1/killeshingaa/app/up',
+      read: function(j){ return j && (j.count != null ? j.count : j.value); } },
+    { url: 'https://api.countapi.xyz/hit/killeshin-gaa-app/visits',
+      read: function(j){ return j && j.value; } }
+  ];
+
+  function attempt(i){
+    if(i >= tries.length){ badge(); return; }
+    fetch(tries[i].url, {cache:'no-store'})
+      .then(function(r){ if(!r.ok) throw 0; return r.json(); })
+      .then(function(j){ if(!show(tries[i].read(j))) throw 0; })
+      .catch(function(){ attempt(i + 1); });
+  }
+
+  function badge(){
+    var img = document.createElement('img');
+    img.alt = 'visits';
+    img.onload = function(){ el.hidden = false; el.textContent = ''; el.appendChild(img); };
+    img.src = 'https://hits.sh/' + location.host + location.pathname +
+              '.svg?style=flat-square&label=visits&color=23a65a&labelColor=0b3d24';
+  }
+
+  attempt(0);
+}
+
+function boot(first){
+  try { renderNext(); } catch(err){ console.error(err);
+    document.getElementById('hero').hidden = true;
+    document.getElementById('athome').hidden = true; }
+  draw(first !== true);
+  try { stamp(); } catch(err){ console.error(err); }
+}
+boot(true);
+counter();
+
+/* Tick every half minute: refreshes the countdown, and rolls straight on to
+   the following game the moment throw-in passes - no reload needed. */
+setInterval(function(){
+  try { renderNext(); if(view === 'fixtures') draw(false); } catch(err){ console.error(err); }
+}, 30000);
+
+/* Data lives in the seed block above. update.py rewrites it in place, so
+   there is no second file to fall out of step with this one. */
+})();
+</script>
+</body>
+</html>
