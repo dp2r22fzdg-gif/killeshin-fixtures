@@ -48,6 +48,37 @@ BRANCHES = {
 }
 GROUND = "Seamus Hearns Park"
 
+# ---------------------------------------------------------------------------
+# Matches called off. The county boards are often slow to mark these, so put
+# them here and the app stamps POSTPONED across the fixture within the hour.
+#
+#   date   - the day it was due to be played, YYYY-MM-DD
+#   grade  - Senior, Junior A, U17, U16 ... as shown on the filter chips
+#   branch - "men" or "ladies"
+#   note   - optional line shown under the stamp
+#
+# Delete the entry once a new date is published and it goes back to normal.
+# ---------------------------------------------------------------------------
+POSTPONED = [
+    # {"date": "2026-09-08", "grade": "U16", "branch": "ladies",
+    #  "note": "New date to be confirmed"},
+]
+
+
+def mark_postponed(fixtures):
+    hits = 0
+    for f in fixtures:
+        for pp in POSTPONED:
+            if (f["date"] == pp["date"]
+                    and f["grade"] == pp.get("grade", f["grade"])
+                    and f["branch"] == pp.get("branch", f["branch"])
+                    and pp.get("opponent", f["opponent"]) == f["opponent"]):
+                f["postponed"] = True
+                f["postponedNote"] = pp.get("note", "")
+                hits += 1
+    print("  postponed: %d marked" % hits)
+    return fixtures
+
 # Club links shown on the Club tab. Edit here; the app picks them up on the
 # next run. "mark" is the letter in the circle.
 CLUB_LINKS = [
@@ -421,7 +452,7 @@ def write_calendars(fixtures, today):
              "men": ("Men's", lambda m: m["branch"] == "men"),
              "ladies": ("Ladies", lambda m: m["branch"] == "ladies"),
              "home": ("Home games", lambda m: "Killeshin" in m["venue"])}
-    upcoming = sorted([f for f in fixtures if f["date"] >= today],
+    upcoming = sorted([f for f in fixtures if f["date"] >= today and not f.get("postponed")],
                       key=lambda x: (x["date"], x["time"]))
     stamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
 
@@ -548,6 +579,7 @@ def main():
     free = sum(1 for n in news if n["access"] == "free")
     print("    %d stories (free %d, subscriber %d)" % (len(news), free, len(news) - free))
 
+    fixtures = mark_postponed(fixtures)
     fixtures.sort(key=lambda x: (x["date"], x["time"]))
     results.sort(key=lambda x: (x["date"], x["time"]), reverse=True)
     items = fixtures + results + tables
