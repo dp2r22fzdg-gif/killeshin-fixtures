@@ -65,6 +65,86 @@ POSTPONED = [
 ]
 
 
+# ---------------------------------------------------------------------------
+# Media shown on the Club tab. Add a line here and it appears within the hour.
+# kind: video | social | read | about
+# ---------------------------------------------------------------------------
+MEDIA = [
+    # Clubber put highlights on YouTube and keep the full games behind their
+    # subscription. The search link is first because it always has the newest.
+    {"kind": "video", "title": "Clubber TV \u2014 every Killeshin game",
+     "note": "Highlights of every championship match they film, newest first",
+     "url": "https://www.youtube.com/@clubbertvsports/search?query=Killeshin"},
+    {"kind": "video", "title": "Killeshin on TikTok",
+     "note": "@killeshin.gaa \u2014 the club\u2019s own videos, 1,900 followers",
+     "url": "https://www.tiktok.com/@killeshin.gaa"},
+    {"kind": "video", "title": "Clubber.ie \u2014 full matches",
+     "note": "The complete games, not just highlights. Subscription needed.",
+     "url": "https://www.clubber.ie/"},
+    {"kind": "video", "title": "Killeshin v Rosenallis \u2014 SFC Round 2",
+     "note": "Highlights, 7 August 2026",
+     "url": "https://www.youtube.com/watch?v=quXSGaRA0gg"},
+    {"kind": "video", "title": "Killeshin v Stradbally \u2014 SFC Round 1",
+     "note": "Highlights, 22 July 2026",
+     "url": "https://www.youtube.com/watch?v=WIAOJlITbOM"},
+    {"kind": "video", "title": "Anything else on YouTube",
+     "note": "A wider search, newest first",
+     "url": "https://www.youtube.com/results?search_query=%22Killeshin%22+GAA&sp=CAI%253D"},
+
+    {"kind": "read", "title": "All Killeshin news, every paper",
+     "note": "One list, newest first, across every title that covers the club",
+     "url": "https://news.google.com/search?q=Killeshin%20GAA%20OR%20%22Killeshin%22%20Laois&hl=en-IE&gl=IE&ceid=IE:en"},
+    {"kind": "read", "title": "LaoisToday \u2014 Killeshin archive",
+     "note": "Years of match reports",
+     "url": "https://www.laoistoday.ie/tag/killeshin/"},
+    {"kind": "read", "title": "LaoisToday \u2014 Killeshin GAA archive",
+     "note": "Club news rather than match reports",
+     "url": "https://www.laoistoday.ie/tag/killeshin-gaa/"},
+    {"kind": "read", "title": "Leinster Express \u2014 Killeshin only",
+     "note": "Free to read. Covers the ladies team too.",
+     "url": "https://www.google.com/search?q=site%3Aleinsterexpress.ie+Killeshin&tbs=sbd%3A1"},
+    {"kind": "read", "title": "Laois Nationalist \u2014 Killeshin only",
+     "note": "Free to read",
+     "url": "https://www.google.com/search?q=site%3Alaois-nationalist.ie+Killeshin&tbs=sbd%3A1"},
+    {"kind": "read", "title": "Carlow Nationalist \u2014 Killeshin only",
+     "note": "The club sits on the border, so worth watching",
+     "url": "https://www.google.com/search?q=site%3Acarlow-nationalist.ie+Killeshin&tbs=sbd%3A1"},
+
+    {"kind": "social", "title": "Killeshin GAA on Facebook",
+     "note": "2,400 followers \u2014 club news lands here first",
+     "url": "https://www.facebook.com/KilleshinGaa/"},
+    {"kind": "social", "title": "Killeshin GAA on TikTok",
+     "note": "@killeshin.gaa \u2014 35,000 likes",
+     "url": "https://www.tiktok.com/@killeshin.gaa"},
+    {"kind": "social", "title": "Killeshin GAA on Instagram",
+     "note": "@killeshingaa",
+     "url": "https://www.instagram.com/killeshingaa/"},
+    {"kind": "social", "title": "@GaaKilleshin on X",
+     "note": "Club account, quiet since 2018",
+     "url": "https://x.com/GaaKilleshin"},
+
+    {"kind": "about", "title": "Killeshin GAA on Wikipedia",
+     "note": "Club history, honours and notable years",
+     "url": "https://en.wikipedia.org/wiki/Killeshin_GAA"},
+    {"kind": "about", "title": "2019 Laois Senior Championship",
+     "note": "The year Killeshin reached a first ever senior county final",
+     "url": "https://en.wikipedia.org/wiki/2019_Laois_Senior_Football_Championship"},
+]
+
+# A few facts for the About panel. Sourced from Wikipedia and the county board.
+CLUB_FACTS = {
+    "founded": "1921",
+    "ground": "Seamus Hearns Park, also called P\u00e1irc Uise\u00e1n",
+    "colours": "Green and white",
+    "honours": [
+        "Laois Intermediate Championship \u2014 1958, 1974, 1993, 2011",
+        "Laois Junior Championship \u2014 1957, 1969, 1981, 2008",
+        "First ever Laois Senior Championship final \u2014 2019",
+        "Winners of RT\u00c9\u2019s Celebrity Bainisteoir, 2011, managed by Tony Cascarino",
+    ],
+}
+
+
 def mark_postponed(fixtures):
     hits = 0
     for f in fixtures:
@@ -593,7 +673,7 @@ def main():
         "source": BRANCHES["men"]["source"],
         "updated": now.isoformat(timespec="seconds"),
         "fixtures": fixtures, "results": results, "tables": tables, "news": news,
-        "club": {"links": CLUB_LINKS},
+        "club": {"links": CLUB_LINKS, "media": MEDIA, "facts": CLUB_FACTS},
     }
 
     print("Calendars")
