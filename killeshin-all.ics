@@ -8,22 +8,8 @@ X-WR-TIMEZONE:Europe/Dublin
 REFRESH-INTERVAL;VALUE=DURATION:PT6H
 X-PUBLISHED-TTL:PT6H
 BEGIN:VEVENT
-UID:killeshin-men-2026-09-06-0@killeshingaa
-DTSTAMP:20260906T222032Z
-DTSTART;TZID=Europe/Dublin:20260906T170000
-DTEND;TZID=Europe/Dublin:20260906T183000
-SUMMARY:Killeshin v Colt Shanahoe (Men's U13)
-LOCATION:Killeshin GAA Grounds
-DESCRIPTION:U13 Football "C" Competition - League Division 1 - Round 7
-BEGIN:VALARM
-TRIGGER:-PT120M
-ACTION:DISPLAY
-DESCRIPTION:Killeshin v Colt Shanahoe today
-END:VALARM
-END:VEVENT
-BEGIN:VEVENT
-UID:killeshin-ladies-2026-09-08-1@killeshingaa
-DTSTAMP:20260906T222032Z
+UID:killeshin-ladies-2026-09-08-0@killeshingaa
+DTSTAMP:20260906T231921Z
 DTSTART;TZID=Europe/Dublin:20260908T183000
 DTEND;TZID=Europe/Dublin:20260908T200000
 SUMMARY:Killeshin v Ballyfin (Ladies U16)
@@ -36,8 +22,8 @@ DESCRIPTION:Killeshin v Ballyfin today
 END:VALARM
 END:VEVENT
 BEGIN:VEVENT
-UID:killeshin-ladies-2026-09-10-2@killeshingaa
-DTSTAMP:20260906T222032Z
+UID:killeshin-ladies-2026-09-10-1@killeshingaa
+DTSTAMP:20260906T231921Z
 DTSTART;TZID=Europe/Dublin:20260910T183000
 DTEND;TZID=Europe/Dublin:20260910T200000
 SUMMARY:Killeshin v Ballyfin (Ladies U14)
@@ -50,8 +36,8 @@ DESCRIPTION:Killeshin v Ballyfin today
 END:VALARM
 END:VEVENT
 BEGIN:VEVENT
-UID:killeshin-ladies-2026-09-11-3@killeshingaa
-DTSTAMP:20260906T222032Z
+UID:killeshin-ladies-2026-09-11-2@killeshingaa
+DTSTAMP:20260906T231921Z
 DTSTART;TZID=Europe/Dublin:20260911T183000
 DTEND;TZID=Europe/Dublin:20260911T200000
 SUMMARY:Killeshin v Shanahoe (Ladies Intermediate)
@@ -64,8 +50,8 @@ DESCRIPTION:Killeshin v Shanahoe today
 END:VALARM
 END:VEVENT
 BEGIN:VEVENT
-UID:killeshin-men-2026-09-12-4@killeshingaa
-DTSTAMP:20260906T222032Z
+UID:killeshin-men-2026-09-12-3@killeshingaa
+DTSTAMP:20260906T231921Z
 DTSTART;TZID=Europe/Dublin:20260912T113000
 DTEND;TZID=Europe/Dublin:20260912T130000
 SUMMARY:Ballylinan v Killeshin (Men's U15)
@@ -78,8 +64,8 @@ DESCRIPTION:Ballylinan v Killeshin today
 END:VALARM
 END:VEVENT
 BEGIN:VEVENT
-UID:killeshin-men-2026-09-12-5@killeshingaa
-DTSTAMP:20260906T222032Z
+UID:killeshin-men-2026-09-12-4@killeshingaa
+DTSTAMP:20260906T231921Z
 DTSTART;TZID=Europe/Dublin:20260912T190000
 DTEND;TZID=Europe/Dublin:20260912T203000
 SUMMARY:Portlaoise v Killeshin (Men's Senior)
@@ -92,8 +78,8 @@ DESCRIPTION:Portlaoise v Killeshin today
 END:VALARM
 END:VEVENT
 BEGIN:VEVENT
-UID:killeshin-men-2026-09-13-6@killeshingaa
-DTSTAMP:20260906T222032Z
+UID:killeshin-men-2026-09-13-5@killeshingaa
+DTSTAMP:20260906T231921Z
 DTSTART;TZID=Europe/Dublin:20260913T120000
 DTEND;TZID=Europe/Dublin:20260913T133000
 SUMMARY:The Rock GAA Club v Killeshin (Men's Junior A)
@@ -106,8 +92,8 @@ DESCRIPTION:The Rock GAA Club v Killeshin today
 END:VALARM
 END:VEVENT
 BEGIN:VEVENT
-UID:killeshin-ladies-2026-09-15-7@killeshingaa
-DTSTAMP:20260906T222032Z
+UID:killeshin-ladies-2026-09-15-6@killeshingaa
+DTSTAMP:20260906T231921Z
 DTSTART;TZID=Europe/Dublin:20260915T183000
 DTEND;TZID=Europe/Dublin:20260915T200000
 SUMMARY:Ballyroan v Killeshin (Ladies U16)
@@ -120,8 +106,8 @@ DESCRIPTION:Ballyroan v Killeshin today
 END:VALARM
 END:VEVENT
 BEGIN:VEVENT
-UID:killeshin-men-2026-09-20-8@killeshingaa
-DTSTAMP:20260906T222032Z
+UID:killeshin-men-2026-09-20-7@killeshingaa
+DTSTAMP:20260906T231921Z
 DTSTART;TZID=Europe/Dublin:20260920T113000
 DTEND;TZID=Europe/Dublin:20260920T130000
 SUMMARY:Killeshin v St Joseph's (Men's U17)
@@ -134,8 +120,8 @@ DESCRIPTION:Killeshin v St Joseph's today
 END:VALARM
 END:VEVENT
 BEGIN:VEVENT
-UID:killeshin-ladies-2026-09-22-9@killeshingaa
-DTSTAMP:20260906T222032Z
+UID:killeshin-ladies-2026-09-22-8@killeshingaa
+DTSTAMP:20260906T231921Z
 DTSTART;TZID=Europe/Dublin:20260922T183000
 DTEND;TZID=Europe/Dublin:20260922T200000
 SUMMARY:Killeshin v Mountrath (Ladies Minor)
@@ -148,8 +134,8 @@ DESCRIPTION:Killeshin v Mountrath today
 END:VALARM
 END:VEVENT
 BEGIN:VEVENT
-UID:killeshin-ladies-2026-09-29-10@killeshingaa
-DTSTAMP:20260906T222032Z
+UID:killeshin-ladies-2026-09-29-9@killeshingaa
+DTSTAMP:20260906T231921Z
 DTSTART;TZID=Europe/Dublin:20260929T180000
 DTEND;TZID=Europe/Dublin:20260929T193000
 SUMMARY:St Brigids v Killeshin (Ladies U16)
@@ -162,8 +148,8 @@ DESCRIPTION:St Brigids v Killeshin today
 END:VALARM
 END:VEVENT
 BEGIN:VEVENT
-UID:killeshin-men-2026-10-16-11@killeshingaa
-DTSTAMP:20260906T222032Z
+UID:killeshin-men-2026-10-16-10@killeshingaa
+DTSTAMP:20260906T231921Z
 DTSTART;TZID=Europe/Dublin:20261016T193000
 DTEND;TZID=Europe/Dublin:20261016T210000
 SUMMARY:Stradbally Parish Gaels v Killeshin (Men's U20)
@@ -176,8 +162,8 @@ DESCRIPTION:Stradbally Parish Gaels v Killeshin today
 END:VALARM
 END:VEVENT
 BEGIN:VEVENT
-UID:killeshin-men-2026-10-24-12@killeshingaa
-DTSTAMP:20260906T222032Z
+UID:killeshin-men-2026-10-24-11@killeshingaa
+DTSTAMP:20260906T231921Z
 DTSTART;TZID=Europe/Dublin:20261024T190000
 DTEND;TZID=Europe/Dublin:20261024T203000
 SUMMARY:Killeshin v Portarlington (Men's U20)
@@ -190,8 +176,8 @@ DESCRIPTION:Killeshin v Portarlington today
 END:VALARM
 END:VEVENT
 BEGIN:VEVENT
-UID:killeshin-men-2026-11-06-13@killeshingaa
-DTSTAMP:20260906T222032Z
+UID:killeshin-men-2026-11-06-12@killeshingaa
+DTSTAMP:20260906T231921Z
 DTSTART;TZID=Europe/Dublin:20261106T193000
 DTEND;TZID=Europe/Dublin:20261106T210000
 SUMMARY:Portlaoise v Killeshin (Men's U20)
