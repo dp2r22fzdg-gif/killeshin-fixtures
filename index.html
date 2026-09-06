@@ -54,15 +54,17 @@ a{color:inherit;text-decoration:none}
 
 /* ── branch switch: three big, obvious buttons ──────────── */
 .branch{display:flex;gap:9px;padding:16px 16px 4px;margin-top:-14px}
-.br{flex:1;background:var(--paper);border-radius:var(--r);padding:13px 6px 11px;
+.br{flex:1;background:var(--green-lt);border-radius:14px;padding:13px 6px 11px;
   display:flex;flex-direction:column;align-items:center;gap:7px;
-  font-size:13.5px;font-weight:700;color:var(--grey);
-  border:2px solid var(--line);box-shadow:0 2px 10px rgba(20,60,40,.05)}
-.br img{width:38px;height:38px;object-fit:contain;opacity:.42}
+  font-size:13.5px;font-weight:700;color:var(--green-dk);
+  border:1.5px solid #BFDFCD;
+  box-shadow:0 3px 0 #BFDFCD, 0 4px 8px rgba(20,60,40,.09);transform:translateY(-1px)}
+.br:active{box-shadow:0 1px 0 #BFDFCD;transform:translateY(1px)}
+.br img{width:38px;height:38px;object-fit:contain;opacity:.5}
 .br .dual{display:flex;width:38px;height:38px;align-items:center;justify-content:center}
 .br .dual img{width:26px;height:26px;margin:0 -5px}
-.br[aria-pressed="true"]{background:var(--forest);border-color:var(--green-dk);color:#fff;
-  box-shadow:0 4px 14px rgba(26,122,72,.28)}
+.br[aria-pressed="true"]{background:var(--forest);border-color:#0F5C34;color:#fff;
+  box-shadow:inset 0 2px 5px rgba(0,0,0,.28), 0 1px 0 #0F5C34;transform:translateY(1px)}
 .br[aria-pressed="true"] img{opacity:1;filter:brightness(0) invert(1)}
 
 /* ── next match ─────────────────────────────────────────── */
@@ -113,24 +115,39 @@ a{color:inherit;text-decoration:none}
 
 /* ── nav ────────────────────────────────────────────────── */
 .nav{position:sticky;top:0;z-index:30;background:var(--paper-2);padding-top:14px}
-.tabs{display:flex;gap:5px;margin:0 16px;background:var(--paper);border-radius:999px;
-  padding:5px;box-shadow:0 2px 10px rgba(20,60,40,.06);overflow-x:auto;scrollbar-width:none}
+.tabs{display:flex;gap:7px;margin:0 16px;padding:3px 0 7px;
+  overflow-x:auto;scrollbar-width:none}
 .tabs::-webkit-scrollbar{display:none}
-.tab{flex:1;white-space:nowrap;padding:9px 13px;border-radius:999px;font-size:12.5px;
-  font-weight:700;color:var(--grey);letter-spacing:.02em;border:1.5px solid var(--line)}
-.tab[aria-selected="true"]{background:var(--forest);color:#fff;border-color:var(--green-dk)}
+/* Raised buttons: a solid edge underneath does the lifting, and the selected
+   one sinks into the page. Reads as pressable without any gloss. */
+.tab{flex:none;white-space:nowrap;padding:10px 16px 9px;border-radius:12px;
+  font-size:13px;font-weight:700;letter-spacing:.01em;
+  background:var(--green-lt);color:var(--green-dk);
+  border:1.5px solid #BFDFCD;
+  box-shadow:0 3px 0 #BFDFCD, 0 4px 8px rgba(20,60,40,.09);
+  transform:translateY(-1px)}
+.tab:active{box-shadow:0 1px 0 #BFDFCD;transform:translateY(1px)}
+.tab[aria-selected="true"]{background:var(--forest);color:#fff;border-color:#0F5C34;
+  box-shadow:inset 0 2px 5px rgba(0,0,0,.28), 0 1px 0 #0F5C34;
+  transform:translateY(1px)}
 .filters{display:flex;gap:8px;overflow-x:auto;padding:12px 16px 4px;scrollbar-width:none;
   align-items:center}
 .filters::-webkit-scrollbar{display:none}
 .filters[hidden]{display:none}
-.chip{flex:none;font-size:13.5px;font-weight:600;color:var(--grey);white-space:nowrap;
-  padding:7px 14px;border-radius:999px;background:var(--paper);border:1px solid var(--line)}
-.chip[aria-pressed="true"]{background:var(--ink);color:#fff;border-color:var(--ink)}
+.chip{flex:none;font-size:13.5px;font-weight:600;color:var(--green-dk);white-space:nowrap;
+  padding:7px 15px;border-radius:10px;background:var(--green-lt);border:1px solid #BFDFCD;
+  box-shadow:0 2px 0 #BFDFCD}
+.chip:active{box-shadow:0 0 0 #BFDFCD;transform:translateY(2px)}
+.chip[aria-pressed="true"]{background:var(--ink);color:#fff;border-color:var(--ink);
+  box-shadow:inset 0 2px 4px rgba(0,0,0,.3);transform:translateY(1px)}
 .home-t{flex:none;display:flex;align-items:center;gap:7px;font-size:13.5px;font-weight:600;
-  color:var(--grey);white-space:nowrap;padding:7px 14px 7px 12px;background:var(--paper);
-  border:1px solid var(--line);border-radius:999px}
-.home-t::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--line-dk)}
-.home-t[aria-pressed="true"]{color:#fff;background:var(--green-dk);border-color:var(--green-dk)}
+  color:var(--green-dk);white-space:nowrap;padding:7px 15px 7px 13px;background:var(--green-lt);
+  border:1px solid #BFDFCD;border-radius:10px;box-shadow:0 2px 0 #BFDFCD}
+.home-t::before{content:"";width:8px;height:8px;border-radius:50%;background:#8FC3A4}
+.home-t:active{box-shadow:none;transform:translateY(2px)}
+.home-t[aria-pressed="true"]{color:#fff;background:var(--green-dk);border-color:#0F5C34;
+  box-shadow:inset 0 2px 4px rgba(0,0,0,.3);transform:translateY(1px)}
+.home-t[aria-pressed="true"]::before{background:#fff}
 .home-t[aria-pressed="true"]::before{background:#fff}
 
 /* ── lists: soft cards, no hard rules ───────────────────── */
@@ -228,12 +245,19 @@ tr.us td{background:var(--green-lt);color:var(--ink);font-weight:700}
 .gr.none .w u{color:var(--line-dk)}
 .bhead{display:flex;align-items:center;gap:11px;padding:20px 4px 12px}
 .bhead img{width:34px;height:34px;object-fit:contain}
+.hint{margin:14px 4px 4px;font-size:13.5px;color:var(--grey);line-height:1.5;
+  background:var(--green-lt);border-radius:var(--r-sm);padding:12px 14px}
 .bhead b{font-size:19px;font-family:'Bricolage Grotesque',Archivo,sans-serif;font-weight:800}
 
 /* ── record: expandable analysis ────────────────────────── */
 .gr{cursor:pointer}
-.gr .go{flex:none;font-size:15px;color:var(--grey-lt);transition:transform .15s}
-.gr[aria-expanded="true"] .go{transform:rotate(90deg);color:var(--green-dk)}
+.gr .go{flex:none;display:flex;align-items:center;gap:6px;font-size:11.5px;font-weight:700;
+  letter-spacing:.05em;text-transform:uppercase;color:var(--green-dk);
+  background:var(--green-lt);border-radius:999px;padding:6px 11px 6px 12px;white-space:nowrap}
+.gr .go em{font-style:normal;font-size:14px;line-height:1;transition:transform .15s;display:block}
+.gr[aria-expanded="true"] .go{background:var(--forest);color:#fff}
+.gr[aria-expanded="true"] .go em{transform:rotate(90deg)}
+.gr:active{transform:translateY(1px)}
 .gr[aria-expanded="true"]{border-bottom-left-radius:0;border-bottom-right-radius:0;
   margin-bottom:0;box-shadow:0 -2px 10px rgba(20,60,40,.05)}
 .an{background:var(--paper);border-radius:0 0 var(--r) var(--r);padding:2px 17px 18px;
@@ -285,8 +309,12 @@ tr.us td{background:var(--green-lt);color:var(--ink);font-weight:700}
 .panel p{margin:0 0 16px;font-size:14.5px;color:var(--grey);line-height:1.6}
 .panel p b{color:var(--ink);font-weight:600}
 .btn{display:block;background:var(--forest);color:#fff;text-align:center;padding:16px;
-  font-size:15px;font-weight:700;border-radius:999px;margin-bottom:9px}
-.btn.alt{background:var(--green-lt);color:var(--green-dk)}
+  font-size:15px;font-weight:700;border-radius:12px;margin-bottom:11px;
+  border:1.5px solid #0F5C34;box-shadow:0 3px 0 #0F5C34}
+.btn:active{box-shadow:0 1px 0 #0F5C34;transform:translateY(2px)}
+.btn.alt{background:var(--green-lt);color:var(--green-dk);border-color:#BFDFCD;
+  box-shadow:0 3px 0 #BFDFCD}
+.btn.alt:active{box-shadow:0 1px 0 #BFDFCD}
 .fine{font-size:13px;color:var(--grey-lt);line-height:1.6;margin:14px 0 0}
 .act{display:flex;align-items:center;gap:15px;background:var(--paper);border-radius:var(--r);
   padding:16px 18px;margin-bottom:9px;box-shadow:0 2px 10px rgba(20,60,40,.05)}
@@ -332,7 +360,7 @@ tr.us td{background:var(--green-lt);color:var(--ink);font-weight:700}
 
 <nav class="branch" id="branch" aria-label="Choose a branch">
   <button class="br" data-b="all" aria-pressed="true">
-    <span class="dual"><img src="crest.png" alt=""><img src="crest-ladies.png" alt=""></span>Both</button>
+    <span class="dual"><img src="crest.png" alt=""><img src="crest-ladies.png" alt=""></span>All</button>
   <button class="br" data-b="men" aria-pressed="false">
     <img src="crest.png" alt="">Men</button>
   <button class="br" data-b="ladies" aria-pressed="false">
@@ -743,7 +771,7 @@ function branchRecord(b){
       '<span>'+r.p+' played \u00b7 '+r.W+'W '+r.D+'D '+r.L+'L \u00b7 '+gp+'% \u00b7 ' +
       r.f+'\u2013'+r.a+'</span></div>' +
       '<div class="w"><u>'+r.W+'</u><span>Wins</span></div>' +
-      '<span class="go">\u203A</span></div>' +
+      '<span class="go">' + (open ? 'Close' : 'Stats') + '<em>\u203A</em></span></div>' +
       (open ? analyse(b, g) : '');
   }).join('');
 
@@ -876,7 +904,8 @@ function renderRecord(){
     ? branchRecord('men') + branchRecord('ladies')
     : branchRecord(branch);
   if(!out) return empty('No record yet', 'Once games are played the wins add up here.');
-  return out;
+  return '<p class="hint">Tap any team for a full breakdown \u2014 rating, form, ' +
+         'where they stand and how the season has gone.</p>' + out;
 }
 
 /* ---- news ---- */
