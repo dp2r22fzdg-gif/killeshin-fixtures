@@ -995,14 +995,26 @@ function drawInner(){
     view==='news'     ? renderNews()     :
     view==='alerts'   ? renderAlerts()   : renderClub();
 }
-function draw(){
+/* Jumping to the very top meant scrolling back past the hero every time a
+   tab was tapped. Instead, land on the tab bar - or stay put if already
+   above it. Expanding a row or a background refresh must not move at all. */
+/* Switching tab puts you at the top of the new list, with the hero and
+   next-at-home panels scrolled out of the way. Opening the app still
+   shows them. */
+function toNav(){
+  try {
+    var nav = document.querySelector('.nav');
+    if(nav) window.scrollTo(0, nav.offsetTop);
+  } catch(err){ /* scrolling is never worth an error */ }
+}
+function draw(scroll){
   try { drawInner(); filters(); }
   catch(err){
     console.error(err);
     document.getElementById('out').innerHTML =
       empty('Something went wrong', 'Pull down to refresh.');
   }
-  window.scrollTo(0,0);
+  if(scroll !== false) toNav();
 }
 document.getElementById('branch').addEventListener('click', function(e){
   var b = e.target.closest('.br'); if(!b) return;
@@ -1014,14 +1026,14 @@ document.getElementById('branch').addEventListener('click', function(e){
   document.getElementById('mastCrest').src = crestOf(branch==='ladies'?'ladies':'men');
   document.getElementById('mastSub').textContent =
     branch==='men' ? 'CLG Gleann Uiseann' : branch==='ladies' ? 'Killeshin Ladies' : "Men and Ladies";
-  renderNext(); draw();
+  renderNext(); draw((window.pageYOffset || 0) >= 40);
 });
 document.getElementById('out').addEventListener('click', function(e){
   var row = e.target.closest('.gr'); if(!row) return;
   var k = row.dataset.key;
   OPEN[k] = !OPEN[k];
   count('/record/' + k.replace('|', '/'));
-  draw();
+  draw(false);
 });
 document.getElementById('filters').addEventListener('click', function(e){
   var c = e.target.closest('.chip');
@@ -1096,20 +1108,20 @@ function counter(){
   attempt(0);
 }
 
-function boot(){
+function boot(first){
   try { renderNext(); } catch(err){ console.error(err);
     document.getElementById('hero').hidden = true;
     document.getElementById('athome').hidden = true; }
-  draw();
+  draw(first !== true);
   try { stamp(); } catch(err){ console.error(err); }
 }
-boot();
+boot(true);
 counter();
 
 /* Tick every half minute: refreshes the countdown, and rolls straight on to
    the following game the moment throw-in passes - no reload needed. */
 setInterval(function(){
-  try { renderNext(); if(view === 'fixtures') draw(); } catch(err){ console.error(err); }
+  try { renderNext(); if(view === 'fixtures') draw(false); } catch(err){ console.error(err); }
 }, 30000);
 
 /* Data lives in the seed block above. update.py rewrites it in place, so
