@@ -36,7 +36,7 @@ TRIES, TIMEOUT = 3, 60
 
 BRANCHES = {
     "men": {
-        "name": "Men's", "team": "Gleann Uiseann", "crest": "crest.png",
+        "name": "Men", "team": "Gleann Uiseann", "crest": "crest.png",
         "source": ("https://laoisgaa.ie/fixtures-results/team/gleann-uiseann/"
                    "6547884c-ea64-5502-8472-8eb26b092437/"),
     },
