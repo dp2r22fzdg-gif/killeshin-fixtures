@@ -66,6 +66,19 @@ POSTPONED = [
 
 
 # ---------------------------------------------------------------------------
+# A single strip on the home page for whatever the club is running now.
+# Set "show" to False to take it down, or change the wording for the next one.
+# ---------------------------------------------------------------------------
+PROMO = {
+    "show": True,
+    "tag": "Last One Standing",
+    "title": "See who is still standing",
+    "note": "Live selections tracker \u2014 who picked what. Entries are closed.",
+    "url": ("https://www.oneshotclub.ie/killeshin-gaa/"
+            "killeshin-gaa-last-man-standing/selections-tracker"),
+}
+
+# ---------------------------------------------------------------------------
 # Media shown on the Club tab. Add a line here and it appears within the hour.
 # kind: video | social | read | about
 # ---------------------------------------------------------------------------
@@ -79,16 +92,20 @@ MEDIA = [
      "note": "Senior Championship Round 1 \u00b7 22 July 2026 \u00b7 highlights",
      "url": "https://www.youtube.com/watch?v=WIAOJlITbOM"},
 
-    # One link per paper, each landing on Killeshin stories only.
+    # One link per paper. Each searches that site for "Killeshin GAA",
+    # newest first, so it lands on club stories rather than a section front.
+    {"kind": "read", "title": "LaoisToday",
+     "note": "The fullest Killeshin archive \u00b7 sport is subscriber only",
+     "url": "https://www.google.com/search?q=site%3Alaoistoday.ie+%22Killeshin+GAA%22&tbs=sbd%3A1"},
     {"kind": "read", "title": "Leinster Express",
-     "note": "Killeshin stories, newest first \u00b7 free to read",
-     "url": "https://www.google.com/search?q=site%3Aleinsterexpress.ie+Killeshin&tbs=sbd%3A1"},
+     "note": "Killeshin GAA, newest first \u00b7 free to read",
+     "url": "https://www.google.com/search?q=site%3Aleinsterexpress.ie+%22Killeshin+GAA%22&tbs=sbd%3A1"},
     {"kind": "read", "title": "Laois Nationalist",
-     "note": "Killeshin stories, newest first \u00b7 free to read",
-     "url": "https://www.google.com/search?q=site%3Alaois-nationalist.ie+Killeshin&tbs=sbd%3A1"},
+     "note": "Killeshin GAA, newest first \u00b7 free to read",
+     "url": "https://www.google.com/search?q=site%3Alaois-nationalist.ie+%22Killeshin+GAA%22&tbs=sbd%3A1"},
     {"kind": "read", "title": "Carlow Nationalist",
-     "note": "Killeshin stories, newest first \u00b7 free to read",
-     "url": "https://www.google.com/search?q=site%3Acarlow-nationalist.ie+Killeshin&tbs=sbd%3A1"},
+     "note": "Killeshin GAA, newest first \u00b7 free to read",
+     "url": "https://www.google.com/search?q=site%3Acarlow-nationalist.ie+%22Killeshin+GAA%22&tbs=sbd%3A1"},
 
     {"kind": "social", "title": "TikTok",
      "note": "@killeshin.gaa \u00b7 1,900 followers, the busiest club channel",
@@ -651,6 +668,7 @@ def main():
         "updated": now.isoformat(timespec="seconds"),
         "fixtures": fixtures, "results": results, "tables": tables, "news": news,
         "club": {"links": CLUB_LINKS, "media": MEDIA, "facts": CLUB_FACTS},
+        "promo": PROMO,
     }
 
     print("Calendars")
