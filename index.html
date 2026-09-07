@@ -131,7 +131,8 @@ a{color:inherit;text-decoration:none}
 /* ── nav ────────────────────────────────────────────────── */
 /* Not pinned. At four rows tall it would cover half the screen and sit on
    top of short panels like Alerts. It scrolls away with everything else. */
-.nav{background:var(--paper-2);padding-top:14px}
+.nav{background:var(--paper-2);padding-top:14px;
+  scroll-margin-top:calc(env(safe-area-inset-top) + 10px)}
 /* Bottom bar, the way a native app does it. Four everyday tabs plus More,
    which opens the rest in a sheet. Always in reach of a thumb. */
 .bar{position:fixed;left:0;right:0;bottom:0;z-index:60;display:grid;
@@ -169,7 +170,7 @@ a{color:inherit;text-decoration:none}
 /* Raised buttons: a solid edge underneath does the lifting, and the selected
    one sinks into the page. Reads as pressable without any gloss. */
 .filters{display:flex;gap:8px;overflow-x:auto;padding:12px 16px 4px;scrollbar-width:none;
-  align-items:center}
+  align-items:center;min-height:52px}
 .filters::-webkit-scrollbar{display:none}
 .filters[hidden]{display:none}
 .chip{flex:none;font-size:13.5px;font-weight:600;color:var(--green-dk);white-space:nowrap;
@@ -191,6 +192,9 @@ a{color:inherit;text-decoration:none}
 
 /* ── lists: soft cards, no hard rules ───────────────────── */
 main{padding:8px 16px 20px;min-height:60vh}
+@keyframes swap{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:none}}
+main.swap{animation:swap .19s cubic-bezier(.22,.61,.36,1)}
+@media (prefers-reduced-motion:reduce){main.swap{animation:none}}
 .dayhead{font-size:11.5px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;
   color:var(--grey);padding:18px 4px 9px}
 .dayhead.soon{color:var(--green-dk)}
@@ -382,9 +386,24 @@ tr.us td{background:var(--green-lt);color:var(--ink);font-weight:700}
 .sub button:active{box-shadow:0 1px 0 #BFDFCD;transform:translateY(1px)}
 .sub button[aria-pressed="true"]{background:var(--forest);color:#fff;border-color:#0F5C34;
   box-shadow:inset 0 2px 5px rgba(0,0,0,.28);transform:translateY(1px)}
-.mgroup{padding:20px 4px 8px}
-.mgroup .lbl{color:var(--green-dk);display:block;margin-bottom:4px}
-.mgroup p{margin:5px 0 0;font-size:13.5px;color:var(--grey);line-height:1.5}
+.mgroup{padding:20px 4px 9px}
+.mgroup .lbl{color:var(--green-dk);display:block}
+/* One card per section with hairline rows, rather than a floating card per
+   link. Far less white space and much quicker to scan. */
+.mlist{background:var(--paper);border-radius:var(--r);overflow:hidden;
+  box-shadow:0 2px 10px rgba(20,60,40,.05)}
+.mrow{display:flex;align-items:center;gap:12px;padding:13px 15px;
+  border-top:1px solid var(--line)}
+.mrow:first-child{border-top:0}
+.mrow .ic{width:30px;height:30px;flex:none;border-radius:9px;background:var(--green-lt);
+  display:grid;place-items:center;font-size:13px;color:var(--green-dk)}
+.mrow .tx{flex:1;min-width:0}
+.mrow .tx b{display:block;font-size:15.5px;font-weight:700;line-height:1.3;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mrow .tx span{display:block;font-size:12.5px;color:var(--grey);margin-top:1px;
+  line-height:1.35;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mrow .go{flex:none;font-size:15px;color:var(--grey-lt)}
+.mrow.wrap2 .tx b{white-space:normal}
 .clubfacts{background:var(--paper);border-radius:var(--r);padding:18px;margin-bottom:9px;
   box-shadow:0 2px 10px rgba(20,60,40,.05)}
 .clubfacts dl{margin:0;display:grid;grid-template-columns:auto 1fr;gap:8px 16px}
@@ -440,6 +459,7 @@ tr.us td{background:var(--green-lt);color:var(--ink);font-weight:700}
     <img src="crest-ladies.png" alt="">Ladies</button>
 </nav>
 
+<div id="top">
 <div class="wrap">
   <section class="hero" id="hero" hidden>
     <div class="cap"><span class="lbl" id="heroLbl">Next match</span><span class="cd" id="heroCd"></span></div>
@@ -467,6 +487,8 @@ tr.us td{background:var(--green-lt);color:var(--ink);font-weight:700}
     <b id="promoTitle"></b><span id="promoNote"></span></span>
   <span class="go">→</span>
 </a>
+
+</div>
 
 <div class="nav">
   <div class="filters" id="filters"></div>
@@ -1094,43 +1116,37 @@ function renderMedia(){
   var facts = (DATA.club && DATA.club.facts) || null;
   if(!media.length && !facts) return empty('Nothing here yet', 'Media links can be added to the data block.');
 
-  var groups = [
-    ['video',  'Watch',  'Highlights Clubber TV have posted. Full games are on clubber.ie, subscription only.'],
-    ['read',   'Read',   'Each one opens that paper\u2019s Killeshin stories, newest first.'],
-    ['social', 'Follow', 'The club\u2019s own channels.'],
-    ['about',  'History','Where the club\u2019s story is written down.']
-  ];
   var mark = {video:'\u25B6', read:'\u2630', social:'\u25C9', about:'\u2691'};
+  function row(icon, title, note, url, wrap){
+    return '<a class="mrow' + (wrap ? ' wrap2' : '') + '" href="' + esc(url) +
+      '" target="_blank" rel="noopener"><span class="ic">' + icon + '</span>' +
+      '<span class="tx"><b>' + esc(title) + '</b><span>' + esc(note) + '</span></span>' +
+      '<span class="go">\u2192</span></a>';
+  }
+  function block(label, rows){
+    return rows ? '<div class="mgroup"><span class="lbl">' + esc(label) + '</span></div>' +
+                  '<div class="mlist">' + rows + '</div>' : '';
+  }
 
   var html = '';
 
-  /* Live headlines, gathered every hour. Free stories first. */
-  var news = (DATA.news || []).slice(0, 8);
+  var news = (DATA.news || []).slice(0, 6);
   if(news.length){
-    html += '<div class="mgroup"><span class="lbl">Latest</span>' +
-      '<p>Stories about Killeshin from the local papers, newest first.</p></div>' +
-      news.map(function(n){
-        var age = -daysAway(n.date), when = shortDate(n.date);
-        if(age === 0) when = 'Today'; else if(age === 1) when = 'Yesterday';
-        else if(age > 1 && age < 7) when = age + ' days ago';
-        return '<a class="act" href="'+esc(n.url)+'" target="_blank" rel="noopener">' +
-          '<span class="ic">\u2630</span><span class="tx"><b>'+esc(n.title)+'</b>' +
-          '<span>'+esc(n.source)+' \u00b7 '+esc(when) +
-          (n.access === 'subscriber' ? ' \u00b7 subscribers only' : '') +
-          '</span></span><span class="go">\u2192</span></a>';
-      }).join('');
+    html += block('Latest', news.map(function(n){
+      var age = -daysAway(n.date), when = shortDate(n.date);
+      if(age === 0) when = 'Today'; else if(age === 1) when = 'Yesterday';
+      else if(age > 1 && age < 7) when = age + ' days ago';
+      return row('\u2630', n.title, n.source + ' \u00b7 ' + when +
+        (n.access === 'subscriber' ? ' \u00b7 subscribers' : ''), n.url, true);
+    }).join(''));
   }
 
-  groups.forEach(function(g){
+  [['video','Watch'],['read','Read'],['social','Follow'],['about','History']].forEach(function(g){
     var items = media.filter(function(m){ return m.kind === g[0]; });
     if(!items.length) return;
-    html += '<div class="mgroup"><span class="lbl">' + esc(g[1]) + '</span>' +
-            '<p>' + esc(g[2]) + '</p></div>' +
-      items.map(function(m){
-        return '<a class="act" href="'+esc(m.url)+'" target="_blank" rel="noopener">' +
-          '<span class="ic">'+mark[m.kind]+'</span><span class="tx"><b>'+esc(m.title)+'</b>' +
-          '<span>'+esc(m.note)+'</span></span><span class="go">\u2192</span></a>';
-      }).join('');
+    html += block(g[1], items.map(function(m){
+      return row(mark[m.kind], m.title, m.note, m.url);
+    }).join(''));
   });
 
   if(facts){
@@ -1143,8 +1159,7 @@ function renderMedia(){
       (facts.honours && facts.honours.length
         ? '<h4>Roll of honour</h4><ul>' +
           facts.honours.map(function(x){ return '<li>'+esc(x)+'</li>'; }).join('') + '</ul>'
-        : '') +
-      '</div>';
+        : '') + '</div>';
   }
   return html;
 }
@@ -1206,6 +1221,12 @@ function filters(){
     '<button class="home-t" id="homeT" aria-pressed="'+homeOnly+'">' +
     (homeOnly ? '\u2713 ' : '') + 'Home only</button><span class="divider"></span>') + chips;
 }
+/* The next match, next at home and the club promo belong on the fixtures
+   page. Everywhere else they are just something to scroll past. */
+function homePanels(){
+  var t = document.getElementById('top');
+  if(t) t.hidden = (view !== 'fixtures');
+}
 function drawInner(){
   document.getElementById('out').innerHTML =
     view==='fixtures' ? renderFixtures() :
@@ -1221,20 +1242,22 @@ function drawInner(){
 /* Switching tab puts you at the top of the new list, with the hero and
    next-at-home panels scrolled out of the way. Opening the app still
    shows them. */
-function toNav(){
-  try {
-    var nav = document.querySelector('.nav');
-    if(nav) window.scrollTo(0, Math.max(0, nav.offsetTop));
-  } catch(err){ /* scrolling is never worth an error */ }
-}
 function draw(scroll){
+  var out = document.getElementById('out');
   try { drawInner(); filters(); }
   catch(err){
     console.error(err);
-    document.getElementById('out').innerHTML =
-      empty('Something went wrong', 'Pull down to refresh.');
+    out.innerHTML = empty('Something went wrong', 'Pull down to refresh.');
   }
-  if(scroll !== false) toNav();
+  homePanels();
+  if(scroll !== false){
+    /* Each page now starts clean, so the top of the page is the right place. */
+    window.scrollTo(0, 0);
+    /* restart the animation: strip the class, force a reflow, put it back */
+    out.classList.remove('swap');
+    void out.offsetWidth;
+    out.classList.add('swap');
+  }
 }
 document.getElementById('branch').addEventListener('click', function(e){
   var b = e.target.closest('.br'); if(!b) return;
@@ -1246,7 +1269,7 @@ document.getElementById('branch').addEventListener('click', function(e){
   document.getElementById('mastCrest').src = crestOf(branch==='ladies'?'ladies':'men');
   document.getElementById('mastSub').textContent =
     branch==='men' ? 'CLG Gleann Uiseann' : branch==='ladies' ? 'Killeshin Ladies' : "Men and Ladies";
-  renderNext(); draw((window.pageYOffset || 0) >= 40);
+  renderNext(); draw(false); homePanels();
 });
 document.getElementById('out').addEventListener('click', function(e){
   var kt = e.target.closest('.ktabs button');
