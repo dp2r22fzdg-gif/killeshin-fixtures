@@ -48,6 +48,10 @@ BRANCHES = {
 }
 GROUND = "Seamus Hearns Park"
 
+# Opposition crests, picked up from the county board pages as we go.
+CREST_MAP = {}
+SRC_BASE = ["https://laoisgaa.ie/"]
+
 # ---------------------------------------------------------------------------
 # Matches called off. The county boards are often slow to mark these, so put
 # them here and the app stamps POSTPONED across the fixture within the hour.
@@ -72,8 +76,8 @@ POSTPONED = [
 PROMO = {
     "show": True,
     "tag": "Last One Standing",
-    "title": "See who is still standing",
-    "note": "Live selections tracker \u2014 who picked what. Entries are closed.",
+    "title": "Who is still in?",
+    "note": "Live tracker of every pick. Entries are closed.",
     "url": ("https://www.oneshotclub.ie/killeshin-gaa/"
             "killeshin-gaa-last-man-standing/selections-tracker"),
 }
@@ -318,6 +322,7 @@ def match_blocks(soup):
 def parse_match(block, date, club, branch):
     bits = [t.strip() for t in block.stripped_strings if t.strip()]
     teams, comp, venue, ref, conceder = [], None, None, None, None
+    crests = CREST_MAP
 
     for a in block.find_all("a"):
         href, text = a.get("href", ""), clean(a)
@@ -328,6 +333,11 @@ def parse_match(block, date, club, branch):
             if name != text:
                 conceder = name
             teams.append(name)
+            # The board sometimes puts a club crest inside the team link.
+            # Take it if it is there; the app falls back to a monogram if not.
+            img = a.find("img")
+            if img is not None and img.get("src"):
+                crests[name] = requests.compat.urljoin(SRC_BASE[0], img["src"])
         elif "/venue/" in href:
             venue = text
         elif COMP_RE.search(href) and comp is None and len(text) > 8:
@@ -615,6 +625,7 @@ def main():
     fixtures, results, tables, failed = [], [], [], []
     for branch, cfg in BRANCHES.items():
         print("%s \u2014 %s" % (cfg["name"], cfg["source"].split("/")[2]))
+        SRC_BASE[0] = "https://" + cfg["source"].split("/")[2] + "/"
         r = fetch(cfg["source"])
         if r is None:
             print("    unreachable")
@@ -668,9 +679,11 @@ def main():
         "updated": now.isoformat(timespec="seconds"),
         "fixtures": fixtures, "results": results, "tables": tables, "news": news,
         "club": {"links": CLUB_LINKS, "media": MEDIA, "facts": CLUB_FACTS},
+        "crests": CREST_MAP,
         "promo": PROMO,
     }
 
+    print("Opposition crests found: %d" % len(CREST_MAP))
     print("Calendars")
     write_calendars(fixtures, today)
     write_app(payload)
