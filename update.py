@@ -62,6 +62,7 @@ CREST_OVERRIDES = {
 }
 
 CREST_MAP = {}
+CRESTS_FILE = "crests.json"      # kept beside the app so an upload cannot wipe it
 SRC_BASE = ["https://laoisgaa.ie/"]
 
 # ---------------------------------------------------------------------------
@@ -167,72 +168,90 @@ CLUB_DIRECTORIES = [
 ]
 
 
-def club_page_index():
-    """Club name -> its page on the county board site."""
-    pages = {}
-    for base in CLUB_DIRECTORIES:
-        r = fetch(base, quiet=True)
-        if r is None:
-            print("    %s unreachable" % base.split("/")[2])
-            continue
-        soup = BeautifulSoup(r.text, "html.parser")
-        n = 0
-        for a in soup.find_all("a", href=re.compile(r"/clubs/[^/]+/?$")):
-            name = clean(a)
-            if not name or len(name) > 40:
-                continue
-            key = norm_club(name)
-            if key and key not in pages:
-                pages[key] = requests.compat.urljoin(base, a["href"])
-                n += 1
-        print("    %-14s %d club pages" % (base.split("/")[2], n))
-    return pages
-
-
-def crest_from_page(url):
-    """
-    Each club page carries its crest as the page's share image, which is the
-    one dependable place to find it.
-    """
-    r = fetch(url, quiet=True)
-    if r is None:
-        return None
-    soup = BeautifulSoup(r.text, "html.parser")
+def meta_image(soup):
+    """The crest is published as the page's share image."""
     for attrs in ({"property": "og:image"}, {"name": "twitter:image"}):
         tag = soup.find("meta", attrs=attrs)
         if tag and tag.get("content"):
             src = tag["content"]
-            # the county's own logo is the fallback share image - not a crest
-            if "laois.png" in src or "/themes/" in src:
-                continue
+            if "laois.png" in src or "/themes/" in src or "lgfa-logo" in src.lower():
+                continue                      # county fallback image, not a crest
             return src
     return None
 
 
+def club_page_index():
+    """
+    Club name -> its page. Tries the directory, and reports what it actually
+    sees so a bad guess shows up in the log rather than failing silently.
+    """
+    pages, crests = {}, {}
+    for base in CLUB_DIRECTORIES:
+        host = base.split("/")[2]
+        r = fetch(base, quiet=True)
+        if r is None:
+            print("      %-14s unreachable" % host)
+            continue
+        soup = BeautifulSoup(r.text, "html.parser")
+        links = soup.find_all("a", href=re.compile(r"/clubs/[^/]+/?$"))
+        with_img = 0
+        for a in links:
+            name = clean(a) or a["href"].rstrip("/").split("/")[-1].replace("-", " ")
+            name = re.sub(r"\s*\d+$", "", name).strip()
+            key = norm_club(name)
+            if not key or len(name) > 40:
+                continue
+            pages.setdefault(key, requests.compat.urljoin(base, a["href"]))
+            img = a.find("img")
+            if img is not None:
+                src = img.get("data-src") or img.get("data-lazy-src") or img.get("src")
+                if src and "/themes/" not in src and "laois.png" not in src:
+                    crests.setdefault(key, requests.compat.urljoin(base, src))
+                    with_img += 1
+        print("      %-14s %d club links, %d with a crest on the listing"
+              % (host, len(links), with_img))
+    return pages, crests
+
+
 def harvest_crests(wanted, already):
     """
-    Look up only the clubs we actually play, and only those we do not have a
-    crest for already. Roughly twenty pages on the first run, then almost none.
+    Two passes. Take crests straight off the directory listing where they are
+    there, then open the individual club page for anything still missing and
+    read its share image. Only for clubs we actually play.
     """
     missing = [w for w in wanted if norm_club(w) not in already]
     if not missing:
-        print("    nothing new to look up")
+        print("      nothing new to look up")
         return {}
 
-    pages = club_page_index()
-    if not pages:
-        return {}
+    pages, listing = club_page_index()
+    found = {}
 
-    found, tried = {}, 0
     for name in missing:
+        key = norm_club(name)
+        if key in listing:
+            found[key] = listing[key]
+    if found:
+        print("      %d crests taken from the listing" % len(found))
+
+    still = [n for n in missing if norm_club(n) not in found]
+    opened = 0
+    for name in still:
         url = pages.get(norm_club(name))
         if not url:
+            print("      no club page for %s" % name)
             continue
-        tried += 1
-        crest = crest_from_page(url)
+        r = fetch(url, quiet=True)
+        opened += 1
+        if r is None:
+            continue
+        crest = meta_image(BeautifulSoup(r.text, "html.parser"))
         if crest:
             found[norm_club(name)] = crest
-    print("    looked up %d clubs, found %d crests" % (tried, len(found)))
+    if opened:
+        print("      opened %d club pages, %d crests in total" % (opened, len(found)))
+    if not found:
+        print("      no crests found - the app will show initials instead")
     return found
 
 
@@ -770,18 +789,25 @@ def main():
 
     print("Club crests")
     opponents = sorted({m["opponent"] for m in fixtures + results if m.get("opponent")})
+
+    # Crests live in their own file. index.html gets replaced by hand from time
+    # to time, and anything stored only in there is lost when that happens.
+    store = os.path.join(HERE, CRESTS_FILE)
     have = {}
     try:
-        with open(APP, encoding="utf-8") as fh:
-            prev = json.loads(re.search(
-                r'<script id="seed" type="application/json">(.*?)</script>',
-                fh.read(), re.S).group(1).replace("<\\/", "</"))
-        have = {norm_club(k): v for k, v in (prev.get("crests") or {}).items()}
-    except Exception:
+        with open(store, encoding="utf-8") as fh:
+            have = {norm_club(k): v for k, v in json.load(fh).items()}
+    except (OSError, ValueError):
         pass
-    print("    %d opponents, %d crests already known" % (len(opponents), len(have)))
+    print("    %d opponents, %d crests on file" % (len(opponents), len(have)))
+
     CREST_MAP.update(have)
     CREST_MAP.update(harvest_crests(opponents, have))
+
+    if CREST_MAP:
+        with open(store, "w", encoding="utf-8") as fh:
+            json.dump(CREST_MAP, fh, ensure_ascii=False, indent=1, sort_keys=True)
+        print("    %d crests saved to %s" % (len(CREST_MAP), CRESTS_FILE))
 
     print("News")
     news = gather_news(today)
