@@ -167,38 +167,72 @@ CLUB_DIRECTORIES = [
 ]
 
 
-def harvest_crests():
-    """
-    Each county board keeps a club directory with a crest beside every club.
-    Read it once a run and build a name -> image lookup, so the app can show
-    the opposition crest instead of a set of initials.
-
-    Best effort: if the page is unreachable or laid out differently, the app
-    falls back to initials and nothing breaks.
-    """
-    found = {}
-    for url in CLUB_DIRECTORIES:
-        r = fetch(url, quiet=True)
+def club_page_index():
+    """Club name -> its page on the county board site."""
+    pages = {}
+    for base in CLUB_DIRECTORIES:
+        r = fetch(base, quiet=True)
         if r is None:
-            print("    %s unreachable" % url.split("/")[2])
+            print("    %s unreachable" % base.split("/")[2])
             continue
         soup = BeautifulSoup(r.text, "html.parser")
-        hits = 0
-        for a in soup.find_all("a", href=re.compile(r"/clubs?/[^/]+/?$")):
-            img = a.find("img")
+        n = 0
+        for a in soup.find_all("a", href=re.compile(r"/clubs/[^/]+/?$")):
             name = clean(a)
-            if img is None or not img.get("src"):
-                continue
-            if not name:                       # crest-only link: use the slug
-                name = a["href"].rstrip("/").split("/")[-1].replace("-", " ").title()
-            src = img.get("data-src") or img.get("src")
-            if not src or "logo" in src.lower() and "club" not in src.lower():
+            if not name or len(name) > 40:
                 continue
             key = norm_club(name)
-            if key and key not in found:
-                found[key] = requests.compat.urljoin(url, src)
-                hits += 1
-        print("    %-16s %d crests" % (url.split("/")[2], hits))
+            if key and key not in pages:
+                pages[key] = requests.compat.urljoin(base, a["href"])
+                n += 1
+        print("    %-14s %d club pages" % (base.split("/")[2], n))
+    return pages
+
+
+def crest_from_page(url):
+    """
+    Each club page carries its crest as the page's share image, which is the
+    one dependable place to find it.
+    """
+    r = fetch(url, quiet=True)
+    if r is None:
+        return None
+    soup = BeautifulSoup(r.text, "html.parser")
+    for attrs in ({"property": "og:image"}, {"name": "twitter:image"}):
+        tag = soup.find("meta", attrs=attrs)
+        if tag and tag.get("content"):
+            src = tag["content"]
+            # the county's own logo is the fallback share image - not a crest
+            if "laois.png" in src or "/themes/" in src:
+                continue
+            return src
+    return None
+
+
+def harvest_crests(wanted, already):
+    """
+    Look up only the clubs we actually play, and only those we do not have a
+    crest for already. Roughly twenty pages on the first run, then almost none.
+    """
+    missing = [w for w in wanted if norm_club(w) not in already]
+    if not missing:
+        print("    nothing new to look up")
+        return {}
+
+    pages = club_page_index()
+    if not pages:
+        return {}
+
+    found, tried = {}, 0
+    for name in missing:
+        url = pages.get(norm_club(name))
+        if not url:
+            continue
+        tried += 1
+        crest = crest_from_page(url)
+        if crest:
+            found[norm_club(name)] = crest
+    print("    looked up %d clubs, found %d crests" % (tried, len(found)))
     return found
 
 
@@ -735,7 +769,19 @@ def main():
             print("  could not recover previous data for %s" % ", ".join(failed))
 
     print("Club crests")
-    CREST_MAP.update(harvest_crests())
+    opponents = sorted({m["opponent"] for m in fixtures + results if m.get("opponent")})
+    have = {}
+    try:
+        with open(APP, encoding="utf-8") as fh:
+            prev = json.loads(re.search(
+                r'<script id="seed" type="application/json">(.*?)</script>',
+                fh.read(), re.S).group(1).replace("<\\/", "</"))
+        have = {norm_club(k): v for k, v in (prev.get("crests") or {}).items()}
+    except Exception:
+        pass
+    print("    %d opponents, %d crests already known" % (len(opponents), len(have)))
+    CREST_MAP.update(have)
+    CREST_MAP.update(harvest_crests(opponents, have))
 
     print("News")
     news = gather_news(today)
