@@ -48,7 +48,19 @@ BRANCHES = {
 }
 GROUND = "Seamus Hearns Park"
 
-# Opposition crests, picked up from the county board pages as we go.
+# Opposition crests.
+#
+# The scraper takes them from the county board pages when it can. Anything you
+# add below wins over what it finds, so if a club's crest is missing or wrong
+# just paste a direct image link here:
+#
+#     "Ballyfin": "https://example.com/ballyfin-crest.png",
+#
+# The name must match exactly how the county board writes it. Anything with no
+# crest shows the club's initials in a badge instead, which is fine.
+CREST_OVERRIDES = {
+}
+
 CREST_MAP = {}
 SRC_BASE = ["https://laoisgaa.ie/"]
 
@@ -141,6 +153,53 @@ CLUB_FACTS = {
         "Winners of RT\u00c9\u2019s Celebrity Bainisteoir, 2011, managed by Tony Cascarino",
     ],
 }
+
+
+def norm_club(name):
+    """Loose key so 'St Joseph\'s GAA' and 'St Josephs' match."""
+    n = re.sub(r"\b(gaa|clg|club|lgfa|ladies)\b", " ", (name or "").lower())
+    return re.sub(r"[^a-z0-9]", "", n)
+
+
+CLUB_DIRECTORIES = [
+    "https://laoisgaa.ie/clubs/",
+    "https://laoislgfa.ie/clubs/",
+]
+
+
+def harvest_crests():
+    """
+    Each county board keeps a club directory with a crest beside every club.
+    Read it once a run and build a name -> image lookup, so the app can show
+    the opposition crest instead of a set of initials.
+
+    Best effort: if the page is unreachable or laid out differently, the app
+    falls back to initials and nothing breaks.
+    """
+    found = {}
+    for url in CLUB_DIRECTORIES:
+        r = fetch(url, quiet=True)
+        if r is None:
+            print("    %s unreachable" % url.split("/")[2])
+            continue
+        soup = BeautifulSoup(r.text, "html.parser")
+        hits = 0
+        for a in soup.find_all("a", href=re.compile(r"/clubs?/[^/]+/?$")):
+            img = a.find("img")
+            name = clean(a)
+            if img is None or not img.get("src"):
+                continue
+            if not name:                       # crest-only link: use the slug
+                name = a["href"].rstrip("/").split("/")[-1].replace("-", " ").title()
+            src = img.get("data-src") or img.get("src")
+            if not src or "logo" in src.lower() and "club" not in src.lower():
+                continue
+            key = norm_club(name)
+            if key and key not in found:
+                found[key] = requests.compat.urljoin(url, src)
+                hits += 1
+        print("    %-16s %d crests" % (url.split("/")[2], hits))
+    return found
 
 
 def mark_postponed(fixtures):
@@ -617,6 +676,22 @@ def write_app(payload):
     print("Wrote index.html (%d bytes)" % len(stamped))
 
 
+def crest_lookup(fixtures, results):
+    """Map every opponent we actually play to a crest, where one exists."""
+    by_key = {norm_club(k): v for k, v in CREST_MAP.items()}
+    by_key.update({norm_club(k): v for k, v in CREST_OVERRIDES.items()})
+    out = {}
+    for m in list(fixtures) + list(results):
+        for team in (m.get("home"), m.get("away"), m.get("opponent")):
+            if not team:
+                continue
+            hit = by_key.get(norm_club(team))
+            if hit:
+                out[team] = hit
+    print("  crests matched to %d of our opponents" % len(out))
+    return out
+
+
 def main():
     dub = timezone(timedelta(hours=1))
     now = datetime.now(dub)
@@ -659,6 +734,9 @@ def main():
         except Exception:
             print("  could not recover previous data for %s" % ", ".join(failed))
 
+    print("Club crests")
+    CREST_MAP.update(harvest_crests())
+
     print("News")
     news = gather_news(today)
     free = sum(1 for n in news if n["access"] == "free")
@@ -679,11 +757,12 @@ def main():
         "updated": now.isoformat(timespec="seconds"),
         "fixtures": fixtures, "results": results, "tables": tables, "news": news,
         "club": {"links": CLUB_LINKS, "media": MEDIA, "facts": CLUB_FACTS},
-        "crests": CREST_MAP,
+        "crests": crest_lookup(fixtures, results),
         "promo": PROMO,
     }
 
-    print("Opposition crests found: %d" % len(CREST_MAP))
+    print("Opposition crests: %d from the boards, %d set by hand"
+          % (len(CREST_MAP), len(CREST_OVERRIDES)))
     print("Calendars")
     write_calendars(fixtures, today)
     write_app(payload)
