@@ -95,6 +95,15 @@ PROMO = {
             "killeshin-gaa-last-man-standing/selections-tracker"),
 }
 
+# The club shop runs as two separate O'Neills pages, so it opens out into
+# both rather than taking two rows on the Club tab.
+SHOP = {
+    "title": "Club shop",
+    "note": "Jerseys, training gear and leisurewear from O\u2019Neills",
+    "men": "https://www.oneills.com/shop-by-team/gaa/ireland/killeshin-mens.html",
+    "ladies": "https://www.oneills.com/shop-by-team/gaa/ireland/killeshin-ladies.html",
+}
+
 # ---------------------------------------------------------------------------
 # Media shown on the Club tab. Add a line here and it appears within the hour.
 # kind: video | social | read | about
@@ -828,7 +837,7 @@ def main():
         "source": BRANCHES["men"]["source"],
         "updated": now.isoformat(timespec="seconds"),
         "fixtures": fixtures, "results": results, "tables": tables, "news": news,
-        "club": {"links": CLUB_LINKS, "media": MEDIA, "facts": CLUB_FACTS},
+        "club": {"links": CLUB_LINKS, "media": MEDIA, "facts": CLUB_FACTS, "shop": SHOP},
         "crests": crest_lookup(fixtures, results),
         "promo": PROMO,
     }
