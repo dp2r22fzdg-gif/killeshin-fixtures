@@ -63,6 +63,8 @@ CREST_OVERRIDES = {
 
 CREST_MAP = {}
 CRESTS_FILE = "crests.json"      # kept beside the app so an upload cannot wipe it
+FORM_FILE = "form.json"          # last few results for every club we play
+TEAM_URLS = {}
 SRC_BASE = ["https://laoisgaa.ie/"]
 
 # ---------------------------------------------------------------------------
@@ -272,6 +274,32 @@ def harvest_crests(wanted, already):
     return found
 
 
+def harvest_form(opponents, branch_of):
+    """
+    Each club has a team page listing its recent matches - the same page we
+    read for Killeshin. Read the opposition's and keep the last few outcomes,
+    so a fixture can show how both sides are going.
+    """
+    out = {}
+    for name in opponents:
+        url = TEAM_URLS.get(norm_club(name))
+        if not url:
+            continue
+        r = fetch(url, quiet=True)
+        if r is None:
+            continue
+        try:
+            _, res, _ = parse_board(r.text, name, branch_of.get(name, "men"))
+        except Exception:
+            continue
+        res.sort(key=lambda x: (x["date"], x.get("time", "")), reverse=True)
+        form = [x["outcome"] for x in res[:3] if x.get("outcome")]
+        if form:
+            out[norm_club(name)] = form
+    print("    form gathered for %d of %d clubs" % (len(out), len(opponents)))
+    return out
+
+
 def mark_postponed(fixtures):
     hits = 0
     for f in fixtures:
@@ -467,6 +495,9 @@ def parse_match(block, date, club, branch):
             img = a.find("img")
             if img is not None and img.get("src"):
                 crests[name] = requests.compat.urljoin(SRC_BASE[0], img["src"])
+            if href:
+                TEAM_URLS.setdefault(norm_club(name),
+                                     requests.compat.urljoin(SRC_BASE[0], href))
         elif "/venue/" in href:
             venue = text
         elif COMP_RE.search(href) and comp is None and len(text) > 8:
@@ -825,6 +856,30 @@ def main():
         with open(store, "w", encoding="utf-8") as fh:
             json.dump(CREST_MAP, fh, ensure_ascii=False, indent=1, sort_keys=True)
         print("    %d crests saved to %s" % (len(CREST_MAP), CRESTS_FILE))
+
+    print("Recent form")
+    branch_of = {}
+    for m in fixtures + results:
+        if m.get("opponent"):
+            branch_of[m["opponent"]] = m["branch"]
+    fstore = os.path.join(HERE, FORM_FILE)
+    form = {}
+    try:
+        with open(fstore, encoding="utf-8") as fh:
+            form = json.load(fh)
+    except (OSError, ValueError):
+        pass
+    form.update(harvest_form(opponents, branch_of))
+    # our own, straight from the results we already hold
+    for b, cfg in BRANCHES.items():
+        mine = [x for x in results if x["branch"] == b]
+        mine.sort(key=lambda x: (x["date"], x.get("time", "")), reverse=True)
+        if mine:
+            form[norm_club(cfg["team"])] = [x["outcome"] for x in mine[:3]]
+    if form:
+        with open(fstore, "w", encoding="utf-8") as fh:
+            json.dump(form, fh, ensure_ascii=False, indent=1, sort_keys=True)
+        print("    %d clubs saved to %s" % (len(form), FORM_FILE))
 
     print("News")
     news = gather_news(today)
