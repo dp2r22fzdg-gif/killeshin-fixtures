@@ -1547,9 +1547,12 @@ function filters(){
 }
 /* The next match, next at home and the club promo belong on the fixtures
    page. Everywhere else they are just something to scroll past. */
+var BRANCHLESS = ['media','alerts','club'];   /* nothing here is per-team */
 function homePanels(){
   var t = document.getElementById('top');
   if(t) t.hidden = (view !== 'fixtures');
+  var b = document.getElementById('branch');
+  if(b) b.hidden = BRANCHLESS.indexOf(view) > -1;
 }
 function drawInner(){
   document.getElementById('out').innerHTML =
@@ -1592,7 +1595,8 @@ document.getElementById('branch').addEventListener('click', function(e){
     x.setAttribute('aria-pressed', String(x.dataset.b === branch)); });
   document.getElementById('mastCrest').src = crestOf(branch==='ladies'?'ladies':'men');
   document.getElementById('mastSub').textContent =
-    branch==='men' ? 'CLG Gleann Uiseann' : branch==='ladies' ? 'Killeshin Ladies' : "Men and Ladies";
+    branch==='men' ? 'CLG Gleann Uise\u00e1n' : branch==='ladies' ? 'Killeshin Ladies'
+                   : 'F\u00e1ilte go Gleann Uise\u00e1n';
   renderNext(); draw(false); homePanels();
 });
 document.getElementById('out').addEventListener('click', function(e){
