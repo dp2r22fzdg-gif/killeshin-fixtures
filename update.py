@@ -104,6 +104,14 @@ SHOP = {
     "ladies": "https://www.oneills.com/shop-by-team/gaa/ireland/killeshin-ladies.html",
 }
 
+# Match tickets are sold by the county boards, one page each.
+TICKETS = {
+    "title": "Buy match tickets",
+    "note": "County board ticket pages for championship and league games",
+    "men": "https://laoisgaa.ie/football-match-tickets/?ftredirect=1",
+    "ladies": "https://laoislgfa.ie/tickets/",
+}
+
 # ---------------------------------------------------------------------------
 # Media shown on the Club tab. Add a line here and it appears within the hour.
 # kind: video | social | read | about
@@ -837,7 +845,8 @@ def main():
         "source": BRANCHES["men"]["source"],
         "updated": now.isoformat(timespec="seconds"),
         "fixtures": fixtures, "results": results, "tables": tables, "news": news,
-        "club": {"links": CLUB_LINKS, "media": MEDIA, "facts": CLUB_FACTS, "shop": SHOP},
+        "club": {"links": CLUB_LINKS, "media": MEDIA, "facts": CLUB_FACTS, "shop": SHOP,
+                 "tickets": TICKETS},
         "crests": crest_lookup(fixtures, results),
         "promo": PROMO,
     }
