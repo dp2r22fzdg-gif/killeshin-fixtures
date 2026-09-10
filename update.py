@@ -274,13 +274,30 @@ def harvest_crests(wanted, already):
     return found
 
 
+def comp_kind(name):
+    """A championship run and a league campaign are separate stories, so form
+    is never mixed across the two. Several competitions are championships
+    played in a league format, so the word championship wins."""
+    return "championship" if "championship" in (name or "").lower() else "league"
+
+
+def form_key(name, branch, grade, kind):
+    """Form belongs to one team in one competition."""
+    return "%s|%s|%s|%s" % (norm_club(name), branch, grade, kind)
+
+
+def last_three(results):
+    """Newest first in, oldest first out - so the app can read left to right."""
+    results = sorted(results, key=lambda x: (x["date"], x.get("time", "")), reverse=True)
+    return [x["outcome"] for x in results[:3] if x.get("outcome")]
+
+
 def harvest_form(opponents, branch_of):
     """
-    Each club has a team page listing its recent matches - the same page we
-    read for Killeshin. Read the opposition's and keep the last few outcomes,
-    so a fixture can show how both sides are going.
+    Read each opponent's own team page and keep the last three results for
+    every age group, so a Senior fixture shows Senior form.
     """
-    out = {}
+    out, done = {}, 0
     for name in opponents:
         url = TEAM_URLS.get(norm_club(name))
         if not url:
@@ -288,15 +305,20 @@ def harvest_form(opponents, branch_of):
         r = fetch(url, quiet=True)
         if r is None:
             continue
+        branch = branch_of.get(name, "men")
         try:
-            _, res, _ = parse_board(r.text, name, branch_of.get(name, "men"))
+            _, res, _ = parse_board(r.text, name, branch)
         except Exception:
             continue
-        res.sort(key=lambda x: (x["date"], x.get("time", "")), reverse=True)
-        form = [x["outcome"] for x in res[:3] if x.get("outcome")]
-        if form:
-            out[norm_club(name)] = form
-    print("    form gathered for %d of %d clubs" % (len(out), len(opponents)))
+        buckets = {}
+        for x in res:
+            buckets.setdefault((x["grade"], comp_kind(x["competition"])), []).append(x)
+        for (grade, kind), rows in buckets.items():
+            f = last_three(rows)
+            if f:
+                out[form_key(name, branch, grade, kind)] = f
+        done += 1
+    print("    read %d club pages, %d team records" % (done, len(out)))
     return out
 
 
@@ -870,12 +892,16 @@ def main():
     except (OSError, ValueError):
         pass
     form.update(harvest_form(opponents, branch_of))
-    # our own, straight from the results we already hold
+    # our own, per team, from the results we already hold
     for b, cfg in BRANCHES.items():
-        mine = [x for x in results if x["branch"] == b]
-        mine.sort(key=lambda x: (x["date"], x.get("time", "")), reverse=True)
-        if mine:
-            form[norm_club(cfg["team"])] = [x["outcome"] for x in mine[:3]]
+        buckets = {}
+        for x in results:
+            if x["branch"] == b:
+                buckets.setdefault((x["grade"], comp_kind(x["competition"])), []).append(x)
+        for (grade, kind), rows in buckets.items():
+            f = last_three(rows)
+            if f:
+                form[form_key(cfg["team"], b, grade, kind)] = f
     if form:
         with open(fstore, "w", encoding="utf-8") as fh:
             json.dump(form, fh, ensure_ascii=False, indent=1, sort_keys=True)
