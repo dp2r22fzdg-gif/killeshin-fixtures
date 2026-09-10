@@ -353,9 +353,12 @@ CLUB_LINKS = [
      "url": "https://laoislgfa.ie/"},
 ]
 
+# Adult teams first, then underage by age, with the two that only run for
+# part of the year at the end.
 GRADE_ORDER = ["Senior", "Intermediate", "Junior A", "Junior C", "Junior",
-               "Kelly Cup", "Adult League", "Minor",
-               "U20", "U17", "U16", "U15", "U14", "U13", "U12", "Féile"]
+               "Adult League", "Minor",
+               "U17", "U16", "U15", "U14", "U13", "U12", "Féile",
+               "U20", "Kelly Cup"]
 MONTHS = {m: i for i, m in enumerate(
     ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"], 1)}
 
