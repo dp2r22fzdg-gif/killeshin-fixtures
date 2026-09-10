@@ -118,6 +118,43 @@
   "L",
   "L"
  ],
+ "ballyfin|ladies|Intermediate|championship": [
+  "W",
+  "W"
+ ],
+ "ballyfin|ladies|Intermediate|league": [
+  "L"
+ ],
+ "ballyfin|ladies|Junior|championship": [
+  "L",
+  "L",
+  "W"
+ ],
+ "ballyfin|ladies|Senior|championship": [
+  "L",
+  "L",
+  "L"
+ ],
+ "ballyfin|ladies|U13|championship": [
+  "L",
+  "L",
+  "L"
+ ],
+ "ballyfin|ladies|U13|league": [
+  "L",
+  "W",
+  "W"
+ ],
+ "ballyfin|ladies|U15|championship": [
+  "W",
+  "W",
+  "L"
+ ],
+ "ballyfin|ladies|U17|championship": [
+  "D",
+  "L",
+  "L"
+ ],
  "ballyfin|men|Junior A|championship": [
   "L",
   "L",
@@ -562,6 +599,55 @@
  "graiguecullen": [
   "L",
   "W",
+  "W"
+ ],
+ "graiguecullen|ladies|Adult League|league": [
+  "W",
+  "W",
+  "W"
+ ],
+ "graiguecullen|ladies|Junior|championship": [
+  "L",
+  "W",
+  "W"
+ ],
+ "graiguecullen|ladies|Junior|league": [
+  "W",
+  "W",
+  "L"
+ ],
+ "graiguecullen|ladies|Senior|championship": [
+  "L",
+  "L",
+  "W"
+ ],
+ "graiguecullen|ladies|U13|championship": [
+  "W",
+  "W",
+  "W"
+ ],
+ "graiguecullen|ladies|U13|league": [
+  "W",
+  "W",
+  "L"
+ ],
+ "graiguecullen|ladies|U15|championship": [
+  "W",
+  "W",
+  "W"
+ ],
+ "graiguecullen|ladies|U15|league": [
+  "L",
+  "L"
+ ],
+ "graiguecullen|ladies|U17|championship": [
+  "W",
+  "W",
+  "W"
+ ],
+ "graiguecullen|ladies|U17|league": [
+  "W",
+  "L",
   "W"
  ],
  "graiguecullen|men|Adult League|league": [
@@ -1205,6 +1291,41 @@
   "L"
  ],
  "stpauls": [
+  "L",
+  "W",
+  "L"
+ ],
+ "stpauls|ladies|Féile|league": [
+  "W",
+  "W",
+  "W"
+ ],
+ "stpauls|ladies|U13|championship": [
+  "W",
+  "L",
+  "W"
+ ],
+ "stpauls|ladies|U13|league": [
+  "L",
+  "W",
+  "W"
+ ],
+ "stpauls|ladies|U15|championship": [
+  "L",
+  "L",
+  "W"
+ ],
+ "stpauls|ladies|U15|league": [
+  "L",
+  "L",
+  "L"
+ ],
+ "stpauls|ladies|U17|championship": [
+  "L",
+  "L",
+  "L"
+ ],
+ "stpauls|ladies|U17|league": [
   "L",
   "W",
   "L"
