@@ -355,10 +355,9 @@ CLUB_LINKS = [
 
 # Adult teams first, then underage by age, with the two that only run for
 # part of the year at the end.
-GRADE_ORDER = ["Senior", "Intermediate", "Junior A", "Junior C", "Junior",
+GRADE_ORDER = ["Senior", "Intermediate", "Junior A", "Junior C", "U20", "Junior",
                "Adult League", "Minor",
-               "U17", "U16", "U15", "U14", "U13", "U12", "Féile",
-               "U20", "Kelly Cup"]
+               "U17", "U16", "U15", "U14", "U13", "U12", "Féile", "Kelly Cup"]
 MONTHS = {m: i for i, m in enumerate(
     ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"], 1)}
 
@@ -539,6 +538,7 @@ def parse_match(block, date, club, branch):
     scores = [t for t in bits if SCORE_RE.match(t)]
     times = [t for t in bits if TIME_RE.match(t)]
     home, away = teams[0], teams[1]
+    mine = norm_club(club)
 
     return {"date": date, "time": times[0] if times else "TBC",
             "competition": tidy(comp), "grade": grade_of(comp, branch), "branch": branch,
@@ -547,7 +547,8 @@ def parse_match(block, date, club, branch):
             "awayScore": scores[1] if len(scores) >= 2 else None,
             "venue": venue, "referee": m.group(1).strip() if m else "TBC",
             "conceded": "CONC" in bits, "conceder": conceder,
-            "isHome": home == club, "opponent": away if home == club else home}
+            "isHome": norm_club(home) == mine,
+            "opponent": away if norm_club(home) == mine else home}
 
 
 def parse_board(html, club, branch):
@@ -565,7 +566,12 @@ def parse_board(html, club, branch):
             continue
 
         m = parse_match(block, date, club, branch)
-        if not m or club not in (m["home"], m["away"]):
+        # Compare loosely: a club can be "Ballyfin" on one page and
+        # "Ballyfin CLG" on another, and an exact match silently drops them.
+        if not m:
+            continue
+        key = norm_club(club)
+        if key not in (norm_club(m["home"]), norm_club(m["away"])):
             continue
         key = (m["date"], m["time"], m["home"], m["away"])
         if key in seen:
@@ -576,7 +582,7 @@ def parse_board(html, club, branch):
         if m["conceded"] and (ht is None or at is None):
             m.update({"homeScore": "\u2014", "awayScore": "\u2014", "homeTotal": 0,
                       "awayTotal": 0, "ourTotal": 0, "theirTotal": 0,
-                      "outcome": "L" if m["conceder"] == club else "W",
+                      "outcome": "L" if norm_club(m["conceder"] or "") == norm_club(club) else "W",
                       "competition": m["competition"] + " (walkover)"})
             results.append(m)
         elif ht is not None and at is not None and (ht > 0 or at > 0):
