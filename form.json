@@ -89,10 +89,25 @@
   "W",
   "W"
  ],
+ "bailenacoille|ladies|Adult League|league": [
+  "L",
+  "W",
+  "W"
+ ],
+ "bailenacoille|ladies|Féile|league": [
+  "L",
+  "L",
+  "L"
+ ],
+ "bailenacoille|ladies|Intermediate|league": [
+  "L",
+  "W",
+  "W"
+ ],
  "bailenacoille|ladies|Junior|championship": [
   "L",
   "L",
-  "W"
+  "L"
  ],
  "bailenacoille|ladies|Junior|league": [
   "L",
@@ -101,6 +116,11 @@
  ],
  "bailenacoille|ladies|Minor|championship": [
   "L",
+  "L"
+ ],
+ "bailenacoille|ladies|Senior|championship": [
+  "L",
+  "W",
   "L"
  ],
  "bailenacoille|ladies|U14|championship": [
@@ -930,8 +950,17 @@
   "L"
  ],
  "parkratheniska|ladies|Adult League|league": [
-  "L",
   "W",
+  "W",
+  "L"
+ ],
+ "parkratheniska|ladies|Féile|league": [
+  "L",
+  "D"
+ ],
+ "parkratheniska|ladies|Junior|championship": [
+  "L",
+  "L",
   "L"
  ],
  "parkratheniska|ladies|Minor|championship": [
@@ -940,7 +969,17 @@
  ],
  "parkratheniska|ladies|Senior|championship": [
   "L",
+  "W",
+  "L"
+ ],
+ "parkratheniska|ladies|U13|championship": [
   "L",
+  "W",
+  "L"
+ ],
+ "parkratheniska|ladies|U13|league": [
+  "L",
+  "D",
   "L"
  ],
  "parkratheniska|ladies|U14|championship": [
@@ -953,6 +992,16 @@
   "L",
   "L"
  ],
+ "parkratheniska|ladies|U15|championship": [
+  "L",
+  "L",
+  "W"
+ ],
+ "parkratheniska|ladies|U15|league": [
+  "L",
+  "L",
+  "L"
+ ],
  "parkratheniska|ladies|U16|championship": [
   "W",
   "L"
@@ -961,6 +1010,16 @@
   "L",
   "W",
   "D"
+ ],
+ "parkratheniska|ladies|U17|championship": [
+  "W",
+  "L",
+  "W"
+ ],
+ "parkratheniska|ladies|U17|league": [
+  "W",
+  "L",
+  "L"
  ],
  "portarlington": [
   "W",
