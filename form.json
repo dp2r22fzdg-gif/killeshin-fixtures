@@ -287,9 +287,9 @@
   "W"
  ],
  "ballyroan|ladies|U14|championship": [
+  "W",
   "L",
-  "L",
-  "D"
+  "L"
  ],
  "ballyroan|ladies|U14|league": [
   "L",
@@ -787,9 +787,9 @@
   "L"
  ],
  "killeshin|ladies|U14|championship": [
-  "L",
   "W",
-  "L"
+  "L",
+  "W"
  ],
  "killeshin|ladies|U14|league": [
   "L",
@@ -1182,7 +1182,7 @@
   "W"
  ],
  "shanahoe|ladies|U14|championship": [
-  "W",
+  "L",
   "W",
   "W"
  ],
