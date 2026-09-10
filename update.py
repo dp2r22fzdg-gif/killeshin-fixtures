@@ -64,6 +64,8 @@ CREST_OVERRIDES = {
 CREST_MAP = {}
 CRESTS_FILE = "crests.json"      # kept beside the app so an upload cannot wipe it
 FORM_FILE = "form.json"          # last few results for every club we play
+RESULTS_FILE = "results.json"    # everything we have ever seen, so nothing is lost
+PAGE_TRIES = 6                   # how far back to page through a team's history
 TEAM_URLS = {}
 SRC_BASE = ["https://laoisgaa.ie/"]
 
@@ -320,6 +322,71 @@ def harvest_form(opponents, branch_of):
         done += 1
     print("    read %d club pages, %d team records" % (done, len(out)))
     return out
+
+
+def match_key(m):
+    return "%s|%s|%s|%s" % (m["date"], m.get("time", ""), m["home"], m["away"])
+
+
+def fetch_all_pages(base, club, branch):
+    """
+    A team page shows only its recent matches. Walk back through the older
+    pages so a full season is picked up, not just the last few weeks.
+    """
+    fixtures, results, soup = [], [], None
+    seen = set()
+    for page in range(1, PAGE_TRIES + 1):
+        url = base if page == 1 else "%s?page=%d" % (base.rstrip("/") + "/", page)
+        r = fetch(url, quiet=(page > 1))
+        if r is None:
+            break
+        fx, rs, sp = parse_board(r.text, club, branch)
+        if page == 1:
+            soup = sp
+        fresh = 0
+        for m in fx:
+            k = match_key(m)
+            if k not in seen:
+                seen.add(k); fixtures.append(m); fresh += 1
+        for m in rs:
+            k = match_key(m)
+            if k not in seen:
+                seen.add(k); results.append(m); fresh += 1
+        if page > 1:
+            print("      page %d added %d" % (page, fresh))
+        if fresh == 0 and page > 1:
+            break
+    return fixtures, results, soup
+
+
+def merge_archive(results, path):
+    """
+    Keep every result we have ever read. The board drops older matches off the
+    team page as the season goes on, and without this they vanish from the app
+    too.
+    """
+    old = []
+    try:
+        with open(path, encoding="utf-8") as fh:
+            old = json.load(fh)
+    except (OSError, ValueError):
+        pass
+
+    by_key = {}
+    for m in old:
+        by_key[match_key(m)] = m
+    added = 0
+    for m in results:
+        k = match_key(m)
+        if k not in by_key:
+            added += 1
+        by_key[k] = m                      # a fresh read wins over the stored copy
+
+    merged = sorted(by_key.values(), key=lambda x: (x["date"], x.get("time", "")), reverse=True)
+    with open(path, "w", encoding="utf-8") as fh:
+        json.dump(merged, fh, ensure_ascii=False, separators=(",", ":"))
+    print("  archive: %d held, %d new this run" % (len(merged), added))
+    return merged
 
 
 def mark_postponed(fixtures):
@@ -838,7 +905,10 @@ def main():
             print("    unreachable")
             failed.append(branch)
             continue
-        fx, rs, soup = parse_board(r.text, cfg["team"], branch)
+        fx, rs, soup = fetch_all_pages(cfg["source"], cfg["team"], branch)
+        if soup is None:
+            failed.append(branch)
+            continue
         tb = parse_tables(soup, cfg["team"], branch)
         print("    fixtures %d, results %d, tables %d" % (len(fx), len(rs), len(tb)))
         if not fx and not rs:
@@ -921,6 +991,7 @@ def main():
     free = sum(1 for n in news if n["access"] == "free")
     print("    %d stories (free %d, subscriber %d)" % (len(news), free, len(news) - free))
 
+    results = merge_archive(results, os.path.join(HERE, RESULTS_FILE))
     fixtures = mark_postponed(fixtures)
     fixtures.sort(key=lambda x: (x["date"], x["time"]))
     results.sort(key=lambda x: (x["date"], x["time"]), reverse=True)
