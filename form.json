@@ -39,6 +39,40 @@
   "L",
   "W"
  ],
+ "anfraoch|men|Adult League|league": [
+  "L",
+  "L",
+  "W"
+ ],
+ "anfraoch|men|Junior A|championship": [
+  "W",
+  "W",
+  "W"
+ ],
+ "anfraoch|men|Minor|championship": [
+  "W",
+  "L"
+ ],
+ "anfraoch|men|U14|championship": [
+  "W",
+  "W",
+  "W"
+ ],
+ "anfraoch|men|U14|league": [
+  "L",
+  "W",
+  "W"
+ ],
+ "anfraoch|men|U16|championship": [
+  "L",
+  "W",
+  "L"
+ ],
+ "anfraoch|men|U16|league": [
+  "W",
+  "W",
+  "D"
+ ],
  "annanough": [
   "W",
   "L",
@@ -107,7 +141,7 @@
  "bailenacoille|ladies|Junior|championship": [
   "L",
   "L",
-  "L"
+  "W"
  ],
  "bailenacoille|ladies|Junior|league": [
   "L",
@@ -138,16 +172,27 @@
   "L",
   "L"
  ],
- "ballyfin|ladies|Intermediate|championship": [
+ "ballyfin|ladies|Adult League|league": [
+  "L",
   "W",
   "W"
  ],
+ "ballyfin|ladies|Intermediate|championship": [
+  "W",
+  "L",
+  "W"
+ ],
  "ballyfin|ladies|Intermediate|league": [
-  "L"
+  "W",
+  "W",
+  "W"
  ],
  "ballyfin|ladies|Junior|championship": [
   "L",
-  "L",
+  "L"
+ ],
+ "ballyfin|ladies|Minor|championship": [
+  "W",
   "W"
  ],
  "ballyfin|ladies|Senior|championship": [
@@ -165,23 +210,52 @@
   "W",
   "W"
  ],
+ "ballyfin|ladies|U14|championship": [
+  "L",
+  "D",
+  "L"
+ ],
+ "ballyfin|ladies|U14|league": [
+  "D",
+  "W",
+  "L"
+ ],
  "ballyfin|ladies|U15|championship": [
   "W",
   "W",
   "L"
+ ],
+ "ballyfin|ladies|U16|championship": [
+  "L",
+  "L",
+  "W"
+ ],
+ "ballyfin|ladies|U16|league": [
+  "L",
+  "W",
+  "W"
  ],
  "ballyfin|ladies|U17|championship": [
   "D",
   "L",
   "L"
  ],
+ "ballyfin|men|Adult League|league": [
+  "L",
+  "W",
+  "W"
+ ],
  "ballyfin|men|Junior A|championship": [
   "L",
-  "L",
+  "L"
+ ],
+ "ballyfin|men|Minor|championship": [
+  "W",
   "W"
  ],
  "ballyfin|men|Other|championship": [
   "W",
+  "L",
   "W"
  ],
  "ballyfin|men|Senior|championship": [
@@ -202,10 +276,30 @@
   "W",
   "W"
  ],
+ "ballyfin|men|U14|championship": [
+  "L",
+  "D",
+  "L"
+ ],
+ "ballyfin|men|U14|league": [
+  "D",
+  "W",
+  "L"
+ ],
  "ballyfin|men|U15|championship": [
   "W",
   "W",
   "L"
+ ],
+ "ballyfin|men|U16|championship": [
+  "L",
+  "L",
+  "W"
+ ],
+ "ballyfin|men|U16|league": [
+  "L",
+  "W",
+  "W"
  ],
  "ballyfin|men|U17|championship": [
   "D",
@@ -526,6 +620,25 @@
   "L",
   "W"
  ],
+ "crettyard|men|Adult League|league": [
+  "L",
+  "W",
+  "W"
+ ],
+ "crettyard|men|Other|championship": [
+  "L",
+  "L",
+  "L"
+ ],
+ "crettyard|men|U16|championship": [
+  "W",
+  "W"
+ ],
+ "crettyard|men|U16|league": [
+  "L",
+  "W",
+  "L"
+ ],
  "emo": [
   "L",
   "W",
@@ -622,24 +735,28 @@
   "W"
  ],
  "graiguecullen|ladies|Adult League|league": [
-  "W",
-  "W",
-  "W"
+  "L",
+  "D",
+  "L"
  ],
  "graiguecullen|ladies|Junior|championship": [
   "L",
-  "W",
-  "W"
+  "L",
+  "L"
  ],
  "graiguecullen|ladies|Junior|league": [
-  "W",
+  "L",
   "W",
   "L"
+ ],
+ "graiguecullen|ladies|Minor|championship": [
+  "W",
+  "W"
  ],
  "graiguecullen|ladies|Senior|championship": [
   "L",
   "L",
-  "W"
+  "L"
  ],
  "graiguecullen|ladies|U13|championship": [
   "W",
@@ -651,6 +768,16 @@
   "W",
   "L"
  ],
+ "graiguecullen|ladies|U14|championship": [
+  "W",
+  "W",
+  "W"
+ ],
+ "graiguecullen|ladies|U14|league": [
+  "W",
+  "W",
+  "W"
+ ],
  "graiguecullen|ladies|U15|championship": [
   "W",
   "W",
@@ -658,6 +785,9 @@
  ],
  "graiguecullen|ladies|U15|league": [
   "L",
+  "L"
+ ],
+ "graiguecullen|ladies|U16|league": [
   "L"
  ],
  "graiguecullen|ladies|U17|championship": [
@@ -671,14 +801,14 @@
   "W"
  ],
  "graiguecullen|men|Adult League|league": [
-  "W",
+  "L",
   "W",
   "L"
  ],
  "graiguecullen|men|Junior A|championship": [
   "L",
-  "W",
-  "W"
+  "L",
+  "L"
  ],
  "graiguecullen|men|Junior A|league": [
   "W",
@@ -695,10 +825,14 @@
   "W",
   "L"
  ],
+ "graiguecullen|men|Minor|championship": [
+  "W",
+  "W"
+ ],
  "graiguecullen|men|Senior|championship": [
   "L",
   "L",
-  "W"
+  "L"
  ],
  "graiguecullen|men|U13|championship": [
   "W",
@@ -710,6 +844,16 @@
   "W",
   "L"
  ],
+ "graiguecullen|men|U14|championship": [
+  "W",
+  "W",
+  "W"
+ ],
+ "graiguecullen|men|U14|league": [
+  "W",
+  "W",
+  "W"
+ ],
  "graiguecullen|men|U15|championship": [
   "W",
   "W",
@@ -717,6 +861,9 @@
  ],
  "graiguecullen|men|U15|league": [
   "L",
+  "L"
+ ],
+ "graiguecullen|men|U16|league": [
   "L"
  ],
  "graiguecullen|men|U17|championship": [
@@ -950,7 +1097,7 @@
   "L"
  ],
  "parkratheniska|ladies|Adult League|league": [
-  "W",
+  "L",
   "W",
   "L"
  ],
@@ -969,7 +1116,7 @@
  ],
  "parkratheniska|ladies|Senior|championship": [
   "L",
-  "W",
+  "L",
   "L"
  ],
  "parkratheniska|ladies|U13|championship": [
@@ -984,8 +1131,8 @@
  ],
  "parkratheniska|ladies|U14|championship": [
   "L",
-  "W",
-  "L"
+  "L",
+  "W"
  ],
  "parkratheniska|ladies|U14|league": [
   "L",
@@ -1108,6 +1255,44 @@
   "W",
   "L",
   "L"
+ ],
+ "portlaoise|men|Adult League|league": [
+  "L",
+  "D",
+  "L"
+ ],
+ "portlaoise|men|Junior A|championship": [
+  "W",
+  "W"
+ ],
+ "portlaoise|men|Minor|championship": [
+  "W",
+  "W"
+ ],
+ "portlaoise|men|Senior|championship": [
+  "L",
+  "W",
+  "L"
+ ],
+ "portlaoise|men|U14|championship": [
+  "L",
+  "L",
+  "W"
+ ],
+ "portlaoise|men|U14|league": [
+  "W",
+  "L",
+  "W"
+ ],
+ "portlaoise|men|U16|championship": [
+  "W",
+  "W",
+  "W"
+ ],
+ "portlaoise|men|U16|league": [
+  "W",
+  "L",
+  "W"
  ],
  "railyardlgfc": [
   "W",
@@ -1349,15 +1534,67 @@
   "L",
   "L"
  ],
+ "stjosephs|men|Adult League|league": [
+  "L",
+  "L",
+  "L"
+ ],
+ "stjosephs|men|Junior A|championship": [
+  "L",
+  "L"
+ ],
+ "stjosephs|men|Minor|championship": [
+  "L",
+  "L"
+ ],
+ "stjosephs|men|Senior|championship": [
+  "W",
+  "W",
+  "W"
+ ],
+ "stjosephs|men|U14|championship": [
+  "D",
+  "L",
+  "L"
+ ],
+ "stjosephs|men|U14|league": [
+  "L",
+  "W",
+  "W"
+ ],
+ "stjosephs|men|U16|championship": [
+  "W",
+  "L",
+  "L"
+ ],
+ "stjosephs|men|U16|league": [
+  "W",
+  "W",
+  "L"
+ ],
  "stpauls": [
   "L",
   "W",
+  "L"
+ ],
+ "stpauls|ladies|Adult League|league": [
+  "L",
+  "L",
   "L"
  ],
  "stpauls|ladies|Féile|league": [
   "W",
   "W",
   "W"
+ ],
+ "stpauls|ladies|Intermediate|championship": [
+  "L",
+  "L",
+  "L"
+ ],
+ "stpauls|ladies|Minor|championship": [
+  "L",
+  "L"
  ],
  "stpauls|ladies|U13|championship": [
   "W",
@@ -1367,6 +1604,16 @@
  "stpauls|ladies|U13|league": [
   "L",
   "W",
+  "W"
+ ],
+ "stpauls|ladies|U14|championship": [
+  "L",
+  "L",
+  "L"
+ ],
+ "stpauls|ladies|U14|league": [
+  "L",
+  "L",
   "W"
  ],
  "stpauls|ladies|U15|championship": [
@@ -1379,6 +1626,16 @@
   "L",
   "L"
  ],
+ "stpauls|ladies|U16|championship": [
+  "W",
+  "W",
+  "W"
+ ],
+ "stpauls|ladies|U16|league": [
+  "L",
+  "W",
+  "L"
+ ],
  "stpauls|ladies|U17|championship": [
   "L",
   "L",
@@ -1389,10 +1646,24 @@
   "W",
   "L"
  ],
+ "stpauls|men|Adult League|league": [
+  "L",
+  "L",
+  "L"
+ ],
  "stpauls|men|Féile|league": [
   "W",
   "W",
   "W"
+ ],
+ "stpauls|men|Minor|championship": [
+  "L",
+  "L"
+ ],
+ "stpauls|men|Other|championship": [
+  "L",
+  "L",
+  "L"
  ],
  "stpauls|men|U13|championship": [
   "W",
@@ -1404,6 +1675,16 @@
   "W",
   "W"
  ],
+ "stpauls|men|U14|championship": [
+  "L",
+  "L",
+  "L"
+ ],
+ "stpauls|men|U14|league": [
+  "L",
+  "L",
+  "W"
+ ],
  "stpauls|men|U15|championship": [
   "L",
   "L",
@@ -1412,6 +1693,16 @@
  "stpauls|men|U15|league": [
   "L",
   "L",
+  "L"
+ ],
+ "stpauls|men|U16|championship": [
+  "W",
+  "W",
+  "W"
+ ],
+ "stpauls|men|U16|league": [
+  "L",
+  "W",
   "L"
  ],
  "stpauls|men|U17|championship": [
@@ -1601,5 +1892,44 @@
   "W",
   "W",
   "L"
+ ],
+ "timahoe|men|Adult League|league": [
+  "W",
+  "L",
+  "W"
+ ],
+ "timahoe|men|Junior A|championship": [
+  "W",
+  "W"
+ ],
+ "timahoe|men|Minor|championship": [
+  "W",
+  "L",
+  "L"
+ ],
+ "timahoe|men|Senior|championship": [
+  "W",
+  "W",
+  "W"
+ ],
+ "timahoe|men|U14|championship": [
+  "W",
+  "L",
+  "W"
+ ],
+ "timahoe|men|U14|league": [
+  "L",
+  "L",
+  "L"
+ ],
+ "timahoe|men|U16|championship": [
+  "L",
+  "W",
+  "L"
+ ],
+ "timahoe|men|U16|league": [
+  "W",
+  "L",
+  "W"
  ]
 }
