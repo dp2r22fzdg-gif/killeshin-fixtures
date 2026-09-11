@@ -141,7 +141,7 @@
  "bailenacoille|ladies|Junior|championship": [
   "L",
   "L",
-  "W"
+  "L"
  ],
  "bailenacoille|ladies|Junior|league": [
   "L",
@@ -179,17 +179,15 @@
  ],
  "ballyfin|ladies|Intermediate|championship": [
   "W",
-  "L",
   "W"
  ],
  "ballyfin|ladies|Intermediate|league": [
-  "W",
-  "W",
-  "W"
+  "L"
  ],
  "ballyfin|ladies|Junior|championship": [
   "L",
-  "L"
+  "L",
+  "W"
  ],
  "ballyfin|ladies|Minor|championship": [
   "W",
@@ -247,7 +245,8 @@
  ],
  "ballyfin|men|Junior A|championship": [
   "L",
-  "L"
+  "L",
+  "W"
  ],
  "ballyfin|men|Minor|championship": [
   "W",
@@ -255,7 +254,6 @@
  ],
  "ballyfin|men|Other|championship": [
   "W",
-  "L",
   "W"
  ],
  "ballyfin|men|Senior|championship": [
@@ -735,17 +733,17 @@
   "W"
  ],
  "graiguecullen|ladies|Adult League|league": [
-  "L",
-  "D",
-  "L"
+  "W",
+  "W",
+  "W"
  ],
  "graiguecullen|ladies|Junior|championship": [
   "L",
-  "L",
-  "L"
+  "W",
+  "W"
  ],
  "graiguecullen|ladies|Junior|league": [
-  "L",
+  "W",
   "W",
   "L"
  ],
@@ -756,7 +754,7 @@
  "graiguecullen|ladies|Senior|championship": [
   "L",
   "L",
-  "L"
+  "W"
  ],
  "graiguecullen|ladies|U13|championship": [
   "W",
@@ -801,14 +799,14 @@
   "W"
  ],
  "graiguecullen|men|Adult League|league": [
-  "L",
+  "W",
   "W",
   "L"
  ],
  "graiguecullen|men|Junior A|championship": [
   "L",
-  "L",
-  "L"
+  "W",
+  "W"
  ],
  "graiguecullen|men|Junior A|league": [
   "W",
@@ -832,7 +830,7 @@
  "graiguecullen|men|Senior|championship": [
   "L",
   "L",
-  "L"
+  "W"
  ],
  "graiguecullen|men|U13|championship": [
   "W",
@@ -1097,7 +1095,7 @@
   "L"
  ],
  "parkratheniska|ladies|Adult League|league": [
-  "L",
+  "W",
   "W",
   "L"
  ],
@@ -1116,7 +1114,7 @@
  ],
  "parkratheniska|ladies|Senior|championship": [
   "L",
-  "L",
+  "W",
   "L"
  ],
  "parkratheniska|ladies|U13|championship": [
