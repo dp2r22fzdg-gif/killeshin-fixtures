@@ -65,6 +65,7 @@ CREST_MAP = {}
 CRESTS_FILE = "crests.json"      # kept beside the app so an upload cannot wipe it
 FORM_FILE = "form.json"          # last few results for every club we play
 RESULTS_FILE = "results.json"    # everything we have ever seen, so nothing is lost
+DATA_FILE = "data.json"          # the live data, kept out of index.html
 PAGE_TRIES = 6                   # how far back to page through a team's history
 TEAM_URLS = {}
 SRC_BASE = ["https://laoisgaa.ie/"]
@@ -1078,6 +1079,14 @@ def main():
           % (len(CREST_MAP), len(CREST_OVERRIDES)))
     print("Calendars")
     write_calendars(fixtures, today)
+
+    # The data lives in its own file as well as in the page. index.html gets
+    # replaced by hand from time to time, and anything held only in there is
+    # thrown back to whenever that copy was made.
+    with open(os.path.join(HERE, DATA_FILE), "w", encoding="utf-8") as fh:
+        json.dump(payload, fh, ensure_ascii=False, separators=(",", ":"))
+    print("Wrote %s (%d fixtures, %d results)" % (DATA_FILE, len(fixtures), len(results)))
+
     write_app(payload)
     print("\nDone \u2014 %d fixtures, %d results, %d tables, %d stories"
           % (len(fixtures), len(results), len(tables), len(news)))
