@@ -108,6 +108,49 @@ SHOP = {
     "ladies": "https://www.oneills.com/shop-by-team/gaa/ireland/killeshin-ladies.html",
 }
 
+# ---------------------------------------------------------------------------
+# Which games need a ticket.
+#
+# The boards do not flag this in the fixtures, so it is worked out from the
+# usual pattern: adult championship games, and anything at a county ground.
+# Correct it here when the rule gets it wrong.
+#
+#   always / never - "YYYY-MM-DD grade" for one specific game, e.g.
+#                    "2026-09-12 Senior"
+# ---------------------------------------------------------------------------
+TICKETED = {
+    "venues": ["o'moore park", "omoore park", "laois hire"],
+    "adult_grades": ["Senior", "Intermediate", "Junior A", "Junior C", "U20"],
+    "always": [],
+    "never": [],
+}
+
+
+def needs_ticket(m):
+    tag = "%s %s" % (m["date"], m["grade"])
+    if tag in TICKETED["never"]:
+        return False
+    if tag in TICKETED["always"]:
+        return True
+    venue = (m.get("venue") or "").lower()
+    if any(v in venue for v in TICKETED["venues"]):
+        return True                       # county grounds are ticketed either way
+
+    # LGFA club games are free in unless they are at a county ground, so the
+    # championship rule below is for the men's side only.
+    if m["branch"] != "men":
+        return False
+
+    comp = (m.get("competition") or "").lower()
+    if "championship" not in comp or m["grade"] not in TICKETED["adult_grades"]:
+        return False
+    # The league phase of a championship is played at club grounds and is
+    # normally free in; the knockout rounds are the ticketed ones.
+    if "league" in comp or "division" in comp:
+        return False
+    return True
+
+
 # Match tickets are sold by the county boards, one page each.
 TICKETS = {
     "title": "Buy match tickets",
@@ -993,6 +1036,12 @@ def main():
 
     results = merge_archive(results, os.path.join(HERE, RESULTS_FILE))
     fixtures = mark_postponed(fixtures)
+    tickets = 0
+    for f in fixtures:
+        if needs_ticket(f):
+            f["ticket"] = TICKETS["ladies" if f["branch"] == "ladies" else "men"]
+            tickets += 1
+    print("  ticketed: %d of %d upcoming games" % (tickets, len(fixtures)))
     fixtures.sort(key=lambda x: (x["date"], x["time"]))
     results.sort(key=lambda x: (x["date"], x["time"]), reverse=True)
     items = fixtures + results + tables
