@@ -276,12 +276,59 @@ a{color:inherit;text-decoration:none}
 .mine-t[aria-pressed="true"]{color:#fff;background:var(--green-dk);border-color:#0F5C34;
   box-shadow:inset 0 2px 4px rgba(0,0,0,.3);transform:translateY(1px)}
 .mine-t[aria-pressed="true"]::before{background:#fff}
-.mine-edit{flex:none;font-size:13px;font-weight:700;color:var(--grey);padding:7px 4px;
-  text-decoration:underline;text-underline-offset:3px}
 
 .picker{position:fixed;inset:0;z-index:80;display:flex;align-items:flex-end;
   background:rgba(10,30,20,.45);opacity:0;pointer-events:none;transition:opacity .16s}
 .picker.open{opacity:1;pointer-events:auto}
+.picker .panel{width:100%;max-height:82vh;overflow-y:auto;background:var(--paper-2);
+  border-radius:24px 24px 0 0;padding:10px 16px calc(20px + env(safe-area-inset-bottom));
+  transform:translateY(16px);transition:transform .16s}
+.picker.open .panel{transform:none}
+.picker .grab{width:42px;height:5px;border-radius:999px;background:var(--line-dk);
+  margin:0 auto 14px}
+.picker h3{font-size:19px;font-family:'Bricolage Grotesque',Archivo,sans-serif;font-weight:800;
+  margin-bottom:5px}
+.picker .lede{font-size:13.5px;color:var(--grey);line-height:1.5;margin:0 0 14px}
+.picker .grp{font-size:10.5px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--green-dk);margin:14px 0 9px;display:flex;align-items:center;gap:9px}
+.picker .grp img{width:22px;height:22px;object-fit:contain}
+.pk{display:flex;align-items:center;gap:12px;width:100%;text-align:left;padding:13px 15px;
+  margin-bottom:8px;border-radius:13px;font-size:16px;font-weight:700;background:var(--paper);
+  border:1px solid var(--line);color:var(--ink)}
+.pk .box{width:23px;height:23px;flex:none;border-radius:7px;border:2px solid var(--line-dk);
+  display:grid;place-items:center;font-size:13px;color:#fff}
+.pk[aria-pressed="true"]{background:var(--green-lt);border-color:#BFDFCD;color:var(--green-dk)}
+.pk[aria-pressed="true"] .box{background:var(--green-dk);border-color:var(--green-dk)}
+.picker .done{display:block;width:100%;background:var(--forest);color:#fff;text-align:center;
+  padding:15px;font-size:15px;font-weight:800;border-radius:13px;margin-top:14px;
+  border:1.5px solid #0F5C34;box-shadow:0 3px 0 #0F5C34}
+.picker .clear{display:block;width:100%;text-align:center;padding:12px;font-size:13.5px;
+  font-weight:700;color:var(--grey);margin-top:6px}
+
+/* ── my teams ───────────────────────────────────────────── */
+.mine-btn{flex:none;display:inline-flex;align-items:center;gap:7px;font-size:13.5px;
+  font-weight:700;white-space:nowrap;padding:7px 15px 7px 13px;border-radius:10px;
+  background:var(--green-lt);color:var(--green-dk);border:1px solid #BFDFCD;
+  box-shadow:0 2px 0 #BFDFCD}
+.mine-btn:active{box-shadow:none;transform:translateY(2px)}
+.mine-btn .star{font-size:14px;line-height:1}
+
+/* With My teams on, the team chips would sit there looking active while doing
+   nothing, so they are replaced by a banner saying whose games are showing. */
+.minebar{display:flex;align-items:center;gap:11px;margin:0 16px;padding:11px 14px;
+  border-radius:14px;background:linear-gradient(160deg,#F2FBF6,#E4F5EB);
+  border:1px solid rgba(31,130,74,.26);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.9)}
+.minebar .star{font-size:16px;color:var(--green-dk);flex:none}
+.minebar .tx{flex:1;min-width:0}
+.minebar .tx b{display:block;font-size:10.5px;font-weight:800;letter-spacing:.15em;
+  text-transform:uppercase;color:var(--green-dk)}
+.minebar .tx span{display:block;font-size:13.5px;color:var(--ink);font-weight:600;
+  margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mine-alt{flex:none;padding:7px 13px;border-radius:10px;font-size:13px;font-weight:700;
+  color:var(--green-dk);background:#fff;border:1px solid #BFDFCD;box-shadow:0 2px 0 #BFDFCD}
+.mine-alt:active{box-shadow:none;transform:translateY(2px)}
+
 .picker .panel{width:100%;max-height:82vh;overflow-y:auto;background:var(--paper-2);
   border-radius:24px 24px 0 0;padding:10px 16px calc(20px + env(safe-area-inset-bottom));
   transform:translateY(16px);transition:transform .16s}
@@ -316,10 +363,6 @@ a{color:inherit;text-decoration:none}
 .mine-btn[aria-pressed="true"]{background:var(--forest);color:#fff;border-color:#0F5C34;
   box-shadow:inset 0 2px 4px rgba(0,0,0,.3);transform:translateY(1px)}
 .mine-btn .star{font-size:14px;line-height:1}
-.mine-edit{flex:none;margin-left:7px;padding:7px 13px;border-radius:10px;
-  font-size:13px;font-weight:700;color:var(--grey);background:var(--paper);
-  border:1px solid var(--line-dk);box-shadow:0 2px 0 var(--line)}
-.mine-edit:active{box-shadow:none;transform:translateY(2px)}
 
 .picker .panel{max-height:78vh;overflow-y:auto}
 .picker h3{font-size:19px;font-family:'Bricolage Grotesque',Archivo,sans-serif;
@@ -1773,34 +1816,56 @@ function grades(){
   }
   return G[branch] || [];
 }
+function mineNames(){
+  return MINE.map(function(id){
+    var bits = id.split('|');
+    return br(bits[0]).name + ' ' + bits[1];
+  }).join(' \u00b7 ');
+}
+
 function filters(){
   var box = document.getElementById('filters');
   if(view !== 'fixtures' && view !== 'results' && view !== 'tables'){
-    box.hidden = true; return; }
+    box.hidden = true; return;
+  }
   box.hidden = false;
+
+  var homeBtn = view === 'tables' ? '' :
+    '<button class="home-t" id="homeT" aria-pressed="' + homeOnly + '">' +
+    (homeOnly ? '\u2713 ' : '') + 'Home only</button>';
+
+  if(grade === '__mine'){
+    box.innerHTML =
+      '<div class="minebar"><span class="star">\u2605</span>' +
+        '<span class="tx"><b>Your teams</b><span>' + esc(mineNames()) + '</span></span>' +
+        '<button class="mine-alt" id="mineEdit">Change</button></div>' +
+      '<div class="homerow">' + homeBtn +
+        '<button class="mine-alt" id="mineOff"' +
+        (homeBtn ? ' style="margin-left:9px"' : '') + '>Show all teams</button>' +
+      '</div>';
+    return;
+  }
+
   var chips = ['All'].concat(grades()).map(function(g){
     return '<button class="chip" aria-pressed="'+(g===grade)+'" data-g="'+esc(g)+'">'+esc(g)+'</button>';
   }).join('');
   box.innerHTML = '<div class="chiprow">' + chips + '</div>' +
-    '<div class="homerow">' +
-      (view === 'tables' ? '' :
-        '<button class="home-t" id="homeT" aria-pressed="' + homeOnly + '">' +
-        (homeOnly ? '\u2713 ' : '') + 'Home only</button>') +
-      '<button class="mine-btn" id="mineBtn" aria-pressed="' + (grade === '__mine') + '">' +
-      '<span class="star">' + (grade === '__mine' ? '\u2605' : '\u2606') + '</span>' +
+    '<div class="homerow">' + homeBtn +
+      '<button class="mine-btn" id="mineBtn"' + (homeBtn ? ' style="margin-left:9px"' : '') + '>' +
+      '<span class="star">\u2606</span>' +
       (MINE.length ? 'My teams (' + MINE.length + ')' : 'My teams') + '</button>' +
-      (MINE.length ? '<button class="mine-edit" id="mineEdit">Edit</button>' : '') +
     '</div>';
 }
-/* The next match, next at home and the club promo belong on the fixtures
-   page. Everywhere else they are just something to scroll past. */
+
 var BRANCHLESS = ['media','alerts','club'];   /* nothing here is per-team */
 function homePanels(){
   var t = document.getElementById('top');
   if(t) t.hidden = (view !== 'fixtures');
   var b = document.getElementById('branch');
-  if(b) b.hidden = BRANCHLESS.indexOf(view) > -1;
+  /* The branch buttons mean nothing while My teams is on - it spans both. */
+  if(b) b.hidden = BRANCHLESS.indexOf(view) > -1 || grade === '__mine';
 }
+
 function drawInner(){
   document.getElementById('out').innerHTML =
     view==='fixtures' ? renderFixtures() :
@@ -1859,14 +1924,11 @@ document.getElementById('out').addEventListener('click', function(e){
   draw(false);
 });
 document.getElementById('filters').addEventListener('click', function(e){
-  if(e.target.closest('#mineEdit')){ openPicker(true); return; }
-  if(e.target.closest('#mineBtn')){
-    if(!MINE.length){ openPicker(true); return; }      /* nothing picked yet */
-    grade = (grade === '__mine') ? 'All' : '__mine';   /* straight on and off */
-    savePrefs();
-    count('/myteams');
-    renderNext(); draw(false);
-    return;
+  if(e.target.closest('#mineEdit') || e.target.closest('#mineBtn')){
+    openPicker(true); return;                 /* one button, one job: choose */
+  }
+  if(e.target.closest('#mineOff')){
+    grade = 'All'; savePrefs(); renderNext(); draw(false); return;
   }
   var c = e.target.closest('.chip');
   if(c){ grade = c.dataset.g; savePrefs(); renderNext(); draw(false); return; }
@@ -1899,7 +1961,7 @@ document.getElementById('picker').addEventListener('click', function(e){
   if(e.target.closest('#pickClear')){ MINE = []; saveMine(); renderPicker(); return; }
   if(e.target.closest('#pickDone') || !e.target.closest('.panel')){
     openPicker(false);
-    if(MINE.length) grade = '__mine';
+    grade = MINE.length ? '__mine' : 'All';   /* nothing ticked means show all */
     savePrefs();
     renderNext(); draw(false);
   }
