@@ -739,7 +739,7 @@
  ],
  "graiguecullen|ladies|Junior|championship": [
   "L",
-  "W",
+  "L",
   "W"
  ],
  "graiguecullen|ladies|Junior|league": [
@@ -814,7 +814,7 @@
   "L"
  ],
  "graiguecullen|men|Junior C|championship": [
-  "W",
+  "L",
   "W",
   "W"
  ],
@@ -1031,8 +1031,8 @@
   "W"
  ],
  "naomhfiontinmaigheanrtha|men|U15|championship": [
-  "L",
   "W",
+  "L",
   "W"
  ],
  "naomhfiontinmaigheanrtha|men|U15|league": [
@@ -1113,9 +1113,9 @@
   "W"
  ],
  "parkratheniska|ladies|Senior|championship": [
-  "L",
   "W",
-  "L"
+  "L",
+  "W"
  ],
  "parkratheniska|ladies|U13|championship": [
   "L",
@@ -1143,7 +1143,6 @@
   "W"
  ],
  "parkratheniska|ladies|U15|league": [
-  "L",
   "L",
   "L"
  ],
