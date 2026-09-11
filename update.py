@@ -120,7 +120,10 @@ SHOP = {
 # ---------------------------------------------------------------------------
 TICKETED = {
     "venues": ["o'moore park", "omoore park", "laois hire"],
-    "adult_grades": ["Senior", "Intermediate", "Junior A", "Junior C", "U20"],
+    # Senior championship knockouts are ticketed at any stage. Junior is free
+    # in until the final.
+    "ticketed_grades": ["Senior"],
+    "final_only_grades": ["Junior A", "Junior C", "Intermediate", "U20"],
     "always": [],
     "never": [],
 }
@@ -142,13 +145,18 @@ def needs_ticket(m):
         return False
 
     comp = (m.get("competition") or "").lower()
-    if "championship" not in comp or m["grade"] not in TICKETED["adult_grades"]:
+    if "championship" not in comp:
         return False
     # The league phase of a championship is played at club grounds and is
-    # normally free in; the knockout rounds are the ticketed ones.
+    # normally free in; the knockout rounds are where a ticket comes in.
     if "league" in comp or "division" in comp:
         return False
-    return True
+
+    if m["grade"] in TICKETED["ticketed_grades"]:
+        return True
+    if m["grade"] in TICKETED["final_only_grades"]:
+        return "final" in comp and "semi" not in comp and "quarter" not in comp
+    return False
 
 
 # Match tickets are sold by the county boards, one page each.
@@ -462,6 +470,10 @@ CLUB_LINKS = [
      "note": "County board \u2014 ladies fixtures and results",
      "url": "https://laoislgfa.ie/"},
 ]
+
+# Grades to leave off the filter chips. Go Games have no scores published,
+# so a chip for them only ever leads to an empty list.
+HIDE_GRADES = ["U12"]
 
 # Adult teams first, then underage by age, with the two that only run for
 # part of the year at the end.
@@ -1050,7 +1062,8 @@ def main():
         "club": "Killeshin GAA", "county": "Laois", "ground": GROUND,
         "branches": BRANCHES,
         "gradesBy": {b: [g for g in GRADE_ORDER
-                         if any(m["grade"] == g for m in items if m["branch"] == b)]
+                         if g not in HIDE_GRADES
+                         and any(m["grade"] == g for m in items if m["branch"] == b)]
                      for b in BRANCHES},
         "source": BRANCHES["men"]["source"],
         "updated": now.isoformat(timespec="seconds"),
