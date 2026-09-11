@@ -441,7 +441,7 @@
  "barrowhouse|men|Junior A|championship": [
   "W",
   "W",
-  "L"
+  "W"
  ],
  "barrowhouse|men|Junior A|league": [
   "L",
@@ -1051,7 +1051,7 @@
   "L"
  ],
  "odempseys|men|Junior A|championship": [
-  "W",
+  "L",
   "W",
   "W"
  ],
@@ -1617,7 +1617,7 @@
  "stpauls|ladies|U15|championship": [
   "L",
   "L",
-  "W"
+  "L"
  ],
  "stpauls|ladies|U15|league": [
   "L",
@@ -1686,7 +1686,7 @@
  "stpauls|men|U15|championship": [
   "L",
   "L",
-  "W"
+  "L"
  ],
  "stpauls|men|U15|league": [
   "L",
