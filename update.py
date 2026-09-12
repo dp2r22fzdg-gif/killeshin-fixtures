@@ -747,7 +747,7 @@ def parse_match(block, date, club, branch):
         m = re.search(r"Venue:\s*([^\n]{2,60})", " ".join(bits))
         venue = m.group(1).strip() if m else "TBC"
 
-    m = re.search(r"Referee:\s*(.+?)(?:\s{2,}|$)", " ".join(bits))
+    m = re.search(r"Referee:\s*(.+?)(?:\s*\u00b7|\s{2,}|$)", " ".join(bits))
     scores = [t for t in bits if SCORE_RE.match(t)]
     times = [t for t in bits if TIME_RE.match(t)]
     home, away = teams[0], teams[1]
@@ -935,11 +935,26 @@ def gather_news(today):
 
 
 # ================================================================ calendars
+def slug(text):
+    """A safe filename fragment - "Junior A" becomes "junior-a"."""
+    return re.sub(r"[^a-z0-9]+", "-", (text or "").lower()).strip("-") or "x"
+
+
 def write_calendars(fixtures, today):
     feeds = {"all": ("All fixtures", lambda m: True),
              "men": ("Men's", lambda m: m["branch"] == "men"),
              "ladies": ("Ladies", lambda m: m["branch"] == "ladies"),
              "home": ("Home games", lambda m: "Killeshin" in m["venue"])}
+
+    # One feed per team as well, so someone who only wants their own child's
+    # games can subscribe to just that, rather than every fixture the club
+    # has. This is what the "My teams" filter in the app can point people at.
+    team_feed = {}
+    for b, g in sorted({(m["branch"], m["grade"]) for m in fixtures}):
+        key = "%s-%s" % (b, slug(g))
+        label = "%s %s" % ("Ladies" if b == "ladies" else "Men's", g)
+        feeds[key] = (label, (lambda bb=b, gg=g: lambda m: m["branch"] == bb and m["grade"] == gg)())
+        team_feed[b + "|" + g] = key
     upcoming = sorted([f for f in fixtures if f["date"] >= today and not f.get("postponed")],
                       key=lambda x: (x["date"], x["time"]))
     stamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
@@ -992,7 +1007,10 @@ def write_calendars(fixtures, today):
         with open(os.path.join(HERE, "killeshin-%s.ics" % key), "w",
                   encoding="utf-8", newline="") as fh:
             fh.write("\r\n".join(L) + "\r\n")
-        print("    killeshin-%-6s %2d events" % (key + ".ics", len(sel)))
+        if key in ("all", "men", "ladies", "home"):
+            print("    killeshin-%-6s %2d events" % (key + ".ics", len(sel)))
+    print("    %d team feeds" % len(team_feed))
+    return team_feed
 
 
 # ================================================================ write
@@ -1169,7 +1187,7 @@ def main():
     print("Opposition crests: %d from the boards, %d set by hand"
           % (len(CREST_MAP), len(CREST_OVERRIDES)))
     print("Calendars")
-    write_calendars(fixtures, today)
+    payload["teamFeeds"] = write_calendars(fixtures, today)
 
     # The data lives in its own file as well as in the page. index.html gets
     # replaced by hand from time to time, and anything held only in there is
