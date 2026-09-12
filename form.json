@@ -26,8 +26,8 @@
  ],
  "anfraoch|ladies|Senior|championship": [
   "L",
-  "W",
-  "L"
+  "L",
+  "W"
  ],
  "anfraoch|ladies|U13|championship": [
   "W",
@@ -532,6 +532,7 @@
   "W"
  ],
  "clonasleestmanmansfootball|ladies|Junior|championship": [
+  "L",
   "W",
   "L"
  ],
@@ -695,7 +696,7 @@
  "gleannuiseann|men|Senior|championship": [
   "W",
   "W",
-  "L"
+  "W"
  ],
  "gleannuiseann|men|Senior|league": [
   "W",
@@ -1229,7 +1230,7 @@
  "portlaoise|ladies|Senior|championship": [
   "L",
   "L",
-  "W"
+  "L"
  ],
  "portlaoise|ladies|U13|championship": [
   "W",
