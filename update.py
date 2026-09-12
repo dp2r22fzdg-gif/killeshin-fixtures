@@ -376,6 +376,96 @@ def harvest_form(opponents, branch_of):
     return out
 
 
+SEEN_FILE = "seen.json"          # tracks what is new or changed, for the badges
+
+
+def fixture_identity(m):
+    """
+    A fixture's stable identity - who, at what grade, in which named round.
+    Deliberately excludes date, time, venue and referee, because those are
+    exactly the things that get confirmed or changed after a fixture first
+    appears, and a rescheduled game is still the same fixture, not a new one.
+    """
+    return "%s|%s|%s|%s" % (m["branch"], m["grade"], norm_club(m["opponent"]), m["competition"])
+
+
+def fixture_fingerprint(m):
+    """The volatile part - if any of this changes, the fixture has been updated."""
+    return "%s|%s|%s|%s" % (m.get("date", ""), m.get("time", ""), m.get("venue", ""), m.get("referee", ""))
+
+
+def track_changes(fixtures, results, path):
+    """
+    Compares this run against what was seen last time, so the app can show a
+    NEW flag on anything posted in the last 24 hours and an UPDATED flag on
+    any fixture whose date, time, venue or referee has changed since it was
+    first seen. The flags are worked out here, once an hour, rather than in
+    the browser, so nothing depends on a visitor's clock.
+    """
+    try:
+        with open(path, encoding="utf-8") as fh:
+            seen = json.load(fh)
+    except (OSError, ValueError):
+        seen = {}
+    seen_fx = seen.get("fixtures", {})
+    seen_rs = seen.get("results", {})
+
+    dub = timezone(timedelta(hours=1))
+    now = datetime.now(dub)
+    now_iso = now.isoformat()
+    cutoff = (now - timedelta(hours=24)).isoformat()
+
+    def within_a_day(iso):
+        return iso is not None and iso > cutoff
+
+    new_fx = new_up = 0
+    for f in fixtures:
+        ident = fixture_identity(f)
+        fp = fixture_fingerprint(f)
+        prior = seen_fx.get(ident)
+        if prior is None:
+            seen_fx[ident] = {"firstSeen": now_iso, "fp": fp}
+            f["isNew"] = True
+            new_fx += 1
+        else:
+            f["isNew"] = within_a_day(prior.get("firstSeen"))
+            if prior.get("fp") != fp:
+                prior["fp"] = fp
+                prior["changedAt"] = now_iso
+                # A fixture just posted for the first time is NEW, not
+                # UPDATED - the fingerprint "changing" from nothing does not
+                # count as an edit.
+                f["isUpdated"] = not f["isNew"]
+                new_up += 0 if f["isNew"] else 1
+            else:
+                f["isUpdated"] = within_a_day(prior.get("changedAt"))
+            seen_fx[ident] = prior
+
+    new_rs = 0
+    for r in results:
+        key = match_key(r)
+        prior = seen_rs.get(key)
+        if prior is None:
+            seen_rs[key] = {"firstSeen": now_iso}
+            r["isNew"] = True
+            new_rs += 1
+        else:
+            r["isNew"] = within_a_day(prior.get("firstSeen"))
+
+    # Drop anything that no longer needs remembering, so the file does not
+    # grow forever: fixtures once they are off the upcoming list, results
+    # once their NEW flag could not possibly still apply.
+    live_fx_ids = {fixture_identity(f) for f in fixtures}
+    seen_fx = {k: v for k, v in seen_fx.items() if k in live_fx_ids}
+    seen_rs = {k: v for k, v in seen_rs.items() if v.get("firstSeen", "") > cutoff}
+
+    with open(path, "w", encoding="utf-8") as fh:
+        json.dump({"fixtures": seen_fx, "results": seen_rs}, fh, ensure_ascii=False, separators=(",", ":"))
+
+    print("  new: %d fixtures, %d results   updated: %d fixtures" % (new_fx, new_rs, new_up))
+    return fixtures, results
+
+
 def match_key(m):
     return "%s|%s|%s|%s" % (m["date"], m.get("time", ""), m["home"], m["away"])
 
@@ -1048,6 +1138,7 @@ def main():
     print("    %d stories (free %d, subscriber %d)" % (len(news), free, len(news) - free))
 
     results = merge_archive(results, os.path.join(HERE, RESULTS_FILE))
+    fixtures, results = track_changes(fixtures, results, os.path.join(HERE, SEEN_FILE))
     fixtures = mark_postponed(fixtures)
     tickets = 0
     for f in fixtures:
