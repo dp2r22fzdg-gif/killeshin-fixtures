@@ -204,8 +204,8 @@
   "L"
  ],
  "ballyfin|ladies|U13|league": [
-  "L",
   "W",
+  "L",
   "W"
  ],
  "ballyfin|ladies|U14|championship": [
@@ -270,8 +270,8 @@
   "L"
  ],
  "ballyfin|men|U13|league": [
-  "L",
   "W",
+  "L",
   "W"
  ],
  "ballyfin|men|U14|championship": [
@@ -339,7 +339,7 @@
   "L"
  ],
  "ballylinan|men|U15|championship": [
-  "W",
+  "L",
   "W",
   "W"
  ],
@@ -409,9 +409,9 @@
   "W"
  ],
  "barrowgaels|men|U13|league": [
-  "W",
   "L",
-  "W"
+  "W",
+  "L"
  ],
  "barrowgaels|men|U15|championship": [
   "L",
@@ -708,9 +708,9 @@
   "W"
  ],
  "gleannuiseann|men|U15|championship": [
-  "L",
   "W",
-  "L"
+  "L",
+  "W"
  ],
  "gleannuiseann|men|U15|league": [
   "L",
@@ -1076,12 +1076,11 @@
   "D"
  ],
  "odempseys|men|U13|league": [
-  "L",
-  "W"
+  "L"
  ],
  "odempseys|men|U15|championship": [
-  "W",
   "L",
+  "W",
   "L"
  ],
  "odempseys|men|U17|championship": [
@@ -1140,7 +1139,7 @@
  "parkratheniska|ladies|U15|championship": [
   "L",
   "L",
-  "W"
+  "L"
  ],
  "parkratheniska|ladies|U15|league": [
   "L",
@@ -1733,14 +1732,13 @@
   "L"
  ],
  "stradballyparishgaels|men|U15|championship": [
-  "L",
+  "W",
   "L",
   "L"
  ],
  "stradballyparishgaels|men|U15|league": [
   "W",
-  "W",
-  "D"
+  "W"
  ],
  "stradballyparishgaels|men|U17|championship": [
   "L",
@@ -1832,7 +1830,7 @@
  ],
  "theharps|men|U15|championship": [
   "W",
-  "L",
+  "W",
   "L"
  ],
  "theharps|men|U17|championship": [
