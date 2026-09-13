@@ -17,7 +17,7 @@
  "anfraoch|ladies|Junior|championship": [
   "L",
   "L",
-  "W"
+  "L"
  ],
  "anfraoch|ladies|Other|championship": [
   "L",
@@ -179,6 +179,7 @@
  ],
  "ballyfin|ladies|Intermediate|championship": [
   "W",
+  "W",
   "W"
  ],
  "ballyfin|ladies|Intermediate|league": [
@@ -254,6 +255,7 @@
  ],
  "ballyfin|men|Other|championship": [
   "W",
+  "W",
   "W"
  ],
  "ballyfin|men|Senior|championship": [
@@ -324,9 +326,9 @@
   "L"
  ],
  "ballylinan|men|Other|championship": [
-  "W",
   "L",
-  "W"
+  "W",
+  "L"
  ],
  "ballylinan|men|U13|championship": [
   "L",
@@ -497,9 +499,9 @@
   "L"
  ],
  "camross|men|U13|championship": [
+  "L",
   "W",
-  "W",
-  "L"
+  "W"
  ],
  "camross|men|U13|league": [
   "W",
@@ -755,7 +757,7 @@
  "graiguecullen|ladies|Senior|championship": [
   "L",
   "L",
-  "W"
+  "L"
  ],
  "graiguecullen|ladies|U13|championship": [
   "W",
@@ -831,7 +833,7 @@
  "graiguecullen|men|Senior|championship": [
   "L",
   "L",
-  "W"
+  "L"
  ],
  "graiguecullen|men|U13|championship": [
   "W",
@@ -1819,9 +1821,9 @@
   "W"
  ],
  "theharps|men|U13|championship": [
+  "L",
   "W",
-  "D",
-  "L"
+  "D"
  ],
  "theharps|men|U13|league": [
   "L",
@@ -1845,8 +1847,8 @@
  ],
  "therock|men|Junior A|championship": [
   "W",
-  "L",
-  "W"
+  "W",
+  "L"
  ],
  "therock|men|Junior A|league": [
   "W",
