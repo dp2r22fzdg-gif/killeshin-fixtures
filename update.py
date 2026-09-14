@@ -1055,6 +1055,29 @@ def crest_lookup(fixtures, results):
     return out
 
 
+def scrape_lms_count(url):
+    """
+    The public selections tracker for Last One Standing shows a plain line
+    right at the top of the page - "N alive of M \u00b7 Gameweek X" - with no
+    login needed. Read it the same way every other page in this file is read.
+    Returns None if the page is unreachable or its wording has changed, so a
+    failed read just falls back to the ordinary static message rather than
+    breaking anything.
+    """
+    r = fetch(url, quiet=True)
+    if r is None:
+        return None
+    text = BeautifulSoup(r.text, "html.parser").get_text(" ", strip=True)
+    m = re.search(r"(\d[\d,]*)\s+alive of\s+(\d[\d,]*)\D{0,20}Gameweek\s*(\d+)", text, re.I)
+    if not m:
+        return None
+    return {
+        "alive": int(m.group(1).replace(",", "")),
+        "total": int(m.group(2).replace(",", "")),
+        "gameweek": int(m.group(3)),
+    }
+
+
 def main():
     dub = timezone(timedelta(hours=1))
     now = datetime.now(dub)
@@ -1167,6 +1190,16 @@ def main():
     fixtures.sort(key=lambda x: (x["date"], x["time"]))
     results.sort(key=lambda x: (x["date"], x["time"]), reverse=True)
     items = fixtures + results + tables
+
+    print("Last One Standing")
+    if PROMO.get("show") and PROMO.get("url"):
+        lms = scrape_lms_count(PROMO["url"])
+        if lms:
+            PROMO["note"] = "%d of %d still in \u00b7 Gameweek %d" % (
+                lms["alive"], lms["total"], lms["gameweek"])
+            print("    %d of %d still in, gameweek %d" % (lms["alive"], lms["total"], lms["gameweek"]))
+        else:
+            print("    could not read the live count - showing the standard message instead")
 
     payload = {
         "club": "Killeshin GAA", "county": "Laois", "ground": GROUND,
