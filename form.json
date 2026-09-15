@@ -391,8 +391,8 @@
   "L"
  ],
  "ballyroan|ladies|U16|championship": [
+  "W",
   "D",
-  "L",
   "L"
  ],
  "ballyroan|ladies|U16|league": [
@@ -945,9 +945,9 @@
   "W"
  ],
  "killeshin|ladies|U16|championship": [
+  "L",
   "W",
-  "D",
-  "W"
+  "D"
  ],
  "killeshin|ladies|U16|league": [
   "L",
@@ -1422,7 +1422,7 @@
   "L"
  ],
  "stbrigids|ladies|U16|championship": [
-  "W",
+  "L",
   "W",
   "W"
  ],
