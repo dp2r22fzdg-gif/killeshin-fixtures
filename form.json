@@ -141,7 +141,7 @@
  "bailenacoille|ladies|Junior|championship": [
   "L",
   "L",
-  "L"
+  "W"
  ],
  "bailenacoille|ladies|Junior|league": [
   "L",
@@ -179,16 +179,17 @@
  ],
  "ballyfin|ladies|Intermediate|championship": [
   "W",
-  "W",
+  "L",
   "W"
  ],
  "ballyfin|ladies|Intermediate|league": [
-  "L"
+  "W",
+  "W",
+  "W"
  ],
  "ballyfin|ladies|Junior|championship": [
   "L",
-  "L",
-  "W"
+  "L"
  ],
  "ballyfin|ladies|Minor|championship": [
   "W",
@@ -227,7 +228,7 @@
  "ballyfin|ladies|U16|championship": [
   "L",
   "L",
-  "W"
+  "L"
  ],
  "ballyfin|ladies|U16|league": [
   "L",
@@ -246,8 +247,7 @@
  ],
  "ballyfin|men|Junior A|championship": [
   "L",
-  "L",
-  "W"
+  "L"
  ],
  "ballyfin|men|Minor|championship": [
   "W",
@@ -255,7 +255,7 @@
  ],
  "ballyfin|men|Other|championship": [
   "W",
-  "W",
+  "L",
   "W"
  ],
  "ballyfin|men|Senior|championship": [
@@ -294,7 +294,7 @@
  "ballyfin|men|U16|championship": [
   "L",
   "L",
-  "W"
+  "L"
  ],
  "ballyfin|men|U16|league": [
   "L",
@@ -632,6 +632,7 @@
   "L"
  ],
  "crettyard|men|U16|championship": [
+  "D",
   "W",
   "W"
  ],
@@ -736,17 +737,17 @@
   "W"
  ],
  "graiguecullen|ladies|Adult League|league": [
-  "W",
-  "W",
-  "W"
+  "L",
+  "D",
+  "L"
  ],
  "graiguecullen|ladies|Junior|championship": [
   "L",
   "L",
-  "W"
+  "L"
  ],
  "graiguecullen|ladies|Junior|league": [
-  "W",
+  "L",
   "W",
   "L"
  ],
@@ -802,14 +803,14 @@
   "W"
  ],
  "graiguecullen|men|Adult League|league": [
-  "W",
+  "L",
   "W",
   "L"
  ],
  "graiguecullen|men|Junior A|championship": [
   "L",
-  "W",
-  "W"
+  "L",
+  "L"
  ],
  "graiguecullen|men|Junior A|league": [
   "W",
@@ -1096,7 +1097,7 @@
   "L"
  ],
  "parkratheniska|ladies|Adult League|league": [
-  "W",
+  "L",
   "W",
   "L"
  ],
@@ -1116,7 +1117,7 @@
  "parkratheniska|ladies|Senior|championship": [
   "L",
   "L",
-  "W"
+  "L"
  ],
  "parkratheniska|ladies|U13|championship": [
   "L",
@@ -1148,6 +1149,7 @@
   "L"
  ],
  "parkratheniska|ladies|U16|championship": [
+  "W",
   "W",
   "L"
  ],
@@ -1259,6 +1261,7 @@
   "L"
  ],
  "portlaoise|men|Junior A|championship": [
+  "D",
   "W",
   "W"
  ],
@@ -1562,7 +1565,7 @@
  ],
  "stjosephs|men|U16|championship": [
   "W",
-  "L",
+  "W",
   "L"
  ],
  "stjosephs|men|U16|league": [
@@ -1625,7 +1628,7 @@
   "L"
  ],
  "stpauls|ladies|U16|championship": [
-  "W",
+  "D",
   "W",
   "W"
  ],
@@ -1694,7 +1697,7 @@
   "L"
  ],
  "stpauls|men|U16|championship": [
-  "W",
+  "D",
   "W",
   "W"
  ],
