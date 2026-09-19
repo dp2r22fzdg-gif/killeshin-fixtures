@@ -333,7 +333,7 @@
   "L"
  ],
  "ballylinan|men|U13|championship": [
-  "L",
+  "W",
   "L",
   "L"
  ],
@@ -413,9 +413,9 @@
   "W"
  ],
  "barrowgaels|men|U13|league": [
-  "L",
   "W",
-  "L"
+  "L",
+  "W"
  ],
  "barrowgaels|men|U15|championship": [
   "L",
@@ -477,7 +477,6 @@
  ],
  "camross|men|Féile|league": [
   "L",
-  "L",
   "L"
  ],
  "camross|men|Junior A|championship": [
@@ -511,9 +510,9 @@
   "L"
  ],
  "camross|men|U15|championship": [
+  "L",
   "W",
-  "W",
-  "D"
+  "W"
  ],
  "camross|men|U17|championship": [
   "W",
@@ -590,7 +589,7 @@
   "L"
  ],
  "coltshanahoe|men|U15|championship": [
-  "W",
+  "L",
   "W",
   "W"
  ],
@@ -1104,8 +1103,7 @@
   "L"
  ],
  "parkratheniska|ladies|Féile|league": [
-  "L",
-  "D"
+  "L"
  ],
  "parkratheniska|ladies|Junior|championship": [
   "L",
@@ -1123,8 +1121,8 @@
  ],
  "parkratheniska|ladies|U13|championship": [
   "L",
-  "W",
-  "L"
+  "L",
+  "W"
  ],
  "parkratheniska|ladies|U13|league": [
   "L",
@@ -1243,13 +1241,13 @@
   "W"
  ],
  "portlaoise|ladies|U13|league": [
-  "W",
+  "L",
   "W",
   "W"
  ],
  "portlaoise|ladies|U15|championship": [
-  "L",
   "W",
+  "L",
   "W"
  ],
  "portlaoise|ladies|U17|championship": [
