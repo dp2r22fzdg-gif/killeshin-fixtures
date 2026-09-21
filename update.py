@@ -11,7 +11,6 @@ fall out of step with it.
 
 Nothing is written unless at least one county board is read successfully.
 """
-
 import json
 import os
 import re
@@ -46,6 +45,7 @@ BRANCHES = {
                    "6063df22-0a35-9537-87e6-5276dfa17357/"),
     },
 }
+
 GROUND = "Seamus Hearns Park"
 
 # Opposition crests.
@@ -74,10 +74,10 @@ SRC_BASE = ["https://laoisgaa.ie/"]
 # Matches called off. The county boards are often slow to mark these, so put
 # them here and the app stamps POSTPONED across the fixture within the hour.
 #
-#   date   - the day it was due to be played, YYYY-MM-DD
-#   grade  - Senior, Junior A, U17, U16 ... as shown on the filter chips
-#   branch - "men" or "ladies"
-#   note   - optional line shown under the stamp
+#   date    - the day it was due to be played, YYYY-MM-DD
+#   grade   - Senior, Junior A, U17, U16 ... as shown on the filter chips
+#   branch  - "men" or "ladies"
+#   note    - optional line shown under the stamp
 #
 # Delete the entry once a new date is published and it goes back to normal.
 # ---------------------------------------------------------------------------
@@ -85,7 +85,6 @@ POSTPONED = [
     # {"date": "2026-09-08", "grade": "U16", "branch": "ladies",
     #  "note": "New date to be confirmed"},
 ]
-
 
 # ---------------------------------------------------------------------------
 # A single strip on the home page for whatever the club is running now.
@@ -181,7 +180,6 @@ MEDIA = [
     {"kind": "video", "title": "Killeshin v Stradbally",
      "note": "Senior Championship Round 1 \u00b7 22 July 2026 \u00b7 highlights",
      "url": "https://www.youtube.com/watch?v=WIAOJlITbOM"},
-
     # One link per paper. Each searches that site for "Killeshin GAA",
     # newest first, so it lands on club stories rather than a section front.
     {"kind": "read", "title": "LaoisToday",
@@ -196,7 +194,6 @@ MEDIA = [
     {"kind": "read", "title": "Carlow Nationalist",
      "note": "Killeshin GAA, newest first \u00b7 free to read",
      "url": "https://www.google.com/search?q=site%3Acarlow-nationalist.ie+%22Killeshin+GAA%22&tbs=sbd%3A1"},
-
     {"kind": "social", "title": "TikTok",
      "note": "@killeshin.gaa \u00b7 1,900 followers, the busiest club channel",
      "url": "https://www.tiktok.com/@killeshin.gaa"},
@@ -209,7 +206,6 @@ MEDIA = [
     {"kind": "social", "title": "X",
      "note": "@GaaKilleshin \u00b7 quiet since 2018",
      "url": "https://x.com/GaaKilleshin"},
-
     {"kind": "about", "title": "Killeshin GAA on Wikipedia",
      "note": "Club history, honours and notable years",
      "url": "https://en.wikipedia.org/wiki/Killeshin_GAA"},
@@ -230,7 +226,7 @@ CLUB_FACTS = {
 
 
 def norm_club(name):
-    """Loose key so 'St Joseph\'s GAA' and 'St Josephs' match."""
+    """Loose key so 'St Joseph's GAA' and 'St Josephs' match."""
     n = re.sub(r"\b(gaa|clg|club|lgfa|ladies)\b", " ", (name or "").lower())
     return re.sub(r"[^a-z0-9]", "", n)
 
@@ -372,7 +368,7 @@ def harvest_form(opponents, branch_of):
             if f:
                 out[form_key(name, branch, grade, kind)] = f
         done += 1
-    print("    read %d club pages, %d team records" % (done, len(out)))
+    print("      read %d club pages, %d team records" % (done, len(out)))
     return out
 
 
@@ -545,6 +541,7 @@ def mark_postponed(fixtures):
     print("  postponed: %d marked" % hits)
     return fixtures
 
+
 # Club links shown on the Club tab. Edit here; the app picks them up on the
 # next run. "mark" is the letter in the circle.
 CLUB_LINKS = [
@@ -571,6 +568,7 @@ HIDE_GRADES = ["U12"]
 GRADE_ORDER = ["Senior", "Intermediate", "Junior A", "Junior C", "U20", "Junior",
                "Adult League", "Minor",
                "U17", "U16", "U15", "U14", "U13", "U12", "Féile", "Kelly Cup"]
+
 MONTHS = {m: i for i, m in enumerate(
     ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"], 1)}
 
@@ -599,13 +597,14 @@ NEWS_SOURCES = [
      "feeds": ["https://www.laoistoday.ie/tag/killeshin/feed/"],
      "pages": ["https://www.laoistoday.ie/tag/killeshin/"]},
 ]
+
 KILLESHIN = re.compile(r"killeshin|gleann uiseann|seamus hearns", re.I)
 NEWS_TAGS = [("Ladies", r"lgfa|ladies"), ("Schools", r"cumann na mbunscol|national school|schools"),
              ("Club", r"fundrais|lotto|agm|committee|development|grant|sponsor"),
              ("Community", r"community|heritage|parish"), ("GAA", r".")]
 
-
 # ================================================================ helpers
+
 def fetch(url, quiet=False):
     for attempt in range(1, TRIES + 1):
         try:
@@ -630,12 +629,11 @@ def grade_of(comp, branch="men"):
 
     Each adult team plays a championship and a league, and they need to count
     as one team, not two:
-        Senior    - Senior Championship  + ACFL Division 2
-        Junior A  - Junior Championship  + ACFL Division 4
+        Senior    - Senior Championship + ACFL Division 2
+        Junior A  - Junior Championship + ACFL Division 4
         Junior C  - Junior C Championship + ACFL Division 7
     """
     c = (comp or "").lower()
-
     for n in ("20", "17", "16", "15", "14", "13", "12"):
         if re.search(r"\bu-?%s\b|under[\s-]*%s\b" % (n, n), c):
             return "U" + n
@@ -643,7 +641,6 @@ def grade_of(comp, branch="men"):
         return "Féile"
     if "minor" in c:
         return "Minor"
-
     if branch == "men":
         if "junior c" in c or re.search(r"acfl division 7\b", c):
             return "Junior C"
@@ -663,7 +660,6 @@ def grade_of(comp, branch="men"):
             return "Junior"
         if "senior" in c:
             return "Senior"
-
     if "division" in c or "league" in c or "cup" in c:
         return "Adult League"
     return "Other"
@@ -688,8 +684,8 @@ def heading_date(text):
         return None
     return "%s-%02d-%02d" % (m.group(3), MONTHS[m.group(2)[:3].title()], int(m.group(1)))
 
-
 # ================================================================ fixtures
+
 def match_blocks(soup):
     """
     Smallest blocks holding two team links, climbed until the competition
@@ -743,11 +739,12 @@ def parse_match(block, date, club, branch):
     if len(teams) < 2:
         return None
 
-    if not venue:                      # "Venue: TBC" carries no venue link
+    if not venue:                          # "Venue: TBC" carries no venue link
         m = re.search(r"Venue:\s*([^\n]{2,60})", " ".join(bits))
         venue = m.group(1).strip() if m else "TBC"
 
-    m = re.search(r"Referee:\s*(.+?)(?:\s*\u00b7|\s{2,}|$)", " ".join(bits))
+    m = re.search(r"Referee:\s*(.+?)(?:\s*\u00b7|\s*Tickets:|\s{2,}|$)", " ".join(bits))
+
     scores = [t for t in bits if SCORE_RE.match(t)]
     times = [t for t in bits if TIME_RE.match(t)]
     home, away = teams[0], teams[1]
@@ -786,6 +783,7 @@ def parse_board(html, club, branch):
         key = norm_club(club)
         if key not in (norm_club(m["home"]), norm_club(m["away"])):
             continue
+
         key = (m["date"], m["time"], m["home"], m["away"])
         if key in seen:
             continue
@@ -833,17 +831,17 @@ def parse_tables(soup, club, branch):
                 continue
             try:
                 rows.append({"team": team, "p": int(nums[2]), "w": int(nums[3]),
-                             "l": int(nums[4]), "d": int(nums[5]), "f": int(nums[6]),
-                             "a": int(nums[7]), "pts": int(nums[-1])})
+                            "l": int(nums[4]), "d": int(nums[5]), "f": int(nums[6]),
+                            "a": int(nums[7]), "pts": int(nums[-1])})
             except (ValueError, IndexError):
                 continue
         if rows and any(r["team"] == club for r in rows):
             out.append({"competition": tidy(name), "grade": grade_of(name, branch),
-                        "branch": branch, "rows": rows})
+                       "branch": branch, "rows": rows})
     return out
 
-
 # ================================================================ news
+
 def read_feed(url):
     r = fetch(url, quiet=True)
     if not r:
@@ -927,14 +925,14 @@ def gather_news(today):
                           else "free")
             tag = next(n for n, pat in NEWS_TAGS if re.search(pat, title, re.I))
             stories.append({"date": date or today, "title": title, "source": src["name"],
-                            "tag": tag, "access": access, "url": link})
+                           "tag": tag, "access": access, "url": link})
             kept += 1
         print("    %-19s %d" % (src["name"], kept))
     stories.sort(key=lambda s: (s["date"], s["access"] == "free"), reverse=True)
     return stories[:30]
 
-
 # ================================================================ calendars
+
 def slug(text):
     """A safe filename fragment - "Junior A" becomes "junior-a"."""
     return re.sub(r"[^a-z0-9]+", "-", (text or "").lower()).strip("-") or "x"
@@ -955,6 +953,7 @@ def write_calendars(fixtures, today):
         label = "%s %s" % ("Ladies" if b == "ladies" else "Men's", g)
         feeds[key] = (label, (lambda bb=b, gg=g: lambda m: m["branch"] == bb and m["grade"] == gg)())
         team_feed[b + "|" + g] = key
+
     upcoming = sorted([f for f in fixtures if f["date"] >= today and not f.get("postponed")],
                       key=lambda x: (x["date"], x["time"]))
     stamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
@@ -998,14 +997,17 @@ def write_calendars(fixtures, today):
                 esc(who), "Ladies" if m["branch"] == "ladies" else "Men's",
                 esc(m["grade"]), "" if timed else " \u2014 time TBC"))
             L += fold("LOCATION:" + esc(m["venue"]))
-            L += fold("DESCRIPTION:" + esc(m["competition"]))
+            if m.get("referee") and m["referee"] != "TBC":
+                L += fold("DESCRIPTION:" + esc(m["competition"] + " \u00b7 Referee: " + m["referee"]))
+            else:
+                L += fold("DESCRIPTION:" + esc(m["competition"]))
             if timed:
-                L += ["BEGIN:VALARM", "TRIGGER:-PT120M", "ACTION:DISPLAY",
-                      "DESCRIPTION:" + esc(who) + " today", "END:VALARM"]
+                L += ["BEGIN:VALARM", "TRIGGER:-PT2H", "ACTION:DISPLAY",
+                      "DESCRIPTION:" + esc(who), "END:VALARM"]
             L.append("END:VEVENT")
         L.append("END:VCALENDAR")
-        with open(os.path.join(HERE, "killeshin-%s.ics" % key), "w",
-                  encoding="utf-8", newline="") as fh:
+
+        with open(os.path.join(HERE, "killeshin-%s.ics" % key), "w", encoding="utf-8") as fh:
             fh.write("\r\n".join(L) + "\r\n")
         if key in ("all", "men", "ladies", "home"):
             print("    killeshin-%-6s %2d events" % (key + ".ics", len(sel)))
@@ -1013,143 +1015,107 @@ def write_calendars(fixtures, today):
     return team_feed
 
 
-# ================================================================ write
-def write_app(payload):
-    """Replace the data block inside index.html, leaving the app untouched."""
-    with open(APP, encoding="utf-8") as fh:
-        html = fh.read()
-
-    blob = json.dumps(payload, ensure_ascii=False, separators=(",", ":")).replace("</", "<\\/")
-    pattern = re.compile(
-        r'(<script id="seed" type="application/json">).*?(</script>)', re.S)
-    if not pattern.search(html):
-        print("Could not find the data block in index.html.", file=sys.stderr)
-        sys.exit(1)
-
-    stamped = pattern.sub(lambda m: m.group(1) + blob + m.group(2), html, count=1)
-    stamped = re.sub(r"Build [^<]*",
-                     "Build " + datetime.now().strftime("%Y-%m-%d %H:%M"), stamped, count=1)
-
-    # Prove the result is still readable before replacing a working file.
-    check = pattern.search(stamped).group(0)
-    json.loads(check.split(">", 1)[1].rsplit("<", 1)[0].replace("<\\/", "</"))
-
-    with open(APP, "w", encoding="utf-8") as fh:
-        fh.write(stamped)
-    print("Wrote index.html (%d bytes)" % len(stamped))
-
-
-def crest_lookup(fixtures, results):
-    """Map every opponent we actually play to a crest, where one exists."""
-    by_key = {norm_club(k): v for k, v in CREST_MAP.items()}
-    by_key.update({norm_club(k): v for k, v in CREST_OVERRIDES.items()})
-    out = {}
-    for m in list(fixtures) + list(results):
-        for team in (m.get("home"), m.get("away"), m.get("opponent")):
-            if not team:
-                continue
-            hit = by_key.get(norm_club(team))
-            if hit:
-                out[team] = hit
-    print("  crests matched to %d of our opponents" % len(out))
-    return out
-
-
 def scrape_lms_count(url):
     """
     The public selections tracker for Last One Standing shows a plain line
     right at the top of the page - "N alive of M \u00b7 Gameweek X" - with no
-    login needed. Read it the same way every other page in this file is read.
-    Returns None if the page is unreachable or its wording has changed, so a
-    failed read just falls back to the ordinary static message rather than
-    breaking anything.
+    login needed, at least when read with a browser. Read it the same way
+    every other page in this file is read.
+
+    Returns (result, reason). result is None if it could not be read; reason
+    explains why, in enough detail to actually diagnose it from the run log
+    rather than guessing - in particular, whether the page came back empty of
+    the word "alive" at all, which would mean the number is filled in by the
+    page's own JavaScript after it loads rather than sitting in the page as
+    plain text, and a script like this one can only ever see the plain text.
     """
     r = fetch(url, quiet=True)
     if r is None:
-        return None
+        return None, "the page could not be reached (network error or it refused the request)"
+
     text = BeautifulSoup(r.text, "html.parser").get_text(" ", strip=True)
+    if "alive" not in text.lower():
+        snippet = text[:160].replace("\n", " ")
+        return None, ("the word \"alive\" never appears in the page as plain text - "
+                       "most likely the count is filled in by the page's own script after "
+                       "it loads, which this cannot see. First 160 characters read: "
+                       + repr(snippet))
+
     m = re.search(r"(\d[\d,]*)\s+alive of\s+(\d[\d,]*)\D{0,20}Gameweek\s*(\d+)", text, re.I)
     if not m:
-        return None
+        i = text.lower().index("alive")
+        return None, ("\"alive\" is there but not in the expected wording. Text around it: "
+                       + repr(text[max(0, i - 40):i + 60]))
+
     return {
         "alive": int(m.group(1).replace(",", "")),
         "total": int(m.group(2).replace(",", "")),
         "gameweek": int(m.group(3)),
-    }
+    }, "ok"
+
+
+def write_app(payload):
+    """Drop the data straight into index.html's seed script, and stamp the footer."""
+    with open(APP, encoding="utf-8") as fh:
+        html = fh.read()
+
+    blob = json.dumps(payload, ensure_ascii=False, separators=(",", ":")).replace("</", "<\\/")
+    html = re.sub(
+        r'(<script id="seed" type="application/json">)(.*?)(</script>)',
+        lambda mm: mm.group(1) + blob + mm.group(3), html, count=1, flags=re.S)
+
+    stamp = datetime.now(timezone(timedelta(hours=1))).strftime("%Y-%m-%d %H:%M")
+    html = re.sub(r"Build \d{4}-\d{2}-\d{2} \d{2}:\d{2}", "Build " + stamp, html, count=1)
+
+    with open(APP, "w", encoding="utf-8") as fh:
+        fh.write(html)
+    print("  wrote %s (%d bytes)" % (os.path.basename(APP), len(html)))
 
 
 def main():
-    dub = timezone(timedelta(hours=1))
-    now = datetime.now(dub)
-    today = now.strftime("%Y-%m-%d")
+    fixtures, results, tables = [], [], []
+    branch_of = {}
+    failed = []
 
-    fixtures, results, tables, failed = [], [], [], []
     for branch, cfg in BRANCHES.items():
         print("%s \u2014 %s" % (cfg["name"], cfg["source"].split("/")[2]))
         SRC_BASE[0] = "https://" + cfg["source"].split("/")[2] + "/"
-        r = fetch(cfg["source"])
-        if r is None:
-            print("    unreachable")
-            failed.append(branch)
-            continue
         fx, rs, soup = fetch_all_pages(cfg["source"], cfg["team"], branch)
         if soup is None:
             failed.append(branch)
             continue
         tb = parse_tables(soup, cfg["team"], branch)
         print("    fixtures %d, results %d, tables %d" % (len(fx), len(rs), len(tb)))
-        if not fx and not rs:
-            failed.append(branch)
+        for m in fx + rs:
+            branch_of[m["opponent"]] = branch
         fixtures += fx
         results += rs
         tables += tb
 
-    if len(failed) == len(BRANCHES):
-        print("\nNeither board could be read. index.html left as it was.", file=sys.stderr)
+    if not fixtures and not results:
+        print("Both boards unreachable \u2014 leaving everything as it was.")
         sys.exit(1)
 
-    if failed:
-        # Keep the working branch's data rather than losing it with the other.
-        try:
-            with open(APP, encoding="utf-8") as fh:
-                prev = json.loads(re.search(
-                    r'<script id="seed" type="application/json">(.*?)</script>',
-                    fh.read(), re.S).group(1).replace("<\\/", "</"))
-            for b in failed:
-                for key, bucket in (("fixtures", fixtures), ("results", results),
-                                    ("tables", tables)):
-                    bucket += [x for x in prev.get(key, []) if x.get("branch") == b]
-                print("  %s: kept previous entries" % b)
-        except Exception:
-            print("  could not recover previous data for %s" % ", ".join(failed))
+    today = datetime.now(timezone(timedelta(hours=1))).strftime("%Y-%m-%d")
 
     print("Club crests")
     opponents = sorted({m["opponent"] for m in fixtures + results if m.get("opponent")})
-
-    # Crests live in their own file. index.html gets replaced by hand from time
-    # to time, and anything stored only in there is lost when that happens.
-    store = os.path.join(HERE, CRESTS_FILE)
-    have = {}
+    have = {norm_club(k): v for k, v in CREST_OVERRIDES.items()}
     try:
-        with open(store, encoding="utf-8") as fh:
-            have = {norm_club(k): v for k, v in json.load(fh).items()}
+        with open(os.path.join(HERE, CRESTS_FILE), encoding="utf-8") as fh:
+            have.update({norm_club(k): v for k, v in json.load(fh).items()})
     except (OSError, ValueError):
         pass
     print("    %d opponents, %d crests on file" % (len(opponents), len(have)))
-
     CREST_MAP.update(have)
     CREST_MAP.update(harvest_crests(opponents, have))
-
+    CREST_MAP.update({k: v for k, v in CREST_OVERRIDES.items()})
     if CREST_MAP:
-        with open(store, "w", encoding="utf-8") as fh:
+        with open(os.path.join(HERE, CRESTS_FILE), "w", encoding="utf-8") as fh:
             json.dump(CREST_MAP, fh, ensure_ascii=False, indent=1, sort_keys=True)
         print("    %d crests saved to %s" % (len(CREST_MAP), CRESTS_FILE))
 
     print("Recent form")
-    branch_of = {}
-    for m in fixtures + results:
-        if m.get("opponent"):
-            branch_of[m["opponent"]] = m["branch"]
     fstore = os.path.join(HERE, FORM_FILE)
     form = {}
     try:
@@ -1158,7 +1124,6 @@ def main():
     except (OSError, ValueError):
         pass
     form.update(harvest_form(opponents, branch_of))
-    # our own, per team, from the results we already hold
     for b, cfg in BRANCHES.items():
         buckets = {}
         for x in results:
@@ -1170,68 +1135,59 @@ def main():
                 form[form_key(cfg["team"], b, grade, kind)] = f
     if form:
         with open(fstore, "w", encoding="utf-8") as fh:
-            json.dump(form, fh, ensure_ascii=False, indent=1, sort_keys=True)
+            json.dump(form, fh, ensure_ascii=False, separators=(",", ":"))
         print("    %d clubs saved to %s" % (len(form), FORM_FILE))
 
     print("News")
     news = gather_news(today)
-    free = sum(1 for n in news if n["access"] == "free")
-    print("    %d stories (free %d, subscriber %d)" % (len(news), free, len(news) - free))
 
     results = merge_archive(results, os.path.join(HERE, RESULTS_FILE))
     fixtures, results = track_changes(fixtures, results, os.path.join(HERE, SEEN_FILE))
     fixtures = mark_postponed(fixtures)
+
     tickets = 0
     for f in fixtures:
         if needs_ticket(f):
             f["ticket"] = TICKETS["ladies" if f["branch"] == "ladies" else "men"]
             tickets += 1
     print("  ticketed: %d of %d upcoming games" % (tickets, len(fixtures)))
-    fixtures.sort(key=lambda x: (x["date"], x["time"]))
-    results.sort(key=lambda x: (x["date"], x["time"]), reverse=True)
-    items = fixtures + results + tables
 
     print("Last One Standing")
     if PROMO.get("show") and PROMO.get("url"):
-        lms = scrape_lms_count(PROMO["url"])
+        lms, reason = scrape_lms_count(PROMO["url"])
         if lms:
             PROMO["note"] = "%d of %d still in \u00b7 Gameweek %d" % (
                 lms["alive"], lms["total"], lms["gameweek"])
             print("    %d of %d still in, gameweek %d" % (lms["alive"], lms["total"], lms["gameweek"]))
         else:
-            print("    could not read the live count - showing the standard message instead")
+            print("    could not read the live count: " + reason)
+
+    print("Calendars")
+    team_feeds = write_calendars(fixtures, today)
+
+    gradesBy = {b: [g for g in GRADE_ORDER if g not in HIDE_GRADES
+                    and any(m["grade"] == g for m in fixtures + results + tables if m.get("branch") == b)]
+                for b in BRANCHES}
 
     payload = {
-        "club": "Killeshin GAA", "county": "Laois", "ground": GROUND,
-        "branches": BRANCHES,
-        "gradesBy": {b: [g for g in GRADE_ORDER
-                         if g not in HIDE_GRADES
-                         and any(m["grade"] == g for m in items if m["branch"] == b)]
-                     for b in BRANCHES},
-        "source": BRANCHES["men"]["source"],
-        "updated": now.isoformat(timespec="seconds"),
-        "fixtures": fixtures, "results": results, "tables": tables, "news": news,
         "club": {"links": CLUB_LINKS, "media": MEDIA, "facts": CLUB_FACTS, "shop": SHOP,
                  "tickets": TICKETS},
-        "crests": crest_lookup(fixtures, results),
-        "promo": PROMO,
+        "county": "Laois", "ground": GROUND,
+        "branches": {b: {"name": cfg["name"], "team": cfg["team"], "crest": cfg["crest"],
+                        "source": cfg["source"]} for b, cfg in BRANCHES.items()},
+        "gradesBy": gradesBy,
+        "source": BRANCHES["men"]["source"],
+        "updated": datetime.now(timezone(timedelta(hours=1))).isoformat(),
+        "fixtures": fixtures, "results": results, "tables": tables, "news": news,
+        "crests": CREST_MAP, "form": form, "promo": PROMO,
+        "teamFeeds": team_feeds,
     }
 
-    print("Opposition crests: %d from the boards, %d set by hand"
-          % (len(CREST_MAP), len(CREST_OVERRIDES)))
-    print("Calendars")
-    payload["teamFeeds"] = write_calendars(fixtures, today)
-
-    # The data lives in its own file as well as in the page. index.html gets
-    # replaced by hand from time to time, and anything held only in there is
-    # thrown back to whenever that copy was made.
     with open(os.path.join(HERE, DATA_FILE), "w", encoding="utf-8") as fh:
         json.dump(payload, fh, ensure_ascii=False, separators=(",", ":"))
     print("Wrote %s (%d fixtures, %d results)" % (DATA_FILE, len(fixtures), len(results)))
 
     write_app(payload)
-    print("\nDone \u2014 %d fixtures, %d results, %d tables, %d stories"
-          % (len(fixtures), len(results), len(tables), len(news)))
 
 
 if __name__ == "__main__":
