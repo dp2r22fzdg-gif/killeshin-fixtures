@@ -119,44 +119,41 @@ SHOP = {
 #                    "2026-09-12 Senior"
 # ---------------------------------------------------------------------------
 TICKETED = {
-    "venues": ["o'moore park", "omoore park", "laois hire"],
-    # Senior championship knockouts are ticketed at any stage. Junior is free
-    # in until the final.
-    "ticketed_grades": ["Senior"],
-    "final_only_grades": ["Junior A", "Junior C", "Intermediate", "U20"],
+    # Confirmed ticketed venues: the two county grounds, at any grade.
+    "venues": ["o'moore park", "omoore park", "laois hire", "loetb"],
     "always": [],
     "never": [],
 }
 
 
 def needs_ticket(m):
+    """
+    The board marks ticketed games directly on the fixtures page - see
+    hasTicketLink, read at parse time - and that is checked first, ahead of
+    this. This is only the fallback for the window before a ticket link has
+    gone up.
+
+    Two separate reasons a game is ticketed:
+      - a recognised county venue, at any grade and any stage
+      - an actual decisive final, at any grade, wherever it is played -
+        underage finals are charged for regardless of venue. This has to
+        exclude "quarter-final" and "semi-final", since both contain the
+        word "final" too and are not the same thing, and it does not
+        require the word "championship" - some finals are labelled things
+        like "League Knockout Stages - Final" instead.
+    """
     tag = "%s %s" % (m["date"], m["grade"])
     if tag in TICKETED["never"]:
         return False
     if tag in TICKETED["always"]:
         return True
+
     venue = (m.get("venue") or "").lower()
     if any(v in venue for v in TICKETED["venues"]):
-        return True                       # county grounds are ticketed either way
-
-    # LGFA club games are free in unless they are at a county ground, so the
-    # championship rule below is for the men's side only.
-    if m["branch"] != "men":
-        return False
+        return True
 
     comp = (m.get("competition") or "").lower()
-    if "championship" not in comp:
-        return False
-    # The league phase of a championship is played at club grounds and is
-    # normally free in; the knockout rounds are where a ticket comes in.
-    if "league" in comp or "division" in comp:
-        return False
-
-    if m["grade"] in TICKETED["ticketed_grades"]:
-        return True
-    if m["grade"] in TICKETED["final_only_grades"]:
-        return "final" in comp and "semi" not in comp and "quarter" not in comp
-    return False
+    return "final" in comp and "quarter" not in comp and "semi" not in comp
 
 
 # Match tickets are sold by the county boards, one page each.
@@ -387,7 +384,8 @@ def fixture_identity(m):
 
 def fixture_fingerprint(m):
     """The volatile part - if any of this changes, the fixture has been updated."""
-    return "%s|%s|%s|%s" % (m.get("date", ""), m.get("time", ""), m.get("venue", ""), m.get("referee", ""))
+    return "%s|%s|%s|%s|%s" % (m.get("date", ""), m.get("time", ""), m.get("venue", ""),
+                               m.get("referee", ""), m.get("hasTicketLink", False))
 
 
 def track_changes(fixtures, results, path):
@@ -743,7 +741,13 @@ def parse_match(block, date, club, branch):
         m = re.search(r"Venue:\s*([^\n]{2,60})", " ".join(bits))
         venue = m.group(1).strip() if m else "TBC"
 
-    m = re.search(r"Referee:\s*(.+?)(?:\s*\u00b7|\s*Tickets:|\s{2,}|$)", " ".join(bits))
+    joined = " ".join(bits)
+    m = re.search(r"Referee:\s*(.+?)(?:\s*\u00b7|\s*Tickets:|\s{2,}|$)", joined)
+    # The board marks a ticketed game with "Tickets: Buy Tickets" right next
+    # to the referee line - the same text already being read here. Reading
+    # this straight from the board beats guessing from grade and wording,
+    # which got Senior right and underage cup finals wrong.
+    has_ticket_link = bool(re.search(r"Tickets:", joined, re.I))
 
     scores = [t for t in bits if SCORE_RE.match(t)]
     times = [t for t in bits if TIME_RE.match(t)]
@@ -757,7 +761,7 @@ def parse_match(block, date, club, branch):
             "awayScore": scores[1] if len(scores) >= 2 else None,
             "venue": venue, "referee": m.group(1).strip() if m else "TBC",
             "conceded": "CONC" in bits, "conceder": conceder,
-            "isHome": norm_club(home) == mine,
+            "isHome": norm_club(home) == mine, "hasTicketLink": has_ticket_link,
             "opponent": away if norm_club(home) == mine else home}
 
 
@@ -1147,7 +1151,7 @@ def main():
 
     tickets = 0
     for f in fixtures:
-        if needs_ticket(f):
+        if f.pop("hasTicketLink", False) or needs_ticket(f):
             f["ticket"] = TICKETS["ladies" if f["branch"] == "ladies" else "men"]
             tickets += 1
     print("  ticketed: %d of %d upcoming games" % (tickets, len(fixtures)))
