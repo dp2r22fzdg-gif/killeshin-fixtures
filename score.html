@@ -105,6 +105,20 @@ input::placeholder{color:rgba(255,255,255,.35)}
 .bulk button{display:block;width:100%;margin-top:8px;padding:14px;border-radius:12px;background:var(--accent);color:#0B2B1A;font-weight:700;font-size:17px}
 .pl .x{flex:none;width:34px;height:34px;margin:-6px -6px -6px 4px;border-radius:50%;font-size:18px;color:var(--mute);background:rgba(0,0,0,.18)}
 .ok{color:var(--accent);font-weight:600;margin-top:8px}
+.extra{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+.extra button{padding:15px 8px;border-radius:12px;border:1px solid var(--line);background:rgba(255,255,255,.07);font-weight:700;font-size:16px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.chips button{padding:10px 14px;border-radius:999px;border:1px solid var(--line);background:rgba(255,255,255,.07);font-weight:700;font-size:15px}
+.chips button.on{background:#fff;color:var(--deep);border-color:#fff}
+.chips button.cy.on{background:#F2C94C;border-color:#F2C94C;color:#2B1D00}
+.chips button.cb.on{background:#111;border-color:#fff;color:#fff}
+.chips button.cr.on{background:var(--red);border-color:var(--red);color:#fff}
+.sheet h4{margin:18px 0 0;font-size:14px;color:var(--mute);font-weight:600}
+.picked{margin-top:12px;padding:12px 14px;border-radius:12px;background:rgba(255,255,255,.08);display:flex;justify-content:space-between;align-items:center;gap:10px}
+.picked button{color:var(--accent);font-weight:600}
+.save{display:block;width:100%;margin-top:14px;padding:16px;border-radius:12px;background:var(--accent);color:#0B2B1A;font-weight:700;font-size:18px}
+.sr.plain{cursor:default}
+.sr .k.cy{color:#F2C94C}.sr .k.cb{color:#fff}.sr .k.cr{color:#FF8A80}
 .addrow input{flex:1;min-width:0}
 .addrow button{flex:none;padding:0 16px;border-radius:10px;background:var(--accent);color:#0B2B1A;font-weight:700}
 @media (prefers-reduced-motion:reduce){.flash,.webstate.on i{animation:none}.hit:active,.pl:active{transform:none}}
@@ -236,6 +250,15 @@ input::placeholder{color:rgba(255,255,255,.35)}
       return { k: k, n: names[k], t: today[k] || { g: 0, p: 0 }, s: season[k] || { g: 0, p: 0 } };
     }).sort(function (a, b) { return pts(b.t) - pts(a.t) || pts(b.s) - pts(a.s) || a.n.localeCompare(b.n); });
   }
+  /* How a score came: saved on the score as t. From play is the default. */
+  var TYPES = {
+    g: [['play', 'From play'], ['pen', 'Penalty'], ['free', 'Free']],
+    '2': [['play', 'From play'], ['free', 'Free'], ['45', '45'], ['side', 'Sideline']],
+    p: [['play', 'From play'], ['free', 'Free'], ['mark', 'Mark'], ['45', '45'], ['side', 'Sideline']]
+  };
+  var TNAME = { free: 'free', pen: 'penalty', '45': '45', mark: 'mark', side: 'sideline' };
+  var CARD = { y: 'Yellow card', b: 'Black card', r: 'Red card' };
+  function alpha(v, m) { return candidates(v, m).slice().sort(function (a, b) { return a.n.localeCompare(b.n); }); }
   function when(m, ts) {
     var L = [['tet2', 'ET 2nd half'], ['tet1', 'ET 1st half'], ['t2h', '2nd half'], ['t1h', '1st half']];
     for (var i = 0; i < L.length; i++) { var t = m[L[i][0]]; if (t && ts >= t) return L[i][1] + ' ' + (Math.floor((ts - t) / 60000) + 1) + '\u2032'; }
@@ -401,13 +424,66 @@ input::placeholder{color:rgba(255,255,255,.35)}
   }
 
   /* The pop-up list of players: after a Killeshin score, or from Players. */
+  /* Men's football: a 45 is worth one point, so it isn't offered on a
+     two-pointer. Ladies football: a 45 kicked straight over is worth two. */
+  function typeChips(e, m) {
+    var cur_ = e.t || 'play';
+    var list = (TYPES[e.v] || TYPES.p).filter(function (t) { return !(e.v === '2' && t[0] === '45' && m && m.branch !== 'ladies'); });
+    return '<div class="chips">' + list.map(function (t) {
+      return '<button data-act="stype" data-t="' + t[0] + '" class="' + (cur_ === t[0] ? 'on' : '') + '">' + t[1] + '</button>';
+    }).join('') + '</div>';
+  }
+  function playerButtons(list, act, extra) {
+    return list.map(function (p) {
+      return '<button class="pl" data-act="' + act + '" data-n="' + esc(p.n) + '"' + (extra || '') + '><span>' + esc(p.n) + '</span></button>';
+    }).join('');
+  }
+  function addRow(label) {
+    return '<div class="addrow"><input id="nn" placeholder="Not listed? Type the name" autocomplete="off" autocapitalize="words" enterkeyhint="done">' +
+      '<button data-act="addname">' + label + '</button></div>';
+  }
+  function drawSub(v, m) {
+    var st = picking.sub, list = alpha(v, m).filter(function (p) { return p.n !== st.on; });
+    var h = '<div class="sheetbg" data-act="pickclose"><div class="sheet" data-act="none"><h3>Substitution</h3>';
+    if (!st.on) {
+      h += '<p class="note">Who is coming on?</p>' + playerButtons(list, 'subpick') + addRow('Add');
+    } else {
+      h += '<div class="picked"><span>Coming on: <b>' + esc(st.on) + '</b></span><button data-act="subreset">Change</button></div>' +
+        '<h4>Who is going off?</h4>' + playerButtons(list, 'subpick') + addRow('Add') +
+        '<button class="undo" data-act="subsave" data-n="">Save without who went off</button>';
+    }
+    return h + '<button class="undo" data-act="pickclose">Cancel</button></div></div>';
+  }
+  function drawCard(v, m) {
+    var st = picking.card, h = '<div class="sheetbg" data-act="pickclose"><div class="sheet" data-act="none"><h3>Card</h3>';
+    h += '<div class="chips">' + ['y', 'b', 'r'].map(function (c) {
+      return '<button data-act="cardc" data-c="' + c + '" class="c' + c + (st.c === c ? ' on' : '') + '">' + CARD[c].replace(' card', '') + '</button>';
+    }).join('') + '</div>';
+    h += '<div class="chips">' + [['k', club(m)], ['o', m.opp || 'Opposition']].map(function (x) {
+      return '<button data-act="cards" data-s="' + x[0] + '" class="' + (st.s === x[0] ? 'on' : '') + '">' + esc(x[1]) + '</button>';
+    }).join('') + '</div>';
+    if (st.s === 'k') {
+      h += '<h4>Which player?</h4>' + playerButtons(alpha(v, m), 'cardsave') + addRow('Add');
+    } else {
+      h += '<h4>Player name or number <span style="opacity:.7">(optional)</span></h4>' +
+        '<div class="addrow"><input id="nn" placeholder="e.g. No. 7" autocomplete="off" enterkeyhint="done"><button data-act="cardopp">Save</button></div>';
+    }
+    return h + '<button class="undo" data-act="pickclose">Cancel</button></div></div>';
+  }
   function drawPicker(v, m) {
+    if (picking.sub) return drawSub(v, m);
+    if (picking.card) return drawCard(v, m);
     var e = picking.ev ? (m.events || {})[picking.ev] : null;
     if (picking.ev && !e) { picking = null; return ''; }
+    if (e && e.s === 'o') {                       /* opposition score: just how it came */
+      return '<div class="sheetbg" data-act="pickclose"><div class="sheet" data-act="none"><h3>' + esc(m.opp || 'Opposition') + ' ' + word(e.v) + '</h3>' +
+        '<p class="note">How did it come?</p>' + typeChips(e, m) + '<button class="undo" data-act="pickclose">Done</button></div></div>';
+    }
     var list = candidates(v, m), cur_ = e && e.n ? nkey(e.n) : '';
     var h = '<div class="sheetbg" data-act="pickclose"><div class="sheet" data-act="none">';
     h += picking.ev
-      ? '<h3>Who scored the ' + word(e.v) + '?</h3><p class="note">Top scorers first. Skip if you\u2019re not sure; tap the score later to name them.</p>'
+      ? '<h3>' + (e.v === 'g' ? 'Goal' : e.v === '2' ? '2-pointer' : 'Point') + '</h3>' + typeChips(e, m) +
+        '<h4>Who scored it? <span style="opacity:.75">Top scorers first</span></h4>'
       : '<h3>' + esc(m.team) + ' players</h3><p class="note">Names added here come up when you record a score, in this match and every later ' + esc(m.team) + ' match.</p>';
     list.forEach(function (p) {
       var hot = pts(p.t) > 0;
@@ -469,14 +545,28 @@ input::placeholder{color:rgba(255,255,255,.35)}
         (unnamed ? (scl.length ? ' \u00b7 ' : '') + '<span class="tag">' + unnamed + ' not named</span>' : '') + '</div>'
       : '';
     var squadN = candidates(v, m).length;
-    var slist = '<div class="slist"><h2><span>' + esc(us) + ' scores</span><button data-act="players">Players (' + squadN + ')</button></h2>' +
-      (ours.length
-        ? ours.map(function (k) {
-            var x = m.events[k];
-            return '<button class="sr" data-act="rename" data-id="' + esc(k) + '"><span class="k">' + (x.v === 'g' ? 'Goal' : x.v === '2' ? '2-pointer' : 'Point') +
-              '<small>' + esc(when(m, x.ts)) + '</small></span><span class="who">' + (x.n ? esc(x.n) : '<span class="tag">Add scorer</span>') + '</span></button>';
+    /* Everything in the match, newest first. Tap a score to change who or
+       how; tap a sub or card to remove it. */
+    var items = [], evs = m.events || {}, logs = m.log || {}, q;
+    for (q in evs) if (evs[q]) items.push({ id: q, ts: evs[q].ts, e: evs[q] });
+    for (q in logs) if (logs[q]) items.push({ id: q, ts: logs[q].ts, l: logs[q] });
+    items.sort(function (a, b) { return b.ts - a.ts; });
+    var slist = '<div class="slist"><h2><span>Match timeline</span><button data-act="players">Players (' + squadN + ')</button></h2>' +
+      (items.length
+        ? items.map(function (it) {
+            var small = '<small>' + esc(when(m, it.ts)) + '</small>';
+            if (it.e) {
+              var x = it.e, lbl = (x.v === 'g' ? 'Goal' : x.v === '2' ? '2-pointer' : 'Point') + (x.t && TNAME[x.t] ? ' (' + TNAME[x.t] + ')' : '');
+              if (x.s === 'o') return '<button class="sr" data-act="rename" data-id="' + esc(it.id) + '"><span class="k" style="color:var(--mute)">' + esc(lbl) + small + '</span><span class="who" style="color:var(--mute)">' + esc(them) + '</span></button>';
+              return '<button class="sr" data-act="rename" data-id="' + esc(it.id) + '"><span class="k">' + esc(lbl) + small + '</span><span class="who">' + (x.n ? esc(x.n) : '<span class="tag">Add scorer</span>') + '</span></button>';
+            }
+            var l = it.l;
+            if (l.k === 'sub') return '<button class="sr" data-act="dellog" data-id="' + esc(it.id) + '"><span class="k">Sub' + small + '</span><span class="who">' + esc(l.on || '') + (l.off ? ' for ' + esc(l.off) : ' on') + '</span></button>';
+            if (l.k === 'card') return '<button class="sr" data-act="dellog" data-id="' + esc(it.id) + '"><span class="k c' + esc(l.c) + '">' + esc(CARD[l.c] || 'Card') + small + '</span><span class="who">' +
+              (l.s === 'o' ? esc(them) + (l.n ? ' ' + esc(l.n) : '') : esc(l.n || us)) + '</span></button>';
+            return '';
           }).join('')
-        : '<p class="note" style="padding:10px 0">Tap a score here to change who got it.</p>') + '</div>';
+        : '<p class="note" style="padding:10px 0">Scores, subs and cards appear here. Tap a score to change who got it or how.</p>') + '</div>';
 
     app.innerHTML = '<div class="top"><button class="link" data-act="back">\u2039 Matches</button>' + syncLine() + '</div>' +
       '<div class="meta">' + esc(m.team) + ', ' + (m.venue === 'away' ? 'away' : m.venue === 'neutral' ? 'neutral venue' : 'home') + (m.comp ? ' \u00b7 ' + esc(m.comp) : '') + '</div>' +
@@ -493,6 +583,7 @@ input::placeholder{color:rgba(255,255,255,.35)}
       '<button class="hit them" data-act="score" data-s="o" data-v="2"' + off + '>2 POINTS<span>+2</span></button>' +
       '<button class="hit them" data-act="score" data-s="o" data-v="p"' + off + '>POINT<span>+1</span></button></div>' +
       '<button class="undo" data-act="undo"' + (last ? '' : ' disabled') + '>' + esc(lastTxt) + '</button>' +
+      '<div class="extra"><button data-act="subopen">\u21c4 Substitution</button><button data-act="cardopen">\u25ae Card</button></div>' +
       stageBtns +
       slist +
       (live ? '<button class="quiet" data-act="unlive">Take off the website</button>' : '') +
@@ -513,6 +604,12 @@ input::placeholder{color:rgba(255,255,255,.35)}
   }
   function blur() { if (document.activeElement && document.activeElement.blur) document.activeElement.blur(); }
 
+  /* Subs and cards go in the match log with the time they happened. */
+  function logItem(base, rec) {
+    rec.ts = Date.now();
+    queue.push({ m: 'PUT', p: base + '/log/' + uid('l'), b: rec });
+    LS.set('kl_queue', queue); render(); flush();
+  }
   /* Put a name on a score, and add it to this match's panel if it's new. */
   function nameScore(base, evId, name) {
     var m = view()[cur]; if (!m) return;
@@ -573,6 +670,15 @@ input::placeholder{color:rgba(255,255,255,.35)}
       var inp = document.getElementById('nn'), nm = inp ? inp.value.replace(/\s+/g, ' ').trim() : '';
       blur();
       if (!nm || !nkey(nm)) { render(); return; }
+      if (picking && picking.sub) {                /* new name while doing a sub: add to panel and pick them */
+        addToSquad(base, [nm]);
+        if (!picking.sub.on) { picking.sub.on = nm; LS.set('kl_queue', queue); render(); flush(); }
+        else { var son = picking.sub.on; picking = null; logItem(base, { k: 'sub', on: son, off: nm }); }
+        return;
+      }
+      if (picking && picking.card) {
+        var cc = picking.card.c; picking = null; addToSquad(base, [nm]); logItem(base, { k: 'card', c: cc, s: 'k', n: nm }); return;
+      }
       var target = picking && picking.ev;
       if (target) picking = null;                 /* adding while naming a score picks that player */
       nameScore(base, target || null, nm);
@@ -587,6 +693,38 @@ input::placeholder{color:rgba(255,255,255,.35)}
       var mh = view()[cur]; if (!mh) return;
       var hide = JSON.parse(JSON.stringify(mh.hide || {})); hide[b.dataset.k] = Date.now();
       enqueue({ m: 'PATCH', p: base, b: { hide: hide } });
+    } else if (a === 'stype') {
+      var evt = picking && picking.ev; if (!evt) return;
+      enqueue({ m: 'PATCH', p: base + '/events/' + evt, b: { t: b.dataset.t === 'play' ? null : b.dataset.t } });
+    } else if (a === 'subopen') {
+      picking = { sub: {} }; render();
+    } else if (a === 'subpick') {
+      if (!picking || !picking.sub) return;
+      if (!picking.sub.on) { picking.sub.on = b.dataset.n; render(); }
+      else { var son2 = picking.sub.on; picking = null; logItem(base, { k: 'sub', on: son2, off: b.dataset.n }); }
+    } else if (a === 'subreset') {
+      picking = { sub: {} }; render();
+    } else if (a === 'subsave') {
+      if (picking && picking.sub && picking.sub.on) { var son3 = picking.sub.on; picking = null; logItem(base, { k: 'sub', on: son3 }); }
+    } else if (a === 'cardopen') {
+      picking = { card: { c: 'y', s: 'k' } }; render();
+    } else if (a === 'cardc') {
+      picking.card.c = b.dataset.c; render();
+    } else if (a === 'cards') {
+      picking.card.s = b.dataset.s; render();
+    } else if (a === 'cardsave') {
+      var cc2 = picking.card.c; picking = null; logItem(base, { k: 'card', c: cc2, s: 'k', n: b.dataset.n });
+    } else if (a === 'cardopp') {
+      var ci = document.getElementById('nn'), cn = ci ? ci.value.trim() : '';
+      blur();
+      var rec = { k: 'card', c: picking.card.c, s: 'o' }; if (cn) rec.n = cn;
+      picking = null; logItem(base, rec);
+    } else if (a === 'dellog') {
+      var ml = view()[cur], li = ml && ml.log && ml.log[b.dataset.id];
+      if (!li) return;
+      var what = li.k === 'sub' ? 'substitution (' + (li.on || '') + ')' : (CARD[li.c] || 'card').toLowerCase() + (li.n ? ' (' + li.n + ')' : '');
+      if (!confirm('Remove this ' + what + '?')) return;
+      enqueue({ m: 'DELETE', p: base + '/log/' + b.dataset.id });
     } else if (a === 'pickclose') {
       blur(); picking = null; render();
     } else if (a === 'rename') {

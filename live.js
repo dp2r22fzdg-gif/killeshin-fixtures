@@ -55,6 +55,39 @@
     '.lv-s small{font-size:16px;font-weight:700;color:#6B7A72;margin-left:6px;letter-spacing:0}' +
     '.lv-scr{margin-top:9px;padding-top:8px;border-top:1px solid #E2EAE5;font-size:12.5px;line-height:1.45;color:#4E5A53}' +
     '.lv-scr b{color:#11492E;font-weight:800;font-variant-numeric:tabular-nums}' +
+    '.lv-card{cursor:pointer}' +
+    '.lv-more{flex:none;font-size:12px;font-weight:800;color:#12703F;background:#E8F6EE;border:1px solid #BFDFCD;' +
+      'border-radius:999px;padding:4px 10px;white-space:nowrap}' +
+    /* match details sheet */
+    '.lvd{position:fixed;inset:0;z-index:90;background:rgba(10,30,20,.5);display:flex;align-items:flex-end;' +
+      'font-family:Archivo,-apple-system,"Helvetica Neue",Arial,sans-serif}' +
+    '.lvd-panel{width:100%;max-width:600px;margin:0 auto;background:#fff;color:#101A14;border-radius:22px 22px 0 0;' +
+      'max-height:90vh;overflow-y:auto;-webkit-overflow-scrolling:touch;padding-bottom:calc(20px + env(safe-area-inset-bottom))}' +
+    '.lvd-board{background:linear-gradient(160deg,#1D5C3C 0%,#11492E 70%);color:#fff;padding:14px 18px 18px;position:sticky;top:0;z-index:2}' +
+    '.lvd-bar{display:flex;align-items:center;gap:10px;margin-bottom:12px}' +
+    '.lvd-bar .lv-comp{color:#A9CFBB}' +
+    '.lvd-x{flex:none;width:36px;height:36px;border-radius:50%;border:0;background:rgba(255,255,255,.14);color:#fff;font-size:20px;line-height:1;cursor:pointer}' +
+    '.lvd-board .lv-n{color:#fff}.lvd-board .lv-s{color:#fff}.lvd-board .lv-s small{color:#8FD6AE}' +
+    '.lvd-board .lv-c{box-shadow:0 0 0 2px rgba(58,205,119,.55)}' +
+    '.lvd-sec{padding:16px 18px 4px}' +
+    '.lvd-sec h4{margin:0 0 8px;font-size:11.5px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:#12703F}' +
+    '.lvd-sr{display:flex;justify-content:space-between;gap:12px;padding:9px 0;border-top:1px solid #E2EAE5}' +
+    '.lvd-sr:first-of-type{border-top:0}' +
+    '.lvd-sr b{font-size:15px}.lvd-sr span{display:block;font-size:12.5px;color:#6B7A72;margin-top:1px}' +
+    '.lvd-sr u{text-decoration:none;font-family:"Bricolage Grotesque",Archivo,sans-serif;font-weight:800;font-size:19px;' +
+      'color:#11492E;font-variant-numeric:tabular-nums;white-space:nowrap}' +
+    '.lvd-note{font-size:12.5px;color:#6B7A72;margin:6px 0 0}' +
+    '.lvd-ev{display:flex;align-items:flex-start;gap:11px;padding:9px 0;border-top:1px solid #EEF3EF;font-size:14.5px;line-height:1.4}' +
+    '.lvd-ev:first-of-type{border-top:0}' +
+    '.lvd-min{flex:none;width:44px;font-weight:800;color:#12703F;font-variant-numeric:tabular-nums;font-size:13.5px;padding-top:1px}' +
+    '.lvd-ic{flex:none;width:24px;height:24px;border-radius:50%;display:grid;place-items:center;font-size:11px;font-weight:800;color:#fff;background:#1F824A}' +
+    '.lvd-ic.o{background:#9AA7A0}.lvd-ic.sub{background:#2F6FB5}' +
+    '.lvd-ic.cy,.lvd-ic.cb,.lvd-ic.cr{width:16px;height:22px;border-radius:3px;margin:1px 4px 0}' +
+    '.lvd-ic.cy{background:#F2C94C}.lvd-ic.cb{background:#111}.lvd-ic.cr{background:#E5484D}' +
+    '.lvd-tx{flex:1;min-width:0}.lvd-tx small{display:block;color:#6B7A72;font-size:12.5px}' +
+    '.lvd-mark{margin:10px 0 2px;padding:7px 12px;border-radius:10px;background:#EFF4F0;font-size:12.5px;font-weight:800;' +
+      'letter-spacing:.06em;text-transform:uppercase;color:#4E5A53;display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap}' +
+    '.lvd-mark span+span{text-transform:none;letter-spacing:0;font-weight:700;color:#11492E}' +
     '@media (prefers-reduced-motion:reduce){.lv-pill i{animation:none}}';
   var st = document.createElement('style');
   st.textContent = css;
@@ -158,7 +191,131 @@
       return esc(r.n) + ' <b>' + fmt(r.g, r.p) + '</b>'; }).join(' \u00b7 ') + '</div>';
   }
 
-  function card(m) {
+  /* ---------- match details: tap a banner to open ---------- */
+  var TNAME = { free: 'free', pen: 'penalty', '45': '45', mark: 'mark', side: 'sideline' };
+  var SUFFIX = { free: 'f', pen: ' pen', '45': ' 45', mark: ' m', side: ' sl' };
+  var openId = null, sheet = null;
+  function worth(e) { return e.v === 'g' ? 3 : e.v === '2' ? 2 : 1; }
+  function scoreWord(v) { return v === 'g' ? 'Goal' : v === '2' ? '2-pointer' : 'Point'; }
+  function when(m, ts) {
+    var L = [['tet2', 'ET2 '], ['tet1', 'ET1 '], ['t2h', '2H '], ['t1h', '1H ']];   /* half lengths differ by grade, so minutes count from each half's start */
+    for (var i = 0; i < L.length; i++) {
+      var t = m[L[i][0]];
+      if (t && ts >= t) {
+        return L[i][1] + (Math.floor((ts - t) / 60000) + 1) + '\u2032';
+      }
+    }
+    return '';
+  }
+  function scoreAt(m, ts) {
+    var r = { kg: 0, kp: 0, og: 0, op: 0 }, ev = m.events || {};
+    for (var k in ev) { var e = ev[k]; if (!e || e.ts > ts) continue; if (e.v === 'g') r[e.s + 'g']++; else r[e.s + 'p'] += worth(e); }
+    return r;
+  }
+  function lineScore(m, r) {
+    var a = club(m) + ' ' + fmt(r.kg, r.kp), b = (m.opp || 'Opposition') + ' ' + fmt(r.og, r.op);
+    return m.venue === 'away' ? b + ' \u2013 ' + a : a + ' \u2013 ' + b;
+  }
+  /* Each scorer's total with the dead-ball scores in brackets, the way the
+     papers write it: Deering 0-05 (0-03f, 0-01 45). */
+  function breakdown(m) {
+    var by = {}, ev = m.events || {}, k;
+    for (k in ev) {
+      var e = ev[k]; if (!e || e.s !== 'k' || !e.n) continue;
+      var id = String(e.n).toLowerCase().replace(/[^a-z0-9]+/g, '');
+      var r = by[id] || (by[id] = { n: e.n, g: 0, p: 0, x: {}, tp: 0 });
+      if (e.v === 'g') r.g++; else r.p += worth(e);
+      if (e.v === '2') r.tp++;
+      if (e.t && SUFFIX[e.t]) { var x = r.x[e.t] || (r.x[e.t] = { g: 0, p: 0 }); if (e.v === 'g') x.g++; else x.p += worth(e); }
+    }
+    return Object.keys(by).map(function (q) { return by[q]; })
+      .sort(function (a, b) { return (b.g * 3 + b.p) - (a.g * 3 + a.p) || a.n.localeCompare(b.n); });
+  }
+  function detail(m) {
+    var t = tally(m), s = state(m), opp = m.opp || 'Opposition', away = m.venue === 'away';
+    var us = side(club(m), t.kg, t.kp, away, ourCrest(m)), them = side(opp, t.og, t.op, !away, theirCrest(opp));
+    var info = [m.team, m.comp].filter(Boolean).map(esc).join(' \u00b7 ');
+    var h = '<div class="lvd-board"><div class="lvd-bar"><span class="lv-pill' + (s.on ? '' : ' idle') + '" style="' +
+      (s.on ? '' : 'background:rgba(255,255,255,.18);color:#fff;border:0') + '">' + (s.on ? '<i></i>' : '') + esc(s.t) + '</span>' +
+      '<span class="lv-comp">' + info + '</span><button class="lvd-x" data-close aria-label="Close">\u00d7</button></div>' +
+      '<div class="lv-row">' + (away ? them + us : us + them) + '</div></div>';
+
+    var list = breakdown(m);
+    var unnamed = 0, ev = m.events || {}, k;
+    for (k in ev) if (ev[k] && ev[k].s === 'k' && !ev[k].n) unnamed++;
+    if (list.length || unnamed) {
+      h += '<div class="lvd-sec"><h4>' + esc(club(m)) + ' scorers</h4>' + list.map(function (r) {
+        var extra = Object.keys(r.x).map(function (q) { return fmt(r.x[q].g, r.x[q].p) + SUFFIX[q]; });
+        if (r.tp) extra.push(r.tp + (r.tp === 1 ? ' two-pointer' : ' two-pointers'));
+        return '<div class="lvd-sr"><div><b>' + esc(r.n) + '</b>' + (extra.length ? '<span>' + esc(extra.join(', ')) + '</span>' : '') +
+          '</div><u>' + fmt(r.g, r.p) + '</u></div>';
+      }).join('') + (unnamed ? '<p class="lvd-note">' + unnamed + (unnamed === 1 ? ' score' : ' scores') + ' not yet credited to a player.</p>' : '') + '</div>';
+    }
+
+    /* Everything that has happened, newest first. */
+    var items = [];
+    for (k in ev) if (ev[k]) items.push({ ts: ev[k].ts, e: ev[k] });
+    var log = m.log || {};
+    for (k in log) if (log[k]) items.push({ ts: log[k].ts, l: log[k] });
+    [['t1h', 'Throw-in', false], ['tht', 'Half-time', true], ['t2h', 'Second half under way', false], ['tetb', 'End of normal time', true],
+     ['tet1', 'Extra time under way', false], ['tetht', 'Extra-time half-time', true], ['tet2', 'Extra-time 2nd half', false],
+     ['tft', 'Full time', true]].forEach(function (x) { if (m[x[0]]) items.push({ ts: m[x[0]], mk: x[1], sc: x[2] }); });
+    items.sort(function (a, b) { return b.ts - a.ts; });
+    if (items.length) {
+      h += '<div class="lvd-sec"><h4>Timeline</h4>' + items.map(function (it) {
+        if (it.mk) return '<div class="lvd-mark"><span>' + esc(it.mk) + '</span>' + (it.sc ? '<span>' + esc(lineScore(m, scoreAt(m, it.ts))) + '</span>' : '') + '</div>';
+        var min = '<span class="lvd-min">' + esc(when(m, it.ts)) + '</span>';
+        if (it.e) {
+          var e = it.e, ours = e.s === 'k', how = e.t && TNAME[e.t] ? ' (' + TNAME[e.t] + ')' : '';
+          var ic = '<span class="lvd-ic' + (ours ? '' : ' o') + '">' + (e.v === 'g' ? 'G' : e.v === '2' ? '2' : 'P') + '</span>';
+          var who = ours ? (e.n ? esc(e.n) : esc(club(m))) : esc(opp);
+          var r = scoreAt(m, e.ts);
+          return '<div class="lvd-ev">' + min + ic + '<span class="lvd-tx"><b>' + scoreWord(e.v) + '</b> \u2013 ' + who + esc(how) +
+            '<small>' + esc(lineScore(m, r)) + '</small></span></div>';
+        }
+        var l = it.l;
+        if (l.k === 'sub') {
+          return '<div class="lvd-ev">' + min + '<span class="lvd-ic sub">\u21c4</span><span class="lvd-tx"><b>Substitution</b> \u2013 ' +
+            esc(l.on || '') + (l.off ? ' on for ' + esc(l.off) : ' comes on') + '</span></div>';
+        }
+        if (l.k === 'card') {
+          var cw = { y: 'Yellow card', b: 'Black card', r: 'Red card' }[l.c] || 'Card';
+          var cwho = l.s === 'o' ? esc(opp) + (l.n ? ' (' + esc(l.n) + ')' : '') : esc(l.n || club(m));
+          return '<div class="lvd-ev">' + min + '<span class="lvd-ic c' + esc(l.c) + '"></span><span class="lvd-tx"><b>' + cw + '</b> \u2013 ' + cwho + '</span></div>';
+        }
+        return '';
+      }).join('') + '</div>';
+    } else {
+      h += '<div class="lvd-sec"><p class="lvd-note">Nothing yet \u2013 scores, subs and cards will appear here as they happen.</p></div>';
+    }
+    return h;
+  }
+  function renderSheet() {
+    if (!openId) return;
+    var m = matches[openId];
+    if (!m) { closeSheet(); return; }
+    if (!sheet) {
+      sheet = document.createElement('div');
+      sheet.className = 'lvd';
+      sheet.setAttribute('role', 'dialog');
+      sheet.setAttribute('aria-label', 'Match details');
+      sheet.innerHTML = '<div class="lvd-panel"></div>';
+      sheet.addEventListener('click', function (ev) {
+        if (ev.target === sheet || ev.target.closest('[data-close]')) closeSheet();
+      });
+      document.body.appendChild(sheet);
+      document.documentElement.style.overflow = 'hidden';
+    }
+    sheet.firstChild.innerHTML = detail(m);                   /* the panel stays put, so its scroll position does too */
+  }
+  function closeSheet() {
+    openId = null;
+    if (sheet) { sheet.remove(); sheet = null; }
+    document.documentElement.style.overflow = '';
+  }
+  document.addEventListener('keydown', function (ev) { if (ev.key === 'Escape' && openId) closeSheet(); });
+
+  function card(m, id) {
     var t = tally(m), s = state(m);
     var opp = m.opp || 'Opposition', away = m.venue === 'away';
     var mine = ourCrest(m), theirs = theirCrest(opp);
@@ -166,9 +323,9 @@
     var us = side(club(m), t.kg, t.kp, away, mine);
     var them = side(opp, t.og, t.op, !away, theirs);
     var info = [m.team, m.comp].filter(Boolean).map(esc).join(' \u00b7 ');
-    return '<div class="lv-card">' +
+    return '<div class="lv-card" data-id="' + esc(id) + '" role="button" tabindex="0" aria-label="Match details">' +
       '<div class="lv-top"><span class="lv-pill' + (s.on ? '' : ' idle') + '">' + (s.on ? '<i></i>' : '') + esc(s.t) + '</span>' +
-      '<span class="lv-comp">' + info + '</span></div>' +
+      '<span class="lv-comp">' + info + '</span><span class="lv-more">Details \u203a</span></div>' +
       '<div class="lv-row">' + (m.venue === 'away' ? them + us : us + them) + '</div>' + scorersLine(m) + '</div>';
   }
 
@@ -190,10 +347,11 @@
     if (!ids.length) {
       box.hidden = true; box.innerHTML = '';
     } else {
-      box.innerHTML = '<div class="lv-stack">' + ids.map(function (k) { return card(matches[k]); }).join('') + '</div>';
+      box.innerHTML = '<div class="lv-stack">' + ids.map(function (k) { return card(matches[k], k); }).join('') + '</div>';
       box.hidden = false;
     }
     layout();
+    renderSheet();
   }
 
   function pull() {
@@ -211,6 +369,13 @@
     box.setAttribute('aria-live', 'polite');
     box.setAttribute('aria-label', 'Live scores');
     document.body.appendChild(box);
+    box.addEventListener('click', function (ev) {
+      var c = ev.target.closest('.lv-card'); if (!c) return;
+      openId = c.getAttribute('data-id'); renderSheet();
+    });
+    box.addEventListener('keydown', function (ev) {
+      if ((ev.key === 'Enter' || ev.key === ' ') && ev.target.classList.contains('lv-card')) { ev.preventDefault(); ev.target.click(); }
+    });
   }
 
   mount();
