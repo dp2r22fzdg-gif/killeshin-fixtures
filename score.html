@@ -10,7 +10,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;800&family=Barlow:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
-:root{--deep:#11492E;--deep2:#1D5C3C;--forest:#1F824A;--accent:#3ACD77;--ink:#fff;--mute:rgba(255,255,255,.62);--line:rgba(255,255,255,.14);--them:#26352D;--warn:#F2B544;--bad:#FF7A6B;
+:root{--deep:#11492E;--deep2:#1D5C3C;--forest:#1F824A;--accent:#3ACD77;--ink:#fff;--mute:rgba(255,255,255,.62);--line:rgba(255,255,255,.14);--them:#26352D;--warn:#F2B544;--bad:#FF7A6B;--red:#E5484D;
   --sans:'Barlow',-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;--num:'Barlow Condensed','Arial Narrow',-apple-system,sans-serif}
 *{box-sizing:border-box}
 html,body{margin:0;height:100%}
@@ -25,6 +25,7 @@ button{cursor:pointer;border:0;background:none;touch-action:manipulation}
 .link{color:var(--accent);font-weight:600;padding:10px 0}
 .sync{font-size:13px;color:var(--mute)}.sync.wait{color:var(--warn);font-weight:600}.sync.bad{color:var(--bad);font-weight:600}
 label{display:block;font-size:14px;color:var(--mute);margin:16px 0 6px}
+label small{font-size:13px;opacity:.8}
 input,select{width:100%;padding:14px;border-radius:10px;border:1px solid var(--line);background:var(--deep2);font-size:17px}
 input::placeholder{color:rgba(255,255,255,.35)}
 .seg{display:flex;border:1px solid var(--line);border-radius:10px;overflow:hidden}
@@ -36,8 +37,16 @@ input::placeholder{color:rgba(255,255,255,.35)}
 .row:last-of-type{border-bottom:1px solid var(--line)}
 .row .t{font-weight:700;font-size:17px}.row .c{font-size:13px;color:var(--mute)}
 .row .s{font:800 24px var(--num);font-variant-numeric:tabular-nums}
+.tag{color:var(--warn);font-weight:600}
 .empty{color:var(--mute);padding:28px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
 .meta{font-size:14px;color:var(--mute);margin-bottom:10px}
+.webstate{display:flex;align-items:center;gap:8px;font-size:14px;font-weight:600;margin-bottom:10px}
+.webstate i{width:9px;height:9px;border-radius:50%;flex:none}
+.webstate.on{color:var(--accent)}.webstate.on i{background:var(--red);animation:pulse 1.4s infinite}
+.webstate.off{color:var(--warn)}.webstate.off i{background:var(--warn)}
+@keyframes pulse{50%{opacity:.25}}
+.golive{display:block;width:100%;margin:0 0 14px;padding:18px;border-radius:12px;background:var(--red);color:#fff;font-weight:700;font-size:19px}
+.golive span{display:block;font-size:13px;font-weight:600;opacity:.85;margin-top:3px}
 .board{border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:6px 0}
 .side{display:flex;align-items:baseline;justify-content:space-between;gap:10px;padding:4px 0}
 .side .n{font-weight:700;font-size:17px;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -46,6 +55,7 @@ input::placeholder{color:rgba(255,255,255,.35)}
 .side .sc small{font:600 22px var(--num);color:var(--mute);margin-left:6px}
 .clock{display:flex;justify-content:space-between;font-size:15px;padding:10px 0 4px}
 .clock b{color:var(--accent)}.clock b.ht{color:var(--warn)}.clock b.idle{color:var(--mute)}
+.note{font-size:13px;color:var(--mute);margin:2px 0 0}
 .pad{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
 .pad h2{grid-column:1/-1;font-size:14px;font-weight:600;color:var(--mute);margin:8px 0 -2px}
 .hit{padding:22px 8px;border-radius:14px;font:800 30px/1 var(--num);letter-spacing:.02em}
@@ -57,10 +67,12 @@ input::placeholder{color:rgba(255,255,255,.35)}
 .undo:disabled{opacity:.35}
 .stage{display:block;width:100%;margin-top:12px;padding:17px;border-radius:12px;background:#fff;color:var(--deep);font-weight:700;font-size:18px}
 .stage.end{background:var(--warn);color:#2B1D00}
+.stage.et{background:transparent;color:#fff;border:1.5px solid rgba(255,255,255,.5)}
 .quiet{display:block;margin:22px auto 0;color:var(--mute);font-size:14px;padding:10px;text-decoration:underline}
+.quiet + .quiet{margin-top:4px}
 .flash{animation:fl .5s}
 @keyframes fl{from{color:var(--accent)}}
-@media (prefers-reduced-motion:reduce){.flash{animation:none}.hit:active{transform:none}}
+@media (prefers-reduced-motion:reduce){.flash,.webstate.on i{animation:none}.hit:active{transform:none}}
 </style>
 </head>
 <body>
@@ -73,6 +85,12 @@ input::placeholder{color:rgba(255,255,255,.35)}
   var app = document.getElementById('app');
   var TEAMS = ['Senior', 'Junior A', 'Junior C', 'U21', 'Minor', 'U16', 'U15', 'U14', 'U13', 'U12',
     'Ladies Intermediate', 'Ladies Junior', 'Ladies Minor', 'Girls U16', 'Girls U14', 'Girls U12'];
+  var COMPS = ['Senior Football Championship', 'ACFL Division 2', 'Junior Football Championship', 'ACFL Division 4',
+    'Junior C Football Championship', 'ACFL Division 7', 'Kelly Cup', 'U20 Football Championship',
+    'U17 Football Championship', 'U17 Football League', 'U15 Football Championship', 'U15 Football League',
+    'U13 Football Competition', 'Ladies Intermediate Championship', 'Ladies Adult Division 2 League',
+    'Ladies Junior B Championship', 'Ladies Adult Division 4 League', 'Challenge match'];
+  var AFTER_FT = 5 * 60000;   /* the website drops a match this long after full time */
 
   var LS = {
     get: function (k, d) { try { var v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch (e) { return d; } },
@@ -90,13 +108,36 @@ input::placeholder{color:rgba(255,255,255,.35)}
   function fmt(g, p) { return g + '-' + (p < 10 ? '0' : '') + p; }
   function club(m) { return m.branch === 'ladies' ? 'Killeshin' : 'Gleann Uise\u00e1n'; }
   function tally(m) { var r = { kg: 0, kp: 0, og: 0, op: 0 }, ev = m.events || {}; for (var k in ev) { var e = ev[k]; if (e && r[e.s + e.v] != null) r[e.s + e.v]++; } return r; }
+  function mins(t) { return Math.floor((Date.now() - t) / 60000) + 1 + '\u2032'; }
+  function hhmm(t) { var d = new Date(t); return (d.getHours() < 10 ? '0' : '') + d.getHours() + ':' + (d.getMinutes() < 10 ? '0' : '') + d.getMinutes(); }
+  function isLive(m) { return m.live !== false; }   /* matches from before Go live existed count as live */
   function clock(m) {
-    var now = Date.now();
-    if (m.status === '1h' && m.t1h) return { l: '1st half', m: Math.floor((now - m.t1h) / 60000) + 1 + '\u2032', k: '' };
-    if (m.status === '2h' && m.t2h) return { l: '2nd half', m: Math.floor((now - m.t2h) / 60000) + 1 + '\u2032', k: '' };
-    if (m.status === 'ht') return { l: 'Half-time', m: '', k: 'ht' };
-    if (m.status === 'ft') return { l: 'Full time', m: '', k: 'idle' };
-    return { l: 'Not started', m: '', k: 'idle' };
+    switch (m.status) {
+      case '1h': return { l: '1st half', m: m.t1h ? mins(m.t1h) : '', k: '' };
+      case 'ht': return { l: 'Half-time', m: '', k: 'ht' };
+      case '2h': return { l: '2nd half', m: m.t2h ? mins(m.t2h) : '', k: '' };
+      case 'etb': return { l: 'Extra time next', m: '', k: 'ht' };
+      case 'et1': return { l: 'Extra time 1st half', m: m.tet1 ? mins(m.tet1) : '', k: '' };
+      case 'etht': return { l: 'Extra time half-time', m: '', k: 'ht' };
+      case 'et2': return { l: 'Extra time 2nd half', m: m.tet2 ? mins(m.tet2) : '', k: '' };
+      case 'ft': return { l: 'Full time', m: '', k: 'idle' };
+      default: return { l: 'Not started', m: '', k: 'idle' };
+    }
+  }
+  var HALF = { '2h': '2nd half', et1: 'extra time 1st half', et2: 'extra time 2nd half' };
+  function steps(m) {
+    var from = m.ftFrom || '2h';
+    return ({
+      pre: [['1h', 'Throw in: start 1st half']],
+      '1h': [['ht', 'Half-time']],
+      ht: [['2h', 'Start 2nd half']],
+      '2h': [['ft', 'Full time'], ['etb', 'Extra time: 2 \u00d7 10 minutes']],
+      etb: [['et1', 'Start extra time 1st half']],
+      et1: [['etht', 'Extra time half-time']],
+      etht: [['et2', 'Start extra time 2nd half']],
+      et2: [['ft', 'Full time']],
+      ft: [[from, 'Reopen ' + (HALF[from] || '2nd half')]]
+    })[m.status || 'pre'] || [];
   }
 
   /* ---------- sign-in (Firebase email/password over REST) ---------- */
@@ -196,25 +237,30 @@ input::placeholder{color:rgba(255,255,255,.35)}
     var v = view(), ids = Object.keys(v).sort(function (a, b) { return (v[b].created || 0) - (v[a].created || 0); });
     var recent = ids.filter(function (id) { return v[id] && Date.now() - (v[id].created || 0) < 24 * 3600000; });
     var h = '<div class="top"><h1>Matches</h1>' + syncLine() + '</div>';
-    h += '<button class="primary" data-act="new" style="margin:6px 0 18px">Start a new match</button>';
+    h += '<button class="primary" data-act="new" style="margin:6px 0 18px">Set up a new match</button>';
     if (!loaded && !recent.length) h += '<p class="empty">Loading\u2026</p>';
-    else if (!recent.length) h += '<p class="empty">No matches today. Start one when the teams are on the pitch.</p>';
+    else if (!recent.length) h += '<p class="empty">No matches today. Set one up before throw-in.</p>';
     recent.forEach(function (id) {
       var m = v[id], t = tally(m), c = clock(m);
       h += '<button class="row" data-act="open" data-id="' + esc(id) + '"><span><div class="t">' + esc(m.team) + ' v ' + esc(m.opp) + '</div>' +
-        '<div class="c">' + c.l + (c.m ? ' ' + c.m : '') + '</div></span><span class="s">' + fmt(t.kg, t.kp) + ' : ' + fmt(t.og, t.op) + '</span></button>';
+        '<div class="c">' + c.l + (c.m ? ' ' + c.m : '') + (isLive(m) ? '' : ' \u00b7 <span class="tag">Not on website</span>') + '</div></span>' +
+        '<span class="s">' + fmt(t.kg, t.kp) + ' : ' + fmt(t.og, t.op) + '</span></button>';
     });
     h += '<button class="quiet" data-act="signout">Sign out</button>';
     app.innerHTML = h;
   }
   function drawNew(err) {
     var opts = TEAMS.map(function (t) { return '<option value="' + esc(t) + '">'; }).join('');
+    var comps = COMPS.map(function (t) { return '<option value="' + esc(t) + '">'; }).join('');
     app.innerHTML = '<div class="top"><button class="link" data-act="back">\u2039 Matches</button></div>' +
       '<label for="tm">Our team</label><input id="tm" list="teams" placeholder="e.g. Senior" value="' + esc(draft.team || '') + '"><datalist id="teams">' + opts + '</datalist>' +
       '<label for="op">Opposition</label><input id="op" placeholder="e.g. Portlaoise" value="' + esc(draft.opp || '') + '">' +
+      '<label for="cp">Competition <small>(pick one or type your own)</small></label><input id="cp" list="comps" placeholder="e.g. Senior Football Championship" value="' + esc(draft.comp || '') + '"><datalist id="comps">' + comps + '</datalist>' +
       '<label>Venue</label><div class="seg"><button data-act="venue" data-v="home" class="' + (draft.venue === 'home' ? 'on' : '') + '">Home</button>' +
       '<button data-act="venue" data-v="away" class="' + (draft.venue === 'away' ? 'on' : '') + '">Away</button></div>' +
-      '<button class="primary" data-act="create">Create match</button>' + (err ? '<p class="err">' + esc(err) + '</p>' : '');
+      '<button class="primary" data-act="create">Save match</button>' +
+      '<p class="note" style="margin-top:10px">Nothing shows on the website until you tap Go live.</p>' +
+      (err ? '<p class="err">' + esc(err) + '</p>' : '');
   }
   function lastEvent(m) {
     var ev = m.events || {}, best = null;
@@ -224,15 +270,32 @@ input::placeholder{color:rgba(255,255,255,.35)}
   function drawMatch() {
     var v = view(), m = v[cur];
     if (!m) { if (loaded) { cur = null; LS.del('kl_cur'); screen = 'list'; return drawList(); } app.innerHTML = '<p class="empty">Loading\u2026</p>'; return; }
-    var t = tally(m), c = clock(m), us = club(m), them = m.opp || 'Opposition';
+    var t = tally(m), c = clock(m), us = club(m), them = m.opp || 'Opposition', live = isLive(m);
     var usRow = '<div class="side us"><span class="n">' + esc(us) + '</span><span class="sc" id="s-k">' + fmt(t.kg, t.kp) + '<small>(' + (t.kg * 3 + t.kp) + ')</small></span></div>';
     var thRow = '<div class="side them"><span class="n">' + esc(them) + '</span><span class="sc" id="s-o">' + fmt(t.og, t.op) + '<small>(' + (t.og * 3 + t.op) + ')</small></span></div>';
     var last = lastEvent(m), lastTxt = 'Undo last score';
     if (last) { var e = m.events[last]; lastTxt = 'Undo ' + (e.s === 'k' ? us : them) + ' ' + (e.v === 'g' ? 'goal' : 'point'); }
-    var next = { pre: ['1h', 'Throw in: start 1st half'], '1h': ['ht', 'Half-time'], ht: ['2h', 'Start 2nd half'], '2h': ['ft', 'Full time'], ft: ['2h', 'Reopen 2nd half'] }[m.status || 'pre'];
-    var off = m.status === 'pre' ? ' disabled' : '';
+    var off = m.status === 'pre' || !m.status ? ' disabled' : '';
+
+    var web;
+    if (!live) {
+      web = '<div class="webstate off"><i></i>Not on the website yet</div>' +
+        '<button class="golive" data-act="golive">Go live<span>Put this match on the website</span></button>';
+    } else if (m.status === 'ft' && m.tft) {
+      var gone = Date.now() - m.tft >= AFTER_FT;
+      web = '<div class="webstate ' + (gone ? 'off' : 'on') + '"><i></i>' +
+        (gone ? 'Taken off the website' : 'On the website until ' + hhmm(m.tft + AFTER_FT)) + '</div>';
+    } else {
+      web = '<div class="webstate on"><i></i>Live on the website</div>';
+    }
+
+    var stageBtns = steps(m).map(function (s) {
+      return '<button class="stage' + (s[0] === 'ft' ? ' end' : s[0] === 'etb' ? ' et' : '') + '" data-act="stage" data-to="' + s[0] + '">' + esc(s[1]) + '</button>';
+    }).join('');
+
     app.innerHTML = '<div class="top"><button class="link" data-act="back">\u2039 Matches</button>' + syncLine() + '</div>' +
-      '<div class="meta">' + esc(m.team) + ', ' + (m.venue === 'away' ? 'away' : 'home') + '</div>' +
+      '<div class="meta">' + esc(m.team) + ', ' + (m.venue === 'away' ? 'away' : 'home') + (m.comp ? ' \u00b7 ' + esc(m.comp) : '') + '</div>' +
+      web +
       '<div class="board">' + (m.venue === 'away' ? thRow + usRow : usRow + thRow) + '</div>' +
       '<div class="clock"><b class="' + c.k + '">' + c.l + '</b><span>' + c.m + '</span></div>' +
       '<div class="pad"><h2>' + esc(us) + '</h2>' +
@@ -242,7 +305,8 @@ input::placeholder{color:rgba(255,255,255,.35)}
       '<button class="hit them" data-act="score" data-s="o" data-v="g"' + off + '>GOAL<span>+3</span></button>' +
       '<button class="hit them" data-act="score" data-s="o" data-v="p"' + off + '>POINT<span>+1</span></button></div>' +
       '<button class="undo" data-act="undo"' + (last ? '' : ' disabled') + '>' + esc(lastTxt) + '</button>' +
-      '<button class="stage' + (next[0] === 'ft' ? ' end' : '') + '" data-act="stage" data-to="' + next[0] + '">' + next[1] + '</button>' +
+      stageBtns +
+      (live ? '<button class="quiet" data-act="unlive">Take off the website</button>' : '') +
       '<button class="quiet" data-act="remove">Remove this match</button>';
   }
   function render() {
@@ -253,6 +317,9 @@ input::placeholder{color:rgba(255,255,255,.35)}
 
   function keepAwake() {
     try { if ('wakeLock' in navigator && !wake) navigator.wakeLock.request('screen').then(function (w) { wake = w; w.addEventListener('release', function () { wake = null; }); }).catch(function () {}); } catch (e) {}
+  }
+  function keepDraft() {
+    draft.team = document.getElementById('tm').value; draft.opp = document.getElementById('op').value; draft.comp = document.getElementById('cp').value;
   }
 
   /* ---------- taps ---------- */
@@ -272,15 +339,22 @@ input::placeholder{color:rgba(255,255,255,.35)}
     } else if (a === 'new') { draft = { venue: 'home' }; go('new'); }
     else if (a === 'back') { if (document.activeElement) document.activeElement.blur(); go('list'); }
     else if (a === 'open') { cur = b.dataset.id; go('match'); }
-    else if (a === 'venue') {
-      draft.team = document.getElementById('tm').value; draft.opp = document.getElementById('op').value; draft.venue = b.dataset.v; drawNew();
-    } else if (a === 'create') {
-      var team = document.getElementById('tm').value.trim(), opp = document.getElementById('op').value.trim();
-      if (!team || !opp) { draft.team = team; draft.opp = opp; return drawNew('Enter our team and the opposition.'); }
+    else if (a === 'venue') { keepDraft(); draft.venue = b.dataset.v; drawNew(); }
+    else if (a === 'create') {
+      keepDraft();
+      var team = draft.team.trim(), opp = draft.opp.trim(), comp = draft.comp.trim();
+      if (!team || !opp) return drawNew('Enter our team and the opposition.');
       cur = uid('m');
       if (document.activeElement) document.activeElement.blur();
-      enqueue({ m: 'PUT', p: '/live/matches/' + cur, b: { team: team, opp: opp, venue: draft.venue, branch: /ladies|girls|lgfa/i.test(team) ? 'ladies' : 'men', status: 'pre', created: Date.now() } });
+      var rec = { team: team, opp: opp, venue: draft.venue, branch: /ladies|girls|lgfa/i.test(team) ? 'ladies' : 'men', status: 'pre', live: false, created: Date.now() };
+      if (comp) rec.comp = comp;
+      enqueue({ m: 'PUT', p: '/live/matches/' + cur, b: rec });
       go('match');
+    } else if (a === 'golive') {
+      enqueue({ m: 'PATCH', p: base, b: { live: true, tlive: Date.now() } });
+    } else if (a === 'unlive') {
+      if (!confirm('Take this match off the website? You can put it back with Go live.')) return;
+      enqueue({ m: 'PATCH', p: base, b: { live: false } });
     } else if (a === 'score') {
       enqueue({ m: 'PUT', p: base + '/events/' + uid('e'), b: { s: b.dataset.s, v: b.dataset.v, ts: Date.now() } });
       if (navigator.vibrate) navigator.vibrate(25);
@@ -288,15 +362,19 @@ input::placeholder{color:rgba(255,255,255,.35)}
     } else if (a === 'undo') {
       var m = view()[cur], k = m && lastEvent(m); if (k) enqueue({ m: 'DELETE', p: base + '/events/' + k });
     } else if (a === 'stage') {
-      var to = b.dataset.to, patch = { status: to };
-      if (to === 'ft' && !confirm('Mark as full time?')) return;
-      if (to === '1h') patch.t1h = Date.now();
-      if (to === 'ht') patch.tht = Date.now();
-      if (to === '2h') { if (view()[cur].status === 'ft') patch.tft = null; else patch.t2h = Date.now(); }
-      if (to === 'ft') patch.tft = Date.now();
+      var to = b.dataset.to, mm = view()[cur], patch = { status: to };
+      if (!mm) return;
+      if (to === 'ft' && !confirm('Mark as full time? The score comes off the website 5 minutes later.')) return;
+      if (to === 'etb' && !confirm('Go to extra time? Two halves of 10 minutes.')) return;
+      if (mm.status === 'ft') { patch.tft = null; patch.ftFrom = null; }          /* reopening */
+      else {
+        var stamp = { '1h': 't1h', ht: 'tht', '2h': 't2h', etb: 'tetb', et1: 'tet1', etht: 'tetht', et2: 'tet2', ft: 'tft' }[to];
+        if (stamp) patch[stamp] = Date.now();
+        if (to === 'ft') patch.ftFrom = mm.status;
+      }
       enqueue({ m: 'PATCH', p: base, b: patch });
     } else if (a === 'remove') {
-      if (!confirm('Remove this match? Use this only for a match started by mistake.')) return;
+      if (!confirm('Remove this match? Use this only for a match set up by mistake.')) return;
       enqueue({ m: 'DELETE', p: base }); go('list');
     }
   });
