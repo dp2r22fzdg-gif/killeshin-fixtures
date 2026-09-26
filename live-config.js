@@ -1,7 +1,6 @@
-/* Killeshin GAA live scores - settings shared by live.js and score.html.
-   Paste your two Firebase values between the quotes. */
+/* Killeshin GAA live scores - settings shared by live.js and score.html. */
 window.KGAA_LIVE = {
-  dbUrl:  "https://YOUR-PROJECT-default-rtdb.europe-west1.firebasedatabase.app",
-  apiKey: "YOUR-WEB-API-KEY",
-  bottomOffset: 78   /* px the live bar sits above the bottom of the screen (clears the nav bar) */
-};
+  dbUrl:  "https://killeshin-gaa-live-default-rtdb.europe-west1.firebasedatabase.app",
+  apiKey: "AIzaSyBdKujDNvCASbgSM5RuCoRxBUHwlNbGfdQ",
+  bottomOffset: 78
+}; 
