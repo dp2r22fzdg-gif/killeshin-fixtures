@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en-IE">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#11492E">
+<title>Scorer | Killeshin GAA</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;800&family=Barlow:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--deep:#11492E;--deep2:#1D5C3C;--forest:#1F824A;--accent:#3ACD77;--ink:#fff;--mute:rgba(255,255,255,.62);--line:rgba(255,255,255,.14);--them:#26352D;--warn:#F2B544;--bad:#FF7A6B;
+  --sans:'Barlow',-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;--num:'Barlow Condensed','Arial Narrow',-apple-system,sans-serif}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{background:var(--deep);color:var(--ink);font:16px/1.4 var(--sans);-webkit-tap-highlight-color:transparent;
+  padding:env(safe-area-inset-top,0px) 0 env(safe-area-inset-bottom,0px)}
+#app{max-width:520px;margin:0 auto;padding:12px 16px 24px}
+button,input,select{font:inherit;color:inherit}
+button{cursor:pointer;border:0;background:none;touch-action:manipulation}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.top{display:flex;justify-content:space-between;align-items:center;min-height:44px;margin-bottom:8px}
+.top h1{font-size:20px;margin:0;font-weight:700}
+.link{color:var(--accent);font-weight:600;padding:10px 0}
+.sync{font-size:13px;color:var(--mute)}.sync.wait{color:var(--warn);font-weight:600}.sync.bad{color:var(--bad);font-weight:600}
+label{display:block;font-size:14px;color:var(--mute);margin:16px 0 6px}
+input,select{width:100%;padding:14px;border-radius:10px;border:1px solid var(--line);background:var(--deep2);font-size:17px}
+input::placeholder{color:rgba(255,255,255,.35)}
+.seg{display:flex;border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.seg button{flex:1;padding:14px;font-weight:600}.seg button.on{background:var(--accent);color:#0B2B1A}
+.primary{display:block;width:100%;margin-top:22px;padding:17px;border-radius:12px;background:var(--accent);color:#0B2B1A;font-weight:700;font-size:18px}
+.primary:disabled{opacity:.5}
+.err{color:var(--bad);margin-top:12px;font-weight:600}
+.row{display:flex;justify-content:space-between;align-items:center;width:100%;padding:16px 0;border-top:1px solid var(--line);text-align:left}
+.row:last-of-type{border-bottom:1px solid var(--line)}
+.row .t{font-weight:700;font-size:17px}.row .c{font-size:13px;color:var(--mute)}
+.row .s{font:800 24px var(--num);font-variant-numeric:tabular-nums}
+.empty{color:var(--mute);padding:28px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.meta{font-size:14px;color:var(--mute);margin-bottom:10px}
+.board{border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:6px 0}
+.side{display:flex;align-items:baseline;justify-content:space-between;gap:10px;padding:4px 0}
+.side .n{font-weight:700;font-size:17px;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.side.them .n{font-weight:600;color:var(--mute)}
+.side .sc{font:800 64px/1 var(--num);font-variant-numeric:tabular-nums;letter-spacing:.01em;white-space:nowrap}
+.side .sc small{font:600 22px var(--num);color:var(--mute);margin-left:6px}
+.clock{display:flex;justify-content:space-between;font-size:15px;padding:10px 0 4px}
+.clock b{color:var(--accent)}.clock b.ht{color:var(--warn)}.clock b.idle{color:var(--mute)}
+.pad{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
+.pad h2{grid-column:1/-1;font-size:14px;font-weight:600;color:var(--mute);margin:8px 0 -2px}
+.hit{padding:22px 8px;border-radius:14px;font:800 30px/1 var(--num);letter-spacing:.02em}
+.hit span{display:block;font:600 13px var(--sans);opacity:.75;margin-top:6px;letter-spacing:0}
+.hit.us{background:var(--forest)}.hit.them{background:var(--them);border:1px solid var(--line)}
+.hit:active{transform:scale(.97)}
+.hit:disabled{opacity:.35}
+.undo{display:block;width:100%;margin-top:12px;padding:14px;border-radius:12px;border:1px solid var(--line);font-weight:600}
+.undo:disabled{opacity:.35}
+.stage{display:block;width:100%;margin-top:12px;padding:17px;border-radius:12px;background:#fff;color:var(--deep);font-weight:700;font-size:18px}
+.stage.end{background:var(--warn);color:#2B1D00}
+.quiet{display:block;margin:22px auto 0;color:var(--mute);font-size:14px;padding:10px;text-decoration:underline}
+.flash{animation:fl .5s}
+@keyframes fl{from{color:var(--accent)}}
+@media (prefers-reduced-motion:reduce){.flash{animation:none}.hit:active{transform:none}}
+</style>
+</head>
+<body>
+<main id="app"></main>
+<script src="live-config.js"></script>
+<script>
+(function () {
+  var C = window.KGAA_LIVE || {};
+  var DB = (C.dbUrl || '').replace(/\/$/, ''), KEY = C.apiKey || '';
+  var app = document.getElementById('app');
+  var TEAMS = ['Senior', 'Junior A', 'Junior C', 'U21', 'Minor', 'U16', 'U15', 'U14', 'U13', 'U12',
+    'Ladies Intermediate', 'Ladies Junior', 'Ladies Minor', 'Girls U16', 'Girls U14', 'Girls U12'];
+
+  var LS = {
+    get: function (k, d) { try { var v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch (e) { return d; } },
+    set: function (k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} },
+    del: function (k) { try { localStorage.removeItem(k); } catch (e) {} }
+  };
+  var auth = LS.get('kl_auth', null);          /* {id, refresh, exp} */
+  var queue = LS.get('kl_queue', []);          /* writes waiting to reach the server */
+  var server = {}, loaded = false, online = true, blocked = '', flushing = false;
+  var screen = auth ? 'list' : 'signin', cur = LS.get('kl_cur', null), draft = { venue: 'home' }, wake = null;
+  if (cur && screen === 'list') screen = 'match';
+
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+  function uid(p) { return p + Date.now().toString(36) + Math.random().toString(36).slice(2, 6); }
+  function fmt(g, p) { return g + '-' + (p < 10 ? '0' : '') + p; }
+  function club(m) { return m.branch === 'ladies' ? 'Killeshin' : 'Gleann Uise\u00e1n'; }
+  function tally(m) { var r = { kg: 0, kp: 0, og: 0, op: 0 }, ev = m.events || {}; for (var k in ev) { var e = ev[k]; if (e && r[e.s + e.v] != null) r[e.s + e.v]++; } return r; }
+  function clock(m) {
+    var now = Date.now();
+    if (m.status === '1h' && m.t1h) return { l: '1st half', m: Math.floor((now - m.t1h) / 60000) + 1 + '\u2032', k: '' };
+    if (m.status === '2h' && m.t2h) return { l: '2nd half', m: Math.floor((now - m.t2h) / 60000) + 1 + '\u2032', k: '' };
+    if (m.status === 'ht') return { l: 'Half-time', m: '', k: 'ht' };
+    if (m.status === 'ft') return { l: 'Full time', m: '', k: 'idle' };
+    return { l: 'Not started', m: '', k: 'idle' };
+  }
+
+  /* ---------- sign-in (Firebase email/password over REST) ---------- */
+  function saveAuth(id, refresh, secs) { auth = { id: id, refresh: refresh, exp: Date.now() + (+secs) * 1000 }; LS.set('kl_auth', auth); }
+  function signIn(email, pw) {
+    return fetch('https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=' + KEY, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: email, password: pw, returnSecureToken: true })
+    }).then(function (r) {
+      return r.json().then(function (j) {
+        if (!r.ok) throw new Error((j.error && j.error.message) || 'failed');
+        saveAuth(j.idToken, j.refreshToken, j.expiresIn);
+      });
+    });
+  }
+  function token(force) {
+    if (!auth) return Promise.reject(new Error('signed-out'));
+    if (!force && auth.exp - Date.now() > 60000) return Promise.resolve(auth.id);
+    return fetch('https://securetoken.googleapis.com/v1/token?key=' + KEY, {
+      method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: 'grant_type=refresh_token&refresh_token=' + encodeURIComponent(auth.refresh)
+    }).then(function (r) {
+      return r.json().then(function (j) {
+        if (!r.ok) { if (r.status === 400) { auth = null; LS.del('kl_auth'); blocked = 'Signed out. Sign in again to save scores.'; } throw new Error('refresh'); }
+        saveAuth(j.id_token, j.refresh_token, j.expires_in);
+        return auth.id;
+      });
+    });
+  }
+
+  /* ---------- write queue: every tap is saved on the phone first, then sent ---------- */
+  function enqueue(op) { queue.push(op); LS.set('kl_queue', queue); render(); flush(); }
+  function send(op, tok) {
+    return fetch(DB + op.p + '.json?auth=' + encodeURIComponent(tok), {
+      method: op.m, headers: { 'Content-Type': 'application/json' },
+      body: op.m === 'DELETE' ? undefined : JSON.stringify(op.b)
+    });
+  }
+  function flush() {
+    if (flushing || !queue.length || blocked) return;
+    flushing = true;
+    var op = queue[0];
+    token().then(function (tok) { return send(op, tok); })
+      .then(function (r) {
+        if (r.status !== 401) return r;
+        return token(true).then(function (tok) { return send(op, tok); });
+      })
+      .then(function (r) {
+        online = true;
+        if (r.status === 401 || r.status === 403) { blocked = 'This login can\u2019t save scores. Check the scorer UID in the database rules.'; return; }
+        if (!r.ok && r.status !== 400) throw new Error('http ' + r.status);
+        if (r.ok) applyOp(server, op); queue.shift(); LS.set('kl_queue', queue);          /* 400 = bad write: drop it so the queue can't jam */
+      })
+      .catch(function () { online = false; setTimeout(flush, 5000); })
+      .then(function () { flushing = false; render(); if (online && queue.length && !blocked) flush(); });
+  }
+
+  /* ---------- reading: server copy + anything still waiting to send ---------- */
+  function pull() {
+    return fetch(DB + '/live/matches.json?t=' + Date.now(), { cache: 'no-store' })
+      .then(function (r) { if (!r.ok) throw 0; return r.json(); })
+      .then(function (j) { server = j || {}; loaded = true; online = true; render(); })
+      .catch(function () { online = false; render(); });
+  }
+  function applyOp(v, op) {
+    var parts = op.p.replace(/^\/live\/matches\/?/, '').split('/').filter(Boolean);
+    if (!parts.length) return;
+    var o = v;
+    for (var i = 0; i < parts.length - 1; i++) {
+      if (o[parts[i]] == null || typeof o[parts[i]] !== 'object') { if (op.m === 'DELETE') return; o[parts[i]] = {}; }
+      o = o[parts[i]];
+    }
+    var k = parts[parts.length - 1];
+    if (op.m === 'PUT') o[k] = JSON.parse(JSON.stringify(op.b));
+    else if (op.m === 'DELETE') delete o[k];
+    else if (op.m === 'PATCH') { o[k] = o[k] || {}; for (var f in op.b) { if (op.b[f] === null) delete o[k][f]; else o[k][f] = op.b[f]; } }
+  }
+  function view() { var v = JSON.parse(JSON.stringify(server)); queue.forEach(function (op) { applyOp(v, op); }); return v; }
+
+  /* ---------- screens ---------- */
+  function syncLine() {
+    if (blocked) return '<span class="sync bad">' + esc(blocked) + '</span>';
+    if (queue.length) return '<span class="sync wait">' + queue.length + (queue.length === 1 ? ' tap' : ' taps') + ' waiting for signal</span>';
+    return '<span class="sync">' + (online ? 'All saved' : 'No signal') + '</span>';
+  }
+  function drawSignin(err) {
+    if (!DB || DB.indexOf('YOUR-') > -1 || !KEY || KEY.indexOf('YOUR-') > -1) {
+      app.innerHTML = '<div class="top"><h1>Scorer</h1></div><p class="err">live-config.js still has placeholder values. Add the Firebase database URL and Web API key.</p>';
+      return;
+    }
+    app.innerHTML = '<div class="top"><h1>Scorer sign-in</h1></div>' +
+      '<label for="em">Email</label><input id="em" type="email" autocomplete="username" inputmode="email" value="' + esc(LS.get('kl_email', '')) + '">' +
+      '<label for="pw">Password</label><input id="pw" type="password" autocomplete="current-password">' +
+      '<button class="primary" data-act="signin">Sign in</button>' + (err ? '<p class="err">' + esc(err) + '</p>' : '');
+  }
+  function drawList() {
+    var v = view(), ids = Object.keys(v).sort(function (a, b) { return (v[b].created || 0) - (v[a].created || 0); });
+    var recent = ids.filter(function (id) { return v[id] && Date.now() - (v[id].created || 0) < 24 * 3600000; });
+    var h = '<div class="top"><h1>Matches</h1>' + syncLine() + '</div>';
+    h += '<button class="primary" data-act="new" style="margin:6px 0 18px">Start a new match</button>';
+    if (!loaded && !recent.length) h += '<p class="empty">Loading\u2026</p>';
+    else if (!recent.length) h += '<p class="empty">No matches today. Start one when the teams are on the pitch.</p>';
+    recent.forEach(function (id) {
+      var m = v[id], t = tally(m), c = clock(m);
+      h += '<button class="row" data-act="open" data-id="' + esc(id) + '"><span><div class="t">' + esc(m.team) + ' v ' + esc(m.opp) + '</div>' +
+        '<div class="c">' + c.l + (c.m ? ' ' + c.m : '') + '</div></span><span class="s">' + fmt(t.kg, t.kp) + ' : ' + fmt(t.og, t.op) + '</span></button>';
+    });
+    h += '<button class="quiet" data-act="signout">Sign out</button>';
+    app.innerHTML = h;
+  }
+  function drawNew(err) {
+    var opts = TEAMS.map(function (t) { return '<option value="' + esc(t) + '">'; }).join('');
+    app.innerHTML = '<div class="top"><button class="link" data-act="back">\u2039 Matches</button></div>' +
+      '<label for="tm">Our team</label><input id="tm" list="teams" placeholder="e.g. Senior" value="' + esc(draft.team || '') + '"><datalist id="teams">' + opts + '</datalist>' +
+      '<label for="op">Opposition</label><input id="op" placeholder="e.g. Portlaoise" value="' + esc(draft.opp || '') + '">' +
+      '<label>Venue</label><div class="seg"><button data-act="venue" data-v="home" class="' + (draft.venue === 'home' ? 'on' : '') + '">Home</button>' +
+      '<button data-act="venue" data-v="away" class="' + (draft.venue === 'away' ? 'on' : '') + '">Away</button></div>' +
+      '<button class="primary" data-act="create">Create match</button>' + (err ? '<p class="err">' + esc(err) + '</p>' : '');
+  }
+  function lastEvent(m) {
+    var ev = m.events || {}, best = null;
+    for (var k in ev) if (ev[k] && (!best || ev[k].ts > ev[best].ts)) best = k;
+    return best;
+  }
+  function drawMatch() {
+    var v = view(), m = v[cur];
+    if (!m) { if (loaded) { cur = null; LS.del('kl_cur'); screen = 'list'; return drawList(); } app.innerHTML = '<p class="empty">Loading\u2026</p>'; return; }
+    var t = tally(m), c = clock(m), us = club(m), them = m.opp || 'Opposition';
+    var usRow = '<div class="side us"><span class="n">' + esc(us) + '</span><span class="sc" id="s-k">' + fmt(t.kg, t.kp) + '<small>(' + (t.kg * 3 + t.kp) + ')</small></span></div>';
+    var thRow = '<div class="side them"><span class="n">' + esc(them) + '</span><span class="sc" id="s-o">' + fmt(t.og, t.op) + '<small>(' + (t.og * 3 + t.op) + ')</small></span></div>';
+    var last = lastEvent(m), lastTxt = 'Undo last score';
+    if (last) { var e = m.events[last]; lastTxt = 'Undo ' + (e.s === 'k' ? us : them) + ' ' + (e.v === 'g' ? 'goal' : 'point'); }
+    var next = { pre: ['1h', 'Throw in: start 1st half'], '1h': ['ht', 'Half-time'], ht: ['2h', 'Start 2nd half'], '2h': ['ft', 'Full time'], ft: ['2h', 'Reopen 2nd half'] }[m.status || 'pre'];
+    var off = m.status === 'pre' ? ' disabled' : '';
+    app.innerHTML = '<div class="top"><button class="link" data-act="back">\u2039 Matches</button>' + syncLine() + '</div>' +
+      '<div class="meta">' + esc(m.team) + ', ' + (m.venue === 'away' ? 'away' : 'home') + '</div>' +
+      '<div class="board">' + (m.venue === 'away' ? thRow + usRow : usRow + thRow) + '</div>' +
+      '<div class="clock"><b class="' + c.k + '">' + c.l + '</b><span>' + c.m + '</span></div>' +
+      '<div class="pad"><h2>' + esc(us) + '</h2>' +
+      '<button class="hit us" data-act="score" data-s="k" data-v="g"' + off + '>GOAL<span>+3</span></button>' +
+      '<button class="hit us" data-act="score" data-s="k" data-v="p"' + off + '>POINT<span>+1</span></button>' +
+      '<h2>' + esc(them) + '</h2>' +
+      '<button class="hit them" data-act="score" data-s="o" data-v="g"' + off + '>GOAL<span>+3</span></button>' +
+      '<button class="hit them" data-act="score" data-s="o" data-v="p"' + off + '>POINT<span>+1</span></button></div>' +
+      '<button class="undo" data-act="undo"' + (last ? '' : ' disabled') + '>' + esc(lastTxt) + '</button>' +
+      '<button class="stage' + (next[0] === 'ft' ? ' end' : '') + '" data-act="stage" data-to="' + next[0] + '">' + next[1] + '</button>' +
+      '<button class="quiet" data-act="remove">Remove this match</button>';
+  }
+  function render() {
+    if (document.activeElement && document.activeElement.tagName === 'INPUT') return; /* don't wipe what's being typed */
+    if (screen === 'signin') drawSignin(); else if (screen === 'list') drawList(); else if (screen === 'new') drawNew(); else drawMatch();
+  }
+  function go(s) { screen = s; if (s === 'match') { LS.set('kl_cur', cur); keepAwake(); } else if (s === 'list') { LS.del('kl_cur'); cur = null; } render(); }
+
+  function keepAwake() {
+    try { if ('wakeLock' in navigator && !wake) navigator.wakeLock.request('screen').then(function (w) { wake = w; w.addEventListener('release', function () { wake = null; }); }).catch(function () {}); } catch (e) {}
+  }
+
+  /* ---------- taps ---------- */
+  app.addEventListener('click', function (ev) {
+    var b = ev.target.closest('[data-act]'); if (!b || b.disabled) return;
+    var a = b.dataset.act, base = '/live/matches/' + cur;
+    if (a === 'signin') {
+      var em = document.getElementById('em').value.trim(), pw = document.getElementById('pw').value;
+      LS.set('kl_email', em);
+      if (!em || !pw) return drawSignin('Enter the scorer email and password.');
+      b.disabled = true; b.textContent = 'Signing in\u2026';
+      signIn(em, pw).then(function () { blocked = ''; document.activeElement.blur(); go('list'); flush(); })
+        .catch(function (e) { drawSignin(/CREDENTIAL|PASSWORD|EMAIL/.test(e.message) ? 'Email or password not recognised.' : 'Couldn\u2019t reach the server. Check signal and try again.'); });
+    } else if (a === 'signout') {
+      if (queue.length && !confirm(queue.length + ' taps haven\u2019t been sent yet and will be lost. Sign out anyway?')) return;
+      auth = null; queue = []; LS.del('kl_auth'); LS.set('kl_queue', []); go('signin');
+    } else if (a === 'new') { draft = { venue: 'home' }; go('new'); }
+    else if (a === 'back') { if (document.activeElement) document.activeElement.blur(); go('list'); }
+    else if (a === 'open') { cur = b.dataset.id; go('match'); }
+    else if (a === 'venue') {
+      draft.team = document.getElementById('tm').value; draft.opp = document.getElementById('op').value; draft.venue = b.dataset.v; drawNew();
+    } else if (a === 'create') {
+      var team = document.getElementById('tm').value.trim(), opp = document.getElementById('op').value.trim();
+      if (!team || !opp) { draft.team = team; draft.opp = opp; return drawNew('Enter our team and the opposition.'); }
+      cur = uid('m');
+      if (document.activeElement) document.activeElement.blur();
+      enqueue({ m: 'PUT', p: '/live/matches/' + cur, b: { team: team, opp: opp, venue: draft.venue, branch: /ladies|girls|lgfa/i.test(team) ? 'ladies' : 'men', status: 'pre', created: Date.now() } });
+      go('match');
+    } else if (a === 'score') {
+      enqueue({ m: 'PUT', p: base + '/events/' + uid('e'), b: { s: b.dataset.s, v: b.dataset.v, ts: Date.now() } });
+      if (navigator.vibrate) navigator.vibrate(25);
+      var el = document.getElementById('s-' + b.dataset.s); if (el) el.classList.add('flash');
+    } else if (a === 'undo') {
+      var m = view()[cur], k = m && lastEvent(m); if (k) enqueue({ m: 'DELETE', p: base + '/events/' + k });
+    } else if (a === 'stage') {
+      var to = b.dataset.to, patch = { status: to };
+      if (to === 'ft' && !confirm('Mark as full time?')) return;
+      if (to === '1h') patch.t1h = Date.now();
+      if (to === 'ht') patch.tht = Date.now();
+      if (to === '2h') { if (view()[cur].status === 'ft') patch.tft = null; else patch.t2h = Date.now(); }
+      if (to === 'ft') patch.tft = Date.now();
+      enqueue({ m: 'PATCH', p: base, b: patch });
+    } else if (a === 'remove') {
+      if (!confirm('Remove this match? Use this only for a match started by mistake.')) return;
+      enqueue({ m: 'DELETE', p: base }); go('list');
+    }
+  });
+
+  document.addEventListener('visibilitychange', function () { if (!document.hidden) { pull(); flush(); if (screen === 'match') keepAwake(); } });
+  window.addEventListener('online', flush);
+  setInterval(function () { if (!document.hidden) pull(); }, 8000);
+  render(); pull(); flush();
+})();
+</script>
+</body>
+</html>
