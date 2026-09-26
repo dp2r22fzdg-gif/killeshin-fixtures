@@ -23,18 +23,21 @@
     '.lv.nobar{padding-bottom:calc(8px + env(safe-area-inset-bottom))}' +
     '.lv-stack{max-height:46vh;overflow-y:auto;-webkit-overflow-scrolling:touch;pointer-events:auto;' +
       'border-radius:18px}' +
-    '.lv-card{background:linear-gradient(160deg,#1D5C3C 0%,#11492E 65%);color:#fff;border-radius:18px;' +
-      'padding:11px 15px 12px;margin-top:8px;border:1px solid rgba(58,205,119,.35);' +
-      'box-shadow:0 -6px 24px rgba(10,30,20,.28),0 6px 18px rgba(17,73,46,.3);' +
+    /* White scoreboard with a green frame: stands out against both the dark
+       match panel and the pale page behind it, and keeps club colours. */
+    '.lv-card{background:#fff;color:#101A14;border-radius:18px;position:relative;overflow:hidden;' +
+      'padding:14px 15px 12px;margin-top:8px;border:2px solid #1F824A;' +
+      'box-shadow:0 -8px 28px rgba(10,30,20,.35),0 4px 14px rgba(10,30,20,.25);' +
       'font-family:Archivo,-apple-system,"Helvetica Neue",Arial,sans-serif}' +
     '.lv-card:first-child{margin-top:0}' +
+    '.lv-card::before{content:"";position:absolute;left:0;right:0;top:0;height:4px;background:#3ACD77}' +
     '.lv-top{display:flex;align-items:center;gap:10px;margin-bottom:8px;min-width:0}' +
     '.lv-pill{flex:none;display:inline-flex;align-items:center;gap:7px;background:#E5484D;color:#fff;' +
       'font-size:11.5px;font-weight:800;letter-spacing:.06em;padding:5px 11px;border-radius:999px;white-space:nowrap}' +
-    '.lv-pill.idle{background:rgba(255,255,255,.18)}' +
+    '.lv-pill.idle{background:#E8F6EE;color:#12703F;border:1px solid #BFDFCD}' +
     '.lv-pill i{width:7px;height:7px;border-radius:50%;background:#fff;animation:lvp 1.4s infinite}' +
     '@keyframes lvp{50%{opacity:.25}}' +
-    '.lv-comp{flex:1;min-width:0;font-size:12.5px;font-weight:600;color:#A9CFBB;' +
+    '.lv-comp{flex:1;min-width:0;font-size:12.5px;font-weight:600;color:#4E5A53;' +
       'overflow:hidden;text-overflow:ellipsis;white-space:nowrap}' +
     '.lv-row{display:flex;justify-content:space-between;gap:14px}' +
     '.lv-side{flex:1;min-width:0;display:flex;flex-direction:column}' +
@@ -42,14 +45,14 @@
     '.lv-id{display:flex;align-items:center;gap:8px;min-width:0;max-width:100%;margin-bottom:3px}' +
     '.lv-side.r .lv-id{flex-direction:row-reverse}' +
     '.lv-c{width:30px;height:30px;flex:none;border-radius:50%;background:#fff;display:grid;place-items:center;' +
-      'overflow:hidden;box-shadow:0 0 0 2px rgba(58,205,119,.5)}' +
+      'overflow:hidden;box-shadow:0 0 0 1.5px #C2D0C7}' +
     '.lv-c img{width:76%;height:76%;object-fit:contain;display:block}' +
     '.lv-c b{font-family:"Bricolage Grotesque",Archivo,sans-serif;font-weight:800;font-size:10.5px;' +
       'color:#11492E;letter-spacing:.01em;line-height:1}' +
     '.lv-n{min-width:0;font-size:14px;font-weight:700;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}' +
     '.lv-s{font-family:"Bricolage Grotesque",Archivo,sans-serif;font-weight:800;font-size:28px;line-height:1.1;' +
-      'letter-spacing:-.02em;font-variant-numeric:tabular-nums;white-space:nowrap}' +
-    '.lv-s small{font-size:16px;font-weight:700;color:#8FD6AE;margin-left:6px;letter-spacing:0}' +
+      'letter-spacing:-.02em;font-variant-numeric:tabular-nums;white-space:nowrap;color:#11492E}' +
+    '.lv-s small{font-size:16px;font-weight:700;color:#6B7A72;margin-left:6px;letter-spacing:0}' +
     '@media (prefers-reduced-motion:reduce){.lv-pill i{animation:none}}';
   var st = document.createElement('style');
   st.textContent = css;
