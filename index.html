@@ -386,6 +386,12 @@ main.swap{animation:swap .19s cubic-bezier(.22,.61,.36,1)}
   margin-bottom:12px}
 .fx-tags{display:flex;align-items:center;gap:7px;flex-wrap:wrap;min-width:0}
 .fx-tags .bm,.fx-tags .flagbadge{margin:0}
+.fx-grade{flex:none;display:inline-flex;align-items:center;
+  font-family:'Bricolage Grotesque',Archivo,sans-serif;font-weight:800;font-size:17px;
+  letter-spacing:-.01em;line-height:1;color:#fff;padding:7px 13px;border-radius:10px;
+  background:linear-gradient(180deg,var(--deep-2),var(--deep));
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.18), 0 2px 6px -2px rgba(17,73,46,.5)}
+.card.lad .fx-grade{background:linear-gradient(180deg,#1C8A4E,var(--green-dk))}
 .fx-ha{font-size:10.5px;font-weight:800;letter-spacing:.09em;text-transform:uppercase;
   padding:3px 10px;border-radius:999px;line-height:1.5;border:1px solid}
 .fx-ha.h{background:var(--green-dk);color:#fff;border-color:var(--green-dk)}
@@ -819,7 +825,7 @@ tr.us td{background:var(--green-lt);color:var(--ink);font-weight:700}
   <div>
     <span id="stamp"></span>
     <br><span class="count" id="count" hidden></span>
-    <br><span style="opacity:.55;font-size:11.5px">Build 2026-09-26 · cards v2</span>
+    <br><span style="opacity:.55;font-size:11.5px">Build 2026-09-26 · cards v3</span>
   </div>
 </div>
 
@@ -1209,8 +1215,8 @@ function renderFixtures(){
     var ha = home ? ['h','Home'] : f.isHome ? ['n','Neutral'] : ['a','Away'];
     html += '<div class="card fx' + (home ? ' hm' : '') + (f.branch === 'ladies' ? ' lad' : '') + '">' +
       '<div class="fx-top">' +
-        '<span class="fx-tags">' + flagBadge(f) + mark(f) +
-          '<span class="gchip">' + esc(f.grade) + '</span>' +
+        '<span class="fx-tags">' + '<span class="fx-grade">' + esc(f.grade) + '</span>' +
+          flagBadge(f) + mark(f) +
           '<span class="fx-ha ' + ha[0] + '">' + ha[1] + '</span>' +
         '</span>' +
         (timed ? '<span class="fx-time num">' + esc(f.time) + '</span>' : '') +
@@ -1242,7 +1248,7 @@ function renderResults(){
     var place = venueOf(r);
     html += '<div class="card'+cls+(r.branch==="ladies"?' lad':'')+'">' +
       '<div class="res-top">' +
-        '<span>' + mark(r) + '<span class="gchip">'+esc(r.grade)+'</span></span>' +
+        '<span class="fx-tags"><span class="fx-grade">'+esc(r.grade)+'</span>' + mark(r) + '</span>' +
         '<span class="obadge '+r.outcome+'">'+word+'</span>' +
       '</div>' +
       scoreLine(r, r.home, r.homeScore, r.homeTotal, r.homeTotal>r.awayTotal) +
@@ -2158,8 +2164,8 @@ setInterval(function(){
 }, 30000);
 })();
 </script>
-<script src="live-config.js"></script>
-<script src="live.js"></script>
+<script src="live-config.js?v=3"></script>
+<script src="live.js?v=3"></script>
 
 </body>
 </html>
