@@ -53,6 +53,8 @@
     '.lv-s{font-family:"Bricolage Grotesque",Archivo,sans-serif;font-weight:800;font-size:28px;line-height:1.1;' +
       'letter-spacing:-.02em;font-variant-numeric:tabular-nums;white-space:nowrap;color:#11492E}' +
     '.lv-s small{font-size:16px;font-weight:700;color:#6B7A72;margin-left:6px;letter-spacing:0}' +
+    '.lv-scr{margin-top:9px;padding-top:8px;border-top:1px solid #E2EAE5;font-size:12.5px;line-height:1.45;color:#4E5A53}' +
+    '.lv-scr b{color:#11492E;font-weight:800;font-variant-numeric:tabular-nums}' +
     '@media (prefers-reduced-motion:reduce){.lv-pill i{animation:none}}';
   var st = document.createElement('style');
   st.textContent = css;
@@ -61,7 +63,15 @@
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
   function fmt(g, p) { return g + '-' + (p < 10 ? '0' : '') + p; }
   function club(m) { return m.branch === 'ladies' ? 'Killeshin' : 'Gleann Uise\u00e1n'; }
-  function tally(m) { var r = { kg: 0, kp: 0, og: 0, op: 0 }, ev = m.events || {}; for (var k in ev) { var e = ev[k]; if (e && r[e.s + e.v] != null) r[e.s + e.v]++; } return r; }
+  /* v is 'g' (goal, 3), '2' (two-pointer, 2 in the points column) or 'p' (point, 1). */
+  function tally(m) {
+    var r = { kg: 0, kp: 0, og: 0, op: 0 }, ev = m.events || {};
+    for (var k in ev) {
+      var e = ev[k]; if (!e || (e.s !== 'k' && e.s !== 'o')) continue;
+      if (e.v === 'g') r[e.s + 'g']++; else r[e.s + 'p'] += (e.v === '2' ? 2 : 1);
+    }
+    return r;
+  }
   /* Worked out from the half's start time on every tick, so the clock keeps
      moving on its own between score fetches. */
   function mins(t) { return t ? ' ' + (Math.floor((Date.now() - t) / 60000) + 1) + '\u2032' : ''; }
@@ -132,6 +142,22 @@
       '<span class="lv-s">' + fmt(g, p) + '<small>(' + (g * 3 + p) + ')</small></span></div>';
   }
 
+  /* Killeshin scorers, top scorer first, e.g. "Lowry 1-04 · Deering 0-02". */
+  function scorersLine(m) {
+    var by = {}, ev = m.events || {}, k;
+    for (k in ev) {
+      var e = ev[k]; if (!e || e.s !== 'k' || !e.n) continue;
+      var id = String(e.n).toLowerCase().replace(/[^a-z0-9]+/g, '');
+      var r = by[id] || (by[id] = { n: e.n, g: 0, p: 0 });
+      if (e.v === 'g') r.g++; else r.p += (e.v === '2' ? 2 : 1);
+    }
+    var list = Object.keys(by).map(function (x) { return by[x]; })
+      .sort(function (a, b) { return (b.g * 3 + b.p) - (a.g * 3 + a.p) || a.n.localeCompare(b.n); });
+    if (!list.length) return '';
+    return '<div class="lv-scr">' + esc(club(m)) + ': ' + list.map(function (r) {
+      return esc(r.n) + ' <b>' + fmt(r.g, r.p) + '</b>'; }).join(' \u00b7 ') + '</div>';
+  }
+
   function card(m) {
     var t = tally(m), s = state(m);
     var opp = m.opp || 'Opposition', away = m.venue === 'away';
@@ -143,7 +169,7 @@
     return '<div class="lv-card">' +
       '<div class="lv-top"><span class="lv-pill' + (s.on ? '' : ' idle') + '">' + (s.on ? '<i></i>' : '') + esc(s.t) + '</span>' +
       '<span class="lv-comp">' + info + '</span></div>' +
-      '<div class="lv-row">' + (m.venue === 'away' ? them + us : us + them) + '</div></div>';
+      '<div class="lv-row">' + (m.venue === 'away' ? them + us : us + them) + '</div>' + scorersLine(m) + '</div>';
   }
 
   /* Sit just above the tab bar, and pad the page so the last card can
