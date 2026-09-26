@@ -53,12 +53,14 @@ input::placeholder{color:rgba(255,255,255,.35)}
 .side.them .n{font-weight:600;color:var(--mute)}
 .side .sc{font:800 64px/1 var(--num);font-variant-numeric:tabular-nums;letter-spacing:.01em;white-space:nowrap}
 .side .sc small{font:600 22px var(--num);color:var(--mute);margin-left:6px}
-.clock{display:flex;justify-content:space-between;font-size:15px;padding:10px 0 4px}
+.clock{display:flex;justify-content:space-between;align-items:center;font-size:15px;padding:10px 0 4px}
+.clock .big{font:800 40px/1 var(--num);font-variant-numeric:tabular-nums;letter-spacing:.01em}
+.clock .big.ht{color:var(--warn)}.clock .big.idle{color:var(--mute);font-size:28px}
 .clock b{color:var(--accent)}.clock b.ht{color:var(--warn)}.clock b.idle{color:var(--mute)}
 .note{font-size:13px;color:var(--mute);margin:2px 0 0}
-.pad{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
+.pad{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:14px}
 .pad h2{grid-column:1/-1;font-size:14px;font-weight:600;color:var(--mute);margin:8px 0 -2px}
-.hit{padding:22px 8px;border-radius:14px;font:800 30px/1 var(--num);letter-spacing:.02em}
+.hit{padding:22px 4px;border-radius:14px;font:800 26px/1 var(--num);letter-spacing:.01em}
 .hit span{display:block;font:600 13px var(--sans);opacity:.75;margin-top:6px;letter-spacing:0}
 .hit.us{background:var(--forest)}.hit.them{background:var(--them);border:1px solid var(--line)}
 .hit:active{transform:scale(.97)}
@@ -72,12 +74,45 @@ input::placeholder{color:rgba(255,255,255,.35)}
 .quiet + .quiet{margin-top:4px}
 .flash{animation:fl .5s}
 @keyframes fl{from{color:var(--accent)}}
-@media (prefers-reduced-motion:reduce){.flash,.webstate.on i{animation:none}.hit:active{transform:none}}
+
+/* ---------- scorers ---------- */
+.scorers{font-size:14px;color:var(--mute);line-height:1.5;padding:6px 0 2px}
+.scorers b{color:#fff;font:800 17px var(--num);font-variant-numeric:tabular-nums;margin-left:3px}
+.slist h2{font-size:14px;font-weight:600;color:var(--mute);margin:22px 0 4px;display:flex;justify-content:space-between;align-items:baseline}
+.slist h2 button{color:var(--accent);font-weight:600;font-size:14px;padding:6px 0}
+.sr{display:flex;justify-content:space-between;align-items:center;gap:12px;width:100%;padding:13px 2px;border-top:1px solid var(--line);text-align:left}
+.sr:last-child{border-bottom:1px solid var(--line)}
+.sr .k{font-weight:700}.sr .k small{font-weight:600;color:var(--mute);font-size:13px;margin-left:8px}
+.sr .who{font-weight:600;text-align:right;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sheetbg{position:fixed;inset:0;z-index:20;background:rgba(0,0,0,.55);display:flex;align-items:flex-end}
+.sheet{width:100%;max-width:520px;margin:0 auto;background:var(--deep2);border-radius:20px 20px 0 0;
+  padding:16px 16px calc(18px + env(safe-area-inset-bottom,0px));max-height:86vh;overflow-y:auto;
+  box-shadow:0 -10px 30px rgba(0,0,0,.35)}
+.sheet h3{margin:0;font-size:21px;font-weight:700}
+.pl{display:flex;justify-content:space-between;align-items:center;gap:12px;width:100%;margin-top:8px;padding:15px 14px;
+  border-radius:12px;background:rgba(255,255,255,.08);border:1px solid var(--line);font-weight:700;font-size:18px;text-align:left}
+.pl.hot{background:var(--forest);border-color:var(--accent)}
+.pl.sel{outline:3px solid #fff;outline-offset:-3px}
+.pl span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pl em{flex:none;font-style:normal;font:600 14px var(--sans);color:var(--mute)}
+.pl.hot em{color:#fff;font:800 20px var(--num)}
+.pl:active{transform:scale(.98)}
+.addrow{display:flex;gap:8px;margin-top:14px}
+.bulk{margin-top:22px;padding-top:16px;border-top:1px solid var(--line)}
+.bulk h4{margin:0 0 4px;font-size:16px}
+.bulk textarea{width:100%;min-height:150px;margin-top:10px;padding:12px;border-radius:10px;border:1px solid var(--line);
+  background:var(--deep);color:#fff;font:16px/1.45 var(--sans);resize:vertical}
+.bulk button{display:block;width:100%;margin-top:8px;padding:14px;border-radius:12px;background:var(--accent);color:#0B2B1A;font-weight:700;font-size:17px}
+.pl .x{flex:none;width:34px;height:34px;margin:-6px -6px -6px 4px;border-radius:50%;font-size:18px;color:var(--mute);background:rgba(0,0,0,.18)}
+.ok{color:var(--accent);font-weight:600;margin-top:8px}
+.addrow input{flex:1;min-width:0}
+.addrow button{flex:none;padding:0 16px;border-radius:10px;background:var(--accent);color:#0B2B1A;font-weight:700}
+@media (prefers-reduced-motion:reduce){.flash,.webstate.on i{animation:none}.hit:active,.pl:active{transform:none}}
 </style>
 </head>
 <body>
 <main id="app"></main>
-<script src="live-config.js"></script>
+<script src="live-config.js?v=5"></script>
 <script>
 (function () {
   var C = window.KGAA_LIVE || {};
@@ -101,14 +136,36 @@ input::placeholder{color:rgba(255,255,255,.35)}
   var queue = LS.get('kl_queue', []);          /* writes waiting to reach the server */
   var server = {}, loaded = false, online = true, blocked = '', flushing = false;
   var screen = auth ? 'list' : 'signin', cur = LS.get('kl_cur', null), draft = { venue: 'home' }, wake = null;
+  var picking = null;                          /* {ev: eventId} while naming a scorer, {manage: true} for the players list */
   if (cur && screen === 'list') screen = 'match';
 
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
   function uid(p) { return p + Date.now().toString(36) + Math.random().toString(36).slice(2, 6); }
   function fmt(g, p) { return g + '-' + (p < 10 ? '0' : '') + p; }
   function club(m) { return m.branch === 'ladies' ? 'Killeshin' : 'Gleann Uise\u00e1n'; }
-  function tally(m) { var r = { kg: 0, kp: 0, og: 0, op: 0 }, ev = m.events || {}; for (var k in ev) { var e = ev[k]; if (e && r[e.s + e.v] != null) r[e.s + e.v]++; } return r; }
+  /* v is 'g' (goal, 3), '2' (two-pointer, 2 in the points column) or 'p' (point, 1). */
+  function tally(m) {
+    var r = { kg: 0, kp: 0, og: 0, op: 0 }, ev = m.events || {};
+    for (var k in ev) {
+      var e = ev[k]; if (!e || (e.s !== 'k' && e.s !== 'o')) continue;
+      if (e.v === 'g') r[e.s + 'g']++; else r[e.s + 'p'] += (e.v === '2' ? 2 : 1);
+    }
+    return r;
+  }
+  function word(v) { return v === 'g' ? 'goal' : v === '2' ? '2-pointer' : 'point'; }
   function mins(t) { return Math.floor((Date.now() - t) / 60000) + 1 + '\u2032'; }
+  /* The running clock: minutes and seconds since the current half started,
+     ticking on screen every second. Half-time shows how long the break has
+     been; before throw-in it shows the time of day. */
+  function mmss(ms) { var t = Math.max(0, Math.floor(ms / 1000)), m = Math.floor(t / 60), s = t % 60; return m + ':' + (s < 10 ? '0' : '') + s; }
+  function bigClock(m) {
+    var run = { '1h': m.t1h, '2h': m.t2h, et1: m.tet1, et2: m.tet2 }[m.status];
+    if (run) return { t: mmss(Date.now() - run), k: '' };
+    var brk = { ht: m.tht, etb: m.tetb, etht: m.tetht }[m.status];
+    if (brk) return { t: 'Break ' + mmss(Date.now() - brk), k: 'ht' };
+    if (m.status === 'ft') return { t: 'FT', k: 'idle' };
+    return { t: hhmm(Date.now()), k: 'idle' };
+  }
   function hhmm(t) { var d = new Date(t); return (d.getHours() < 10 ? '0' : '') + d.getHours() + ':' + (d.getMinutes() < 10 ? '0' : '') + d.getMinutes(); }
   function isLive(m) { return m.live !== false; }   /* matches from before Go live existed count as live */
   function clock(m) {
@@ -138,6 +195,78 @@ input::placeholder{color:rgba(255,255,255,.35)}
       et2: [['ft', 'Full time']],
       ft: [[from, 'Reopen ' + (HALF[from] || '2nd half')]]
     })[m.status || 'pre'] || [];
+  }
+
+  /* ---------- scorers ----------
+     Each Killeshin score can carry a player name (n). Names are remembered
+     per team: every name used or added in an earlier match for the same team
+     (Senior, U17...) comes back in the picker, so the panel builds itself. */
+  function nkey(n) { return String(n || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 40); }
+  function teamKey(t) { return String(t || '').toLowerCase().replace(/\s+/g, ' ').trim(); }
+  function pts(r) { return r.g * 3 + r.p; }
+  function byPlayer(m, into) {
+    var ev = m.events || {};
+    for (var k in ev) {
+      var e = ev[k]; if (!e || e.s !== 'k' || !e.n) continue;
+      var id = nkey(e.n); if (!id) continue;
+      var r = into[id] || (into[id] = { n: e.n, g: 0, p: 0 });
+      if (e.v === 'g') r.g++; else r.p += (e.v === '2' ? 2 : 1);
+    }
+    return into;
+  }
+  /* Today's scorers first (highest first), then the team's season scorers,
+     then the rest of the panel A to Z. */
+  function candidates(v, m) {
+    var today = byPlayer(m, {}), season = {}, names = {}, tk = teamKey(m.team), k;
+    var added = {}, hidden = {};                 /* latest add / remove time per player, across the team's matches */
+    Object.keys(v).forEach(function (id) {
+      var x = v[id]; if (!x || teamKey(x.team) !== tk) return;
+      var a = x.squadAt || {}, h = x.hide || {}, q;
+      for (q in a) added[q] = Math.max(added[q] || 0, a[q]);
+      for (q in h) hidden[q] = Math.max(hidden[q] || 0, h[q]);
+      if (id === cur) return;
+      byPlayer(x, season);
+      var sq = x.squad || {}; for (q in sq) if (!names[q]) names[q] = sq[q];
+    });
+    var own = m.squad || {}; for (k in own) names[k] = own[k];
+    for (k in season) if (!names[k]) names[k] = season[k].n;
+    for (k in today) names[k] = today[k].n;
+    for (k in hidden) if (!today[k] && hidden[k] > (added[k] || 0)) delete names[k];
+    return Object.keys(names).map(function (k) {
+      return { k: k, n: names[k], t: today[k] || { g: 0, p: 0 }, s: season[k] || { g: 0, p: 0 } };
+    }).sort(function (a, b) { return pts(b.t) - pts(a.t) || pts(b.s) - pts(a.s) || a.n.localeCompare(b.n); });
+  }
+  function when(m, ts) {
+    var L = [['tet2', 'ET 2nd half'], ['tet1', 'ET 1st half'], ['t2h', '2nd half'], ['t1h', '1st half']];
+    for (var i = 0; i < L.length; i++) { var t = m[L[i][0]]; if (t && ts >= t) return L[i][1] + ' ' + (Math.floor((ts - t) / 60000) + 1) + '\u2032'; }
+    return hhmm(ts);
+  }
+
+  /* Turn a pasted team sheet into names: one per line (or comma separated),
+     jersey numbers, "(c)" and headings like SUBS stripped, CAPITALS tidied. */
+  function parseNames(txt) {
+    var parts = String(txt || '').split(/\n|;/);
+    if (parts.length < 2) parts = String(txt || '').split(',');
+    var seen = {}, out = [];
+    parts.forEach(function (l) {
+      var n = l.replace(/\(.*?\)/g, ' ').replace(/^[\s\d.\-\u2013:)#]+/, '').replace(/[\s\d.\-\u2013]+$/, '')
+        .replace(/\s+/g, ' ').trim();
+      if (!/[a-z]/i.test(n) || n.length < 3) return;
+      if (n.split(' ').length <= 2 && /^(subs|substitutes|panel|team|teamsheet|management|manager|mentors?|selectors?|starting|squad|captain|backs|forwards|midfield)\b/i.test(n)) return;
+      if (/\b(killeshin|gleann|uise[a\u00e1]n|gaa|clg|lgfa|club|v|vs)\b/i.test(n)) return;   /* titles like "Killeshin Seniors v Portlaoise" */
+      if (n === n.toUpperCase()) n = n.toLowerCase().replace(/(^|[\s'\-])([a-z])/g, function (a, b, c) { return b + c.toUpperCase(); });
+      var k = nkey(n); if (!k || seen[k]) return;
+      seen[k] = 1; out.push(n);
+    });
+    return out;
+  }
+  /* Add names to this match's panel in one write, so a whole team goes up in
+     a single tap even on poor signal. */
+  function addToSquad(base, list) {
+    var m = view()[cur]; if (!m || !list.length) return;
+    var sq = JSON.parse(JSON.stringify(m.squad || {})), at = JSON.parse(JSON.stringify(m.squadAt || {})), now = Date.now();
+    list.forEach(function (n) { var k = nkey(n); if (k) { sq[k] = n; at[k] = now; } });
+    queue.push({ m: 'PATCH', p: base, b: { squad: sq, squadAt: at } });
   }
 
   /* ---------- sign-in (Firebase email/password over REST) ---------- */
@@ -199,7 +328,7 @@ input::placeholder{color:rgba(255,255,255,.35)}
   function pull() {
     return fetch(DB + '/live/matches.json?t=' + Date.now(), { cache: 'no-store' })
       .then(function (r) { if (!r.ok) throw 0; return r.json(); })
-      .then(function (j) { server = j || {}; loaded = true; online = true; render(); })
+      .then(function (j) { server = j || {}; loaded = true; online = true; if (!picking) render(); /* don't jump the player list while it's open */ })
       .catch(function () { online = false; render(); });
   }
   function applyOp(v, op) {
@@ -256,8 +385,11 @@ input::placeholder{color:rgba(255,255,255,.35)}
       '<label for="tm">Our team</label><input id="tm" list="teams" placeholder="e.g. Senior" value="' + esc(draft.team || '') + '"><datalist id="teams">' + opts + '</datalist>' +
       '<label for="op">Opposition</label><input id="op" placeholder="e.g. Portlaoise" value="' + esc(draft.opp || '') + '">' +
       '<label for="cp">Competition <small>(pick one or type your own)</small></label><input id="cp" list="comps" placeholder="e.g. Senior Football Championship" value="' + esc(draft.comp || '') + '"><datalist id="comps">' + comps + '</datalist>' +
-      '<label>Venue</label><div class="seg"><button data-act="venue" data-v="home" class="' + (draft.venue === 'home' ? 'on' : '') + '">Home</button>' +
-      '<button data-act="venue" data-v="away" class="' + (draft.venue === 'away' ? 'on' : '') + '">Away</button></div>' +
+      '<label>Venue</label><div class="seg">' +
+      [['home', 'Home'], ['away', 'Away'], ['neutral', 'Neutral']].map(function (o) {
+        return '<button data-act="venue" data-v="' + o[0] + '" class="' + (draft.venue === o[0] ? 'on' : '') + '">' + o[1] + '</button>';
+      }).join('') + '</div>' +
+      '<p class="note" style="margin-top:6px">Neutral for county grounds like O\u2019Moore Park. Killeshin shows on the left.</p>' +
       '<button class="primary" data-act="create">Save match</button>' +
       '<p class="note" style="margin-top:10px">Nothing shows on the website until you tap Go live.</p>' +
       (err ? '<p class="err">' + esc(err) + '</p>' : '');
@@ -267,14 +399,47 @@ input::placeholder{color:rgba(255,255,255,.35)}
     for (var k in ev) if (ev[k] && (!best || ev[k].ts > ev[best].ts)) best = k;
     return best;
   }
+
+  /* The pop-up list of players: after a Killeshin score, or from Players. */
+  function drawPicker(v, m) {
+    var e = picking.ev ? (m.events || {})[picking.ev] : null;
+    if (picking.ev && !e) { picking = null; return ''; }
+    var list = candidates(v, m), cur_ = e && e.n ? nkey(e.n) : '';
+    var h = '<div class="sheetbg" data-act="pickclose"><div class="sheet" data-act="none">';
+    h += picking.ev
+      ? '<h3>Who scored the ' + word(e.v) + '?</h3><p class="note">Top scorers first. Skip if you\u2019re not sure; tap the score later to name them.</p>'
+      : '<h3>' + esc(m.team) + ' players</h3><p class="note">Names added here come up when you record a score, in this match and every later ' + esc(m.team) + ' match.</p>';
+    list.forEach(function (p) {
+      var hot = pts(p.t) > 0;
+      var sub = hot ? fmt(p.t.g, p.t.p) : (pts(p.s) > 0 ? 'Season ' + fmt(p.s.g, p.s.p) : '');
+      h += picking.ev
+        ? '<button class="pl' + (hot ? ' hot' : '') + (cur_ === p.k ? ' sel' : '') + '" data-act="pick" data-n="' + esc(p.n) + '"><span>' + esc(p.n) + '</span><em>' + sub + '</em></button>'
+        : '<div class="pl' + (hot ? ' hot' : '') + '"><span>' + esc(p.n) + '</span><em>' + sub + '</em>' +
+          (hot ? '' : '<button class="x" data-act="drop" data-k="' + esc(p.k) + '" aria-label="Remove ' + esc(p.n) + '">\u00d7</button>') + '</div>';
+    });
+    if (!list.length) h += '<p class="note" style="margin-top:14px">No players yet for ' + esc(m.team) + '. Type a name below.</p>';
+    h += '<div class="addrow"><input id="nn" placeholder="New player name" autocomplete="off" autocapitalize="words" enterkeyhint="done">' +
+      '<button data-act="addname">' + (picking.ev ? 'Add' : 'Add player') + '</button></div>';
+    if (picking.manage) {
+      h += '<div class="bulk"><h4>Add a whole team at once</h4>' +
+        '<p class="note">Paste the names, one per line. Numbers, (c) and headings like SUBS are tidied up for you.</p>' +
+        '<p class="note" style="margin-top:6px"><b>From a photo or PDF on iPhone:</b> open it, press and hold on a name, drag to select the list, tap Copy, then paste here.</p>' +
+        '<textarea id="bulk" placeholder="1. Paddy Kelly&#10;2. Sean Brennan&#10;3. Evan Lowry"></textarea>' +
+        '<button data-act="bulkadd">Add all</button>' + (picking.msg ? '<p class="ok">' + esc(picking.msg) + '</p>' : '') + '</div>';
+    }
+    if (picking.ev && e.n) h += '<button class="undo" data-act="pick" data-n="">Remove the name from this score</button>';
+    h += '<button class="undo" data-act="pickclose">' + (picking.ev ? 'Skip' : 'Done') + '</button></div></div>';
+    return h;
+  }
+
   function drawMatch() {
     var v = view(), m = v[cur];
-    if (!m) { if (loaded) { cur = null; LS.del('kl_cur'); screen = 'list'; return drawList(); } app.innerHTML = '<p class="empty">Loading\u2026</p>'; return; }
+    if (!m) { if (loaded) { cur = null; LS.del('kl_cur'); screen = 'list'; picking = null; return drawList(); } app.innerHTML = '<p class="empty">Loading\u2026</p>'; return; }
     var t = tally(m), c = clock(m), us = club(m), them = m.opp || 'Opposition', live = isLive(m);
     var usRow = '<div class="side us"><span class="n">' + esc(us) + '</span><span class="sc" id="s-k">' + fmt(t.kg, t.kp) + '<small>(' + (t.kg * 3 + t.kp) + ')</small></span></div>';
     var thRow = '<div class="side them"><span class="n">' + esc(them) + '</span><span class="sc" id="s-o">' + fmt(t.og, t.op) + '<small>(' + (t.og * 3 + t.op) + ')</small></span></div>';
     var last = lastEvent(m), lastTxt = 'Undo last score';
-    if (last) { var e = m.events[last]; lastTxt = 'Undo ' + (e.s === 'k' ? us : them) + ' ' + (e.v === 'g' ? 'goal' : 'point'); }
+    if (last) { var e = m.events[last]; lastTxt = 'Undo ' + (e.s === 'k' ? us : them) + ' ' + word(e.v) + (e.n ? ' (' + e.n + ')' : ''); }
     var off = m.status === 'pre' || !m.status ? ' disabled' : '';
 
     var web;
@@ -293,27 +458,52 @@ input::placeholder{color:rgba(255,255,255,.35)}
       return '<button class="stage' + (s[0] === 'ft' ? ' end' : s[0] === 'etb' ? ' et' : '') + '" data-act="stage" data-to="' + s[0] + '">' + esc(s[1]) + '</button>';
     }).join('');
 
+    /* Scorers so far, top scorer first, plus any scores still to be named. */
+    var sc = byPlayer(m, {}), scl = Object.keys(sc).map(function (k) { return sc[k]; })
+      .sort(function (a, b) { return pts(b) - pts(a) || a.n.localeCompare(b.n); });
+    var ours = Object.keys(m.events || {}).filter(function (k) { var x = m.events[k]; return x && x.s === 'k'; })
+      .sort(function (a, b) { return m.events[b].ts - m.events[a].ts; });
+    var unnamed = ours.filter(function (k) { return !m.events[k].n; }).length;
+    var scorers = (scl.length || unnamed)
+      ? '<div class="scorers">' + scl.map(function (r) { return esc(r.n) + '<b>' + fmt(r.g, r.p) + '</b>'; }).join(' \u00b7 ') +
+        (unnamed ? (scl.length ? ' \u00b7 ' : '') + '<span class="tag">' + unnamed + ' not named</span>' : '') + '</div>'
+      : '';
+    var squadN = candidates(v, m).length;
+    var slist = '<div class="slist"><h2><span>' + esc(us) + ' scores</span><button data-act="players">Players (' + squadN + ')</button></h2>' +
+      (ours.length
+        ? ours.map(function (k) {
+            var x = m.events[k];
+            return '<button class="sr" data-act="rename" data-id="' + esc(k) + '"><span class="k">' + (x.v === 'g' ? 'Goal' : x.v === '2' ? '2-pointer' : 'Point') +
+              '<small>' + esc(when(m, x.ts)) + '</small></span><span class="who">' + (x.n ? esc(x.n) : '<span class="tag">Add scorer</span>') + '</span></button>';
+          }).join('')
+        : '<p class="note" style="padding:10px 0">Tap a score here to change who got it.</p>') + '</div>';
+
     app.innerHTML = '<div class="top"><button class="link" data-act="back">\u2039 Matches</button>' + syncLine() + '</div>' +
-      '<div class="meta">' + esc(m.team) + ', ' + (m.venue === 'away' ? 'away' : 'home') + (m.comp ? ' \u00b7 ' + esc(m.comp) : '') + '</div>' +
+      '<div class="meta">' + esc(m.team) + ', ' + (m.venue === 'away' ? 'away' : m.venue === 'neutral' ? 'neutral venue' : 'home') + (m.comp ? ' \u00b7 ' + esc(m.comp) : '') + '</div>' +
       web +
       '<div class="board">' + (m.venue === 'away' ? thRow + usRow : usRow + thRow) + '</div>' +
-      '<div class="clock"><b class="' + c.k + '">' + c.l + '</b><span>' + c.m + '</span></div>' +
+      (function () { var bc = bigClock(m); return '<div class="clock"><b class="' + c.k + '">' + c.l + '</b><span class="big ' + bc.k + '" id="clk">' + esc(bc.t) + '</span></div>'; })() +
+      scorers +
       '<div class="pad"><h2>' + esc(us) + '</h2>' +
       '<button class="hit us" data-act="score" data-s="k" data-v="g"' + off + '>GOAL<span>+3</span></button>' +
+      '<button class="hit us" data-act="score" data-s="k" data-v="2"' + off + '>2 POINTS<span>+2</span></button>' +
       '<button class="hit us" data-act="score" data-s="k" data-v="p"' + off + '>POINT<span>+1</span></button>' +
       '<h2>' + esc(them) + '</h2>' +
       '<button class="hit them" data-act="score" data-s="o" data-v="g"' + off + '>GOAL<span>+3</span></button>' +
+      '<button class="hit them" data-act="score" data-s="o" data-v="2"' + off + '>2 POINTS<span>+2</span></button>' +
       '<button class="hit them" data-act="score" data-s="o" data-v="p"' + off + '>POINT<span>+1</span></button></div>' +
       '<button class="undo" data-act="undo"' + (last ? '' : ' disabled') + '>' + esc(lastTxt) + '</button>' +
       stageBtns +
+      slist +
       (live ? '<button class="quiet" data-act="unlive">Take off the website</button>' : '') +
-      '<button class="quiet" data-act="remove">Remove this match</button>';
+      '<button class="quiet" data-act="remove">Remove this match</button>' +
+      (picking ? drawPicker(v, m) : '');
   }
   function render() {
-    if (document.activeElement && document.activeElement.tagName === 'INPUT') return; /* don't wipe what's being typed */
+    if (document.activeElement && /^(INPUT|TEXTAREA)$/.test(document.activeElement.tagName)) return; /* don't wipe what's being typed */
     if (screen === 'signin') drawSignin(); else if (screen === 'list') drawList(); else if (screen === 'new') drawNew(); else drawMatch();
   }
-  function go(s) { screen = s; if (s === 'match') { LS.set('kl_cur', cur); keepAwake(); } else if (s === 'list') { LS.del('kl_cur'); cur = null; } render(); }
+  function go(s) { picking = null; screen = s; if (s === 'match') { LS.set('kl_cur', cur); keepAwake(); } else if (s === 'list') { LS.del('kl_cur'); cur = null; } render(); }
 
   function keepAwake() {
     try { if ('wakeLock' in navigator && !wake) navigator.wakeLock.request('screen').then(function (w) { wake = w; w.addEventListener('release', function () { wake = null; }); }).catch(function () {}); } catch (e) {}
@@ -321,23 +511,36 @@ input::placeholder{color:rgba(255,255,255,.35)}
   function keepDraft() {
     draft.team = document.getElementById('tm').value; draft.opp = document.getElementById('op').value; draft.comp = document.getElementById('cp').value;
   }
+  function blur() { if (document.activeElement && document.activeElement.blur) document.activeElement.blur(); }
+
+  /* Put a name on a score, and add it to this match's panel if it's new. */
+  function nameScore(base, evId, name) {
+    var m = view()[cur]; if (!m) return;
+    if (name) {
+      var k = nkey(name);
+      if (k && !(m.squad && m.squad[k])) addToSquad(base, [name]);
+    }
+    if (evId) queue.push({ m: 'PATCH', p: base + '/events/' + evId, b: { n: name || null } });
+    LS.set('kl_queue', queue); render(); flush();
+  }
 
   /* ---------- taps ---------- */
   app.addEventListener('click', function (ev) {
     var b = ev.target.closest('[data-act]'); if (!b || b.disabled) return;
     var a = b.dataset.act, base = '/live/matches/' + cur;
+    if (a === 'none') return;
     if (a === 'signin') {
       var em = document.getElementById('em').value.trim(), pw = document.getElementById('pw').value;
       LS.set('kl_email', em);
       if (!em || !pw) return drawSignin('Enter the scorer email and password.');
       b.disabled = true; b.textContent = 'Signing in\u2026';
-      signIn(em, pw).then(function () { blocked = ''; document.activeElement.blur(); go('list'); flush(); })
+      signIn(em, pw).then(function () { blocked = ''; blur(); go('list'); flush(); })
         .catch(function (e) { drawSignin(/CREDENTIAL|PASSWORD|EMAIL/.test(e.message) ? 'Email or password not recognised.' : 'Couldn\u2019t reach the server. Check signal and try again.'); });
     } else if (a === 'signout') {
       if (queue.length && !confirm(queue.length + ' taps haven\u2019t been sent yet and will be lost. Sign out anyway?')) return;
       auth = null; queue = []; LS.del('kl_auth'); LS.set('kl_queue', []); go('signin');
     } else if (a === 'new') { draft = { venue: 'home' }; go('new'); }
-    else if (a === 'back') { if (document.activeElement) document.activeElement.blur(); go('list'); }
+    else if (a === 'back') { blur(); go('list'); }
     else if (a === 'open') { cur = b.dataset.id; go('match'); }
     else if (a === 'venue') { keepDraft(); draft.venue = b.dataset.v; drawNew(); }
     else if (a === 'create') {
@@ -345,7 +548,7 @@ input::placeholder{color:rgba(255,255,255,.35)}
       var team = draft.team.trim(), opp = draft.opp.trim(), comp = draft.comp.trim();
       if (!team || !opp) return drawNew('Enter our team and the opposition.');
       cur = uid('m');
-      if (document.activeElement) document.activeElement.blur();
+      blur();
       var rec = { team: team, opp: opp, venue: draft.venue, branch: /ladies|girls|lgfa/i.test(team) ? 'ladies' : 'men', status: 'pre', live: false, created: Date.now() };
       if (comp) rec.comp = comp;
       enqueue({ m: 'PUT', p: '/live/matches/' + cur, b: rec });
@@ -356,11 +559,43 @@ input::placeholder{color:rgba(255,255,255,.35)}
       if (!confirm('Take this match off the website? You can put it back with Go live.')) return;
       enqueue({ m: 'PATCH', p: base, b: { live: false } });
     } else if (a === 'score') {
-      enqueue({ m: 'PUT', p: base + '/events/' + uid('e'), b: { s: b.dataset.s, v: b.dataset.v, ts: Date.now() } });
+      /* The score is saved straight away; the name is added after, so the
+         scoreboard never waits on the picker. */
+      var evId = uid('e');
+      if (b.dataset.s === 'k') picking = { ev: evId };
+      enqueue({ m: 'PUT', p: base + '/events/' + evId, b: { s: b.dataset.s, v: b.dataset.v, ts: Date.now() } });
       if (navigator.vibrate) navigator.vibrate(25);
       var el = document.getElementById('s-' + b.dataset.s); if (el) el.classList.add('flash');
+    } else if (a === 'pick') {
+      var evp = picking && picking.ev; picking = null;
+      if (evp) nameScore(base, evp, b.dataset.n);
+    } else if (a === 'addname') {
+      var inp = document.getElementById('nn'), nm = inp ? inp.value.replace(/\s+/g, ' ').trim() : '';
+      blur();
+      if (!nm || !nkey(nm)) { render(); return; }
+      var target = picking && picking.ev;
+      if (target) picking = null;                 /* adding while naming a score picks that player */
+      nameScore(base, target || null, nm);
+    } else if (a === 'bulkadd') {
+      var ta = document.getElementById('bulk'), names = parseNames(ta ? ta.value : '');
+      blur();
+      if (!names.length) { picking = { manage: true, msg: 'No names found. Put one name on each line.' }; render(); return; }
+      addToSquad(base, names);
+      picking = { manage: true, msg: names.length + (names.length === 1 ? ' player' : ' players') + ' added.' };
+      LS.set('kl_queue', queue); render(); flush();
+    } else if (a === 'drop') {
+      var mh = view()[cur]; if (!mh) return;
+      var hide = JSON.parse(JSON.stringify(mh.hide || {})); hide[b.dataset.k] = Date.now();
+      enqueue({ m: 'PATCH', p: base, b: { hide: hide } });
+    } else if (a === 'pickclose') {
+      blur(); picking = null; render();
+    } else if (a === 'rename') {
+      picking = { ev: b.dataset.id }; render();
+    } else if (a === 'players') {
+      picking = { manage: true }; render();
     } else if (a === 'undo') {
-      var m = view()[cur], k = m && lastEvent(m); if (k) enqueue({ m: 'DELETE', p: base + '/events/' + k });
+      var m = view()[cur], k = m && lastEvent(m);
+      if (k) { if (picking && picking.ev === k) picking = null; enqueue({ m: 'DELETE', p: base + '/events/' + k }); }
     } else if (a === 'stage') {
       var to = b.dataset.to, mm = view()[cur], patch = { status: to };
       if (!mm) return;
@@ -378,10 +613,22 @@ input::placeholder{color:rgba(255,255,255,.35)}
       enqueue({ m: 'DELETE', p: base }); go('list');
     }
   });
+  /* Return on the keyboard adds the name. */
+  app.addEventListener('keydown', function (ev) {
+    if (ev.key === 'Enter' && ev.target && ev.target.id === 'nn') {
+      ev.preventDefault();
+      var btn = app.querySelector('[data-act="addname"]'); if (btn) btn.click();
+    }
+  });
 
   document.addEventListener('visibilitychange', function () { if (!document.hidden) { pull(); flush(); if (screen === 'match') keepAwake(); } });
   window.addEventListener('online', flush);
   setInterval(function () { if (!document.hidden) pull(); }, 8000);
+  setInterval(function () {
+    var el = document.getElementById('clk'); if (!el || screen !== 'match') return;
+    var m = view()[cur]; if (!m) return;
+    var bc = bigClock(m); el.textContent = bc.t; el.className = 'big ' + bc.k;
+  }, 1000);
   render(); pull(); flush();
 })();
 </script>
