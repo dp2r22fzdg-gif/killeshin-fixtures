@@ -47,6 +47,10 @@ input::placeholder{color:rgba(255,255,255,.35)}
 @keyframes pulse{50%{opacity:.25}}
 .golive{display:block;width:100%;margin:0 0 14px;padding:18px;border-radius:12px;background:var(--red);color:#fff;font-weight:700;font-size:19px}
 .golive span{display:block;font-size:13px;font-weight:600;opacity:.85;margin-top:3px}
+/* Match delayed: shown on the website banner while switched on */
+.delay{display:block;width:100%;margin:0 0 14px;padding:14px;border-radius:12px;border:1.5px solid var(--warn);color:var(--warn);font-weight:700;font-size:16px}
+.delay span{display:block;font-size:13px;font-weight:600;opacity:.85;margin-top:3px}
+.delay.on{background:var(--warn);color:#2B1D00}
 .board{border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:6px 0}
 .side{display:flex;align-items:baseline;justify-content:space-between;gap:10px;padding:4px 0}
 .side .n{font-weight:700;font-size:17px;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -528,7 +532,7 @@ input::placeholder{color:rgba(255,255,255,.35)}
     recent.forEach(function (id) {
       var m = v[id], t = tally(m), c = clock(m);
       h += '<button class="row" data-act="open" data-id="' + esc(id) + '"><span><div class="t">' + esc(m.team) + ' v ' + esc(m.opp) + '</div>' +
-        '<div class="c">' + c.l + (c.m ? ' ' + c.m : '') + (isLive(m) ? '' : ' \u00b7 <span class="tag">Not on website</span>') + '</div></span>' +
+        '<div class="c">' + c.l + (c.m ? ' ' + c.m : '') + (m.delayed ? ' \u00b7 <span class="tag">Delayed</span>' : '') + (isLive(m) ? '' : ' \u00b7 <span class="tag">Not on website</span>') + '</div></span>' +
         '<span class="s">' + fmt(t.kg, t.kp) + ' : ' + fmt(t.og, t.op) + '</span></button>';
     });
     h += '<button class="quiet" data-act="signout">Sign out</button>';
@@ -728,6 +732,10 @@ input::placeholder{color:rgba(255,255,255,.35)}
     app.innerHTML = '<div class="top"><button class="link" data-act="back">\u2039 Matches</button>' + syncLine() + '</div>' +
       '<div class="meta">' + esc(m.team) + ', ' + (m.venue === 'away' ? 'away' : m.venue === 'neutral' ? 'neutral venue' : 'home') + (m.comp ? ' \u00b7 ' + esc(m.comp) : '') + '</div>' +
       web +
+      (m.status === 'ft' ? '' : '<button class="delay' + (m.delayed ? ' on' : '') + '" data-act="delay">' +
+        (m.delayed ? '\u23F8 Match delayed<span>Showing on the website. Tap when it\u2019s back under way.</span>'
+                   : 'Mark as delayed<span>' + (live ? 'Shows \u201cMatch delayed\u201d on the website' : 'Shows on the website once you tap Go live') + '</span>') +
+        '</button>') +
       '<div class="board">' + (m.venue === 'away' ? thRow + usRow : usRow + thRow) + '</div>' +
       (function () { var bc = bigClock(m); return '<div class="clock"><b class="' + c.k + '">' + c.l + '</b><span class="big ' + bc.k + '" id="clk">' + esc(bc.t) + '</span></div>'; })() +
       scorers +
@@ -811,6 +819,9 @@ input::placeholder{color:rgba(255,255,255,.35)}
       go('match');
     } else if (a === 'golive') {
       enqueue({ m: 'PATCH', p: base, b: { live: true, tlive: Date.now() } });
+    } else if (a === 'delay') {
+      var md = view()[cur]; if (!md) return;
+      enqueue({ m: 'PATCH', p: base, b: md.delayed ? { delayed: null } : { delayed: true, tdelay: Date.now() } });
     } else if (a === 'unlive') {
       if (!confirm('Take this match off the website? You can put it back with Go live.')) return;
       enqueue({ m: 'PATCH', p: base, b: { live: false } });
@@ -924,6 +935,7 @@ input::placeholder{color:rgba(255,255,255,.35)}
     if (!mm) return;
     if (to === 'ft' && !confirm('Mark as full time? The score comes off the website 5 minutes later.')) return;
     if (to === 'etb' && !confirm('Go to extra time? Two halves of 10 minutes.')) return;
+    patch.delayed = null;                                                        /* play has moved on, so the delay is over */
     if (mm.status === 'ft') { patch.tft = null; patch.ftFrom = null; }          /* reopening */
     else {
       var stamp = { '1h': 't1h', ht: 'tht', '2h': 't2h', etb: 'tetb', et1: 'tet1', etht: 'tetht', et2: 'tet2', ft: 'tft' }[to];

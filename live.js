@@ -38,6 +38,7 @@
     '.lv-pill{flex:none;display:inline-flex;align-items:center;gap:7px;background:#E5484D;color:#fff;' +
       'font-size:11.5px;font-weight:800;letter-spacing:.06em;padding:5px 11px;border-radius:999px;white-space:nowrap}' +
     '.lv-pill.idle{background:#E8F6EE;color:#12703F;border:1px solid #BFDFCD}' +
+    '.lv-pill.delay{background:#F2B544;color:#2B1D00;border:0}' +                  /* amber: match delayed */
     '.lv-pill i{width:7px;height:7px;border-radius:50%;background:#fff;animation:lvp 1.4s infinite}' +
     '@keyframes lvp{50%{opacity:.25}}' +
     '.lv-comp{flex:1;min-width:0;font-size:12.5px;font-weight:600;color:#4E5A53;' +
@@ -136,6 +137,7 @@
   function mins(t) { return t ? ' ' + (Math.floor((Date.now() - t) / 60000) + 1) + '\u2032' : ''; }
 
   function state(m) {
+    if (m.delayed) return { t: m.status && m.status !== 'pre' && m.status !== 'ft' ? 'Match delayed \u00b7 play stopped' : 'Match delayed', on: false, d: true };
     switch (m.status) {
       case '1h': return { t: 'Live \u00b7 1st half' + mins(m.t1h), on: true };
       case 'ht': return { t: 'Half-time', on: false };
@@ -150,6 +152,7 @@
   }
   /* The same, in as few characters as possible, for the slim scoreboard. */
   function shortState(m) {
+    if (m.delayed) return { t: 'Delayed', on: false, d: true };
     switch (m.status) {
       case '1h': return { t: '1H' + mins(m.t1h), on: true };
       case 'ht': return { t: 'HT', on: false };
@@ -275,8 +278,8 @@
     var t = tally(m), s = state(m), opp = m.opp || 'Opposition', away = m.venue === 'away';
     var us = side(club(m), t.kg, t.kp, away, ourCrest(m)), them = side(opp, t.og, t.op, !away, theirCrest(opp));
     var info = [m.team, m.comp].filter(Boolean).map(esc).join(' \u00b7 ');
-    var h = '<div class="lvd-board"><div class="lvd-bar"><span class="lv-pill' + (s.on ? '' : ' idle') + '" style="' +
-      (s.on ? '' : 'background:rgba(255,255,255,.18);color:#fff;border:0') + '">' + (s.on ? '<i></i>' : '') + esc(s.t) + '</span>' +
+    var h = '<div class="lvd-board"><div class="lvd-bar"><span class="lv-pill' + (s.d ? ' delay' : s.on ? '' : ' idle') + '" style="' +
+      (s.on || s.d ? '' : 'background:rgba(255,255,255,.18);color:#fff;border:0') + '">' + (s.on ? '<i></i>' : '') + esc(s.t) + '</span>' +
       '<span class="lv-comp">' + info + '</span><button class="lvd-x" data-close aria-label="Close">\u00d7</button></div>' +
       '<div class="lv-row">' + (away ? them + us : us + them) + '</div></div>';
 
@@ -364,7 +367,7 @@
     var them = side(opp, t.og, t.op, !away, theirs);
     var info = [m.team, m.comp].filter(Boolean).map(esc).join(' \u00b7 ');
     return '<div class="lv-card" data-id="' + esc(id) + '" role="button" tabindex="0" aria-label="Match details">' +
-      '<div class="lv-top"><span class="lv-pill' + (s.on ? '' : ' idle') + '">' + (s.on ? '<i></i>' : '') + esc(s.t) + '</span>' +
+      '<div class="lv-top"><span class="lv-pill' + (s.d ? ' delay' : s.on ? '' : ' idle') + '">' + (s.on ? '<i></i>' : '') + esc(s.t) + '</span>' +
       '<span class="lv-comp">' + info + '</span><span class="lv-more">Details \u203a</span></div>' +
       '<div class="lv-row">' + (m.venue === 'away' ? them + us : us + them) + '</div>' + scorersLine(m) + '</div>';
   }
@@ -385,7 +388,7 @@
       : usHalf + usScore + '<span class="lv-dash">\u2013</span>' + themScore + themHalf;
     var info = [m.team, m.comp].filter(Boolean).map(esc).join(' \u00b7 ');
     return '<div class="lv-card lv-slim" data-id="' + esc(id) + '" role="button" tabindex="0" aria-label="Match details">' +
-      '<div class="lv-top"><span class="lv-pill' + (s.on ? '' : ' idle') + '">' + (s.on ? '<i></i>' : '') + esc(s.t) + '</span>' +
+      '<div class="lv-top"><span class="lv-pill' + (s.d ? ' delay' : s.on ? '' : ' idle') + '">' + (s.on ? '<i></i>' : '') + esc(s.t) + '</span>' +
       '<span class="lv-comp">' + info + '</span><span class="lv-more">Details \u203a</span></div>' +
       '<div class="lv-mrow">' + row + '</div></div>';
   }
@@ -473,7 +476,7 @@
       if (card.querySelector('.lv-statsbtn')) return;
       var dh = card.previousElementSibling;
       while (dh && !dh.classList.contains('dayhead')) dh = dh.previousElementSibling;
-      var gr = card.querySelector('.fx-grade');
+      var gr = card.querySelector('.fx-grade, .gchip');                /* grade chip: both card layouts */
       if (!dh || !gr) return;
       var names = Array.prototype.map.call(card.querySelectorAll('.sl .n > span:not(.mini)'), function (x) { return x.textContent.trim(); });
       var opp = names.filter(function (n) { return n !== 'Killeshin'; })[0];
