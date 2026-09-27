@@ -28,11 +28,22 @@ jobs:
       - name: Update everything
         run: python update.py
 
+      # One permanent file per season: results, final tables and every
+      # scorer-app match. If it ever fails, the update above still goes out.
+      - name: Season archive
+        run: python archive.py
+        continue-on-error: true
+
       - name: Commit if anything changed
         run: |
           git config user.name  "Killeshin GAA bot"
           git config user.email "actions@github.com"
-          git add index.html data.json crests.json form.json results.json killeshin-all.ics killeshin-men.ics killeshin-ladies.ics killeshin-home.ics
+          # nullglob: a pattern with no files yet (no archive in a new repo)
+          # is simply skipped instead of stopping the job.
+          shopt -s nullglob
+          # killeshin-*.ics covers the per-team calendars too (men-senior,
+          # ladies-u16 ...), which the Alerts tab links to.
+          git add index.html data.json crests.json form.json results.json seen.json killeshin-*.ics archive-*.json
 
           if git diff --staged --quiet; then
             echo "Nothing changed."
