@@ -62,14 +62,14 @@
     '.lv-more{flex:none;font-size:12px;font-weight:800;color:#12703F;background:#E8F6EE;border:1px solid #BFDFCD;' +
       'border-radius:999px;padding:4px 10px;white-space:nowrap}' +
     /* slim scoreboard, used when more than one match is live */
-    '.lv-card.mini{padding:10px 12px 9px;margin-top:6px;border-radius:14px}' +
-    '.lv-card.mini:first-child{margin-top:0}' +
-    '.lv-card.mini::before{height:3px}' +
-    '.lv-card.mini .lv-top{margin-bottom:6px;gap:8px}' +
-    '.lv-card.mini .lv-pill{font-size:10.5px;padding:3px 9px;gap:6px}' +
-    '.lv-card.mini .lv-pill i{width:6px;height:6px}' +
-    '.lv-card.mini .lv-comp{font-size:12px;font-weight:700;color:#11492E}' +
-    '.lv-card.mini .lv-more{font-size:11px;padding:2px 9px}' +
+    '.lv-card.lv-slim{padding:10px 12px 9px;margin-top:6px;border-radius:14px}' +
+    '.lv-card.lv-slim:first-child{margin-top:0}' +
+    '.lv-card.lv-slim::before{height:3px}' +
+    '.lv-card.lv-slim .lv-top{margin-bottom:6px;gap:8px}' +
+    '.lv-card.lv-slim .lv-pill{font-size:10.5px;padding:3px 9px;gap:6px}' +
+    '.lv-card.lv-slim .lv-pill i{width:6px;height:6px}' +
+    '.lv-card.lv-slim .lv-comp{font-size:12px;font-weight:700;color:#11492E}' +
+    '.lv-card.lv-slim .lv-more{font-size:11px;padding:2px 9px}' +
     '.lv-mrow{display:flex;align-items:center;gap:8px;min-width:0}' +
     '.lv-ms-side{flex:1;min-width:0;display:flex;align-items:center;gap:7px}' +
     '.lv-ms-side.r{flex-direction:row-reverse}' +
@@ -379,7 +379,7 @@
       ? themHalf + themScore + '<span class="lv-dash">\u2013</span>' + usScore + usHalf
       : usHalf + usScore + '<span class="lv-dash">\u2013</span>' + themScore + themHalf;
     var info = [m.team, m.comp].filter(Boolean).map(esc).join(' \u00b7 ');
-    return '<div class="lv-card mini" data-id="' + esc(id) + '" role="button" tabindex="0" aria-label="Match details">' +
+    return '<div class="lv-card lv-slim" data-id="' + esc(id) + '" role="button" tabindex="0" aria-label="Match details">' +
       '<div class="lv-top"><span class="lv-pill' + (s.on ? '' : ' idle') + '">' + (s.on ? '<i></i>' : '') + esc(s.t) + '</span>' +
       '<span class="lv-comp">' + info + '</span><span class="lv-more">Details \u203a</span></div>' +
       '<div class="lv-mrow">' + row + '</div></div>';
