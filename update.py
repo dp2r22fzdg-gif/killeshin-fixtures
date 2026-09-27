@@ -1196,3 +1196,8 @@ def main():
 
 if __name__ == "__main__":
     main()
+    try:
+        import archive
+        archive.run()
+    except Exception as e:
+        print("Season archive skipped:", e)
