@@ -291,8 +291,11 @@ input::placeholder{color:rgba(255,255,255,.35)}
   function candidates(v, m) {
     var today = byPlayer(m, {}), season = {}, names = {}, tk = teamIdOf(m), k;
     var added = {}, hidden = {};                 /* latest add / remove time per player, across the team's matches */
-    Object.keys(v).forEach(function (id) {
-      var x = v[id]; if (!x || teamIdOf(x) !== tk) return;
+    var pool = {};                               /* live matches plus finished ones moved to the stats store */
+    for (k in archived) pool[k] = archived[k];
+    for (k in v) pool[k] = v[k];
+    Object.keys(pool).forEach(function (id) {
+      var x = pool[id]; if (!x || teamIdOf(x) !== tk) return;
       var a = x.squadAt || {}, h = x.hide || {}, q;
       for (q in a) added[q] = Math.max(added[q] || 0, a[q]);
       for (q in h) hidden[q] = Math.max(hidden[q] || 0, h[q]);
@@ -420,10 +423,71 @@ input::placeholder{color:rgba(255,255,255,.35)}
   function pull() {
     return fetch(DB + '/live/matches.json?t=' + Date.now(), { cache: 'no-store' })
       .then(function (r) { if (!r.ok) throw 0; return r.json(); })
-      .then(function (j) { server = j || {}; loaded = true; online = true; if (!picking) render(); /* don't jump the player list while it's open */ })
+      .then(function (j) { server = j || {}; loaded = true; online = true; if (!picking) render(); /* don't jump the player list while it's open */ checkArchive(); })
       .catch(function () { online = false; render(); });
   }
+
+  /* ---------- finished matches move to the stats store ----------
+     Once the county board result for a match shows on the website, the
+     match is copied to live/stats with a link to that result, so the
+     website can put a Match stats button on the result card. It then comes
+     off the scorer's list. A match that never gets a county board result
+     (a challenge match) moves across after 3 days with no link. */
+  var archived = {}, statsLoaded = false, lastCheck = 0, archiving = {};
+  var CHECK_EVERY = 5 * 60000, NO_RESULT_AFTER = 3 * 86400000;
+  function pullStats() {
+    return fetch(DB + '/live/stats.json?t=' + Date.now(), { cache: 'no-store' })
+      .then(function (r) { if (!r.ok) throw 0; return r.json(); })
+      .then(function (j) { archived = j || {}; statsLoaded = true; checkArchive(); })
+      .catch(function () { /* try again on the next round */ });
+  }
+  function two(n) { return (n < 10 ? '0' : '') + n; }
+  function dayOf(t) { var d = new Date(t); return d.getFullYear() + '-' + two(d.getMonth() + 1) + '-' + two(d.getDate()); }
+  function loose(n) { return String(n || '').toLowerCase().replace(/\b(gaa|clg|club|lgfa|ladies)\b/g, ' ').replace(/[^a-z0-9]/g, ''); }
+  function gradeOf(m) { var t = TEAMS[teamIdOf(m)]; return String(t ? t.label : (m.team || '')).replace(/^Ladies /, ''); }
+  /* Same day, same branch, same grade, and the opposition names agree.
+     If the names don't agree but there was only one game for that team
+     that day, that's the one. */
+  function findResult(m, results) {
+    var day = dayOf(m.t1h || m.created), b = m.branch || 'men', g = gradeOf(m), o = loose(m.opp);
+    var same = results.filter(function (r) {
+      return r && r.date === day && r.branch === b &&
+        (r.grade === g || (r.grade === 'Kelly Cup' && /kelly/i.test(m.comp || '')));
+    });
+    var hit = same.filter(function (r) { var ro = loose(r.opponent); return ro && o && (ro.indexOf(o) > -1 || o.indexOf(ro) > -1); });
+    if (hit.length) return hit[0];
+    return same.length === 1 ? same[0] : null;
+  }
+  function checkArchive() {
+    if (!auth || !loaded || !statsLoaded || blocked || queue.length) return;
+    if (Date.now() - lastCheck < CHECK_EVERY) return;
+    var ready = Object.keys(server).filter(function (id) {
+      var m = server[id];
+      return m && !m.roster && m.status === 'ft' && m.tft && Date.now() - m.tft > AFTER_FT && id !== cur && !archiving[id];
+    });
+    if (!ready.length) return;
+    lastCheck = Date.now();
+    fetch('data.json?t=' + Date.now(), { cache: 'no-store' })
+      .then(function (r) { if (!r.ok) throw 0; return r.json(); })
+      .then(function (j) {
+        var results = (j && j.results) || [], moved = 0;
+        ready.forEach(function (id) {
+          var m = server[id]; if (!m || archiving[id] || id === cur) return;
+          var r = findResult(m, results);
+          if (!r && Date.now() - m.tft < NO_RESULT_AFTER) return;    /* wait for the county board */
+          var rec = JSON.parse(JSON.stringify(m));
+          rec.archived = Date.now();
+          if (r) rec.link = { date: r.date, branch: r.branch, grade: r.grade, opp: r.opponent };
+          archiving[id] = 1; archived[id] = rec; moved++;
+          queue.push({ m: 'PUT', p: '/live/stats/' + id, b: rec });          /* copy first... */
+          queue.push({ m: 'DELETE', p: '/live/matches/' + id });            /* ...then remove, in that order */
+        });
+        if (moved) { LS.set('kl_queue', queue); render(); flush(); }
+      })
+      .catch(function () { lastCheck = Date.now() - CHECK_EVERY + 60000; /* website not reachable: try again in a minute */ });
+  }
   function applyOp(v, op) {
+    if (!/^\/live\/matches(\/|$)/.test(op.p)) return;   /* writes to the stats store don't touch the match list */
     var parts = op.p.replace(/^\/live\/matches\/?/, '').split('/').filter(Boolean);
     if (!parts.length) return;
     var o = v;
@@ -907,7 +971,8 @@ input::placeholder{color:rgba(255,255,255,.35)}
     var m = view()[cur]; if (!m) return;
     var bc = bigClock(m); el.textContent = bc.t; el.className = 'big ' + bc.k;
   }, 1000);
-  render(); pull(); flush();
+  setInterval(function () { if (!document.hidden) pullStats(); }, 10 * 60000);
+  render(); pull(); pullStats(); flush();
 })();
 </script>
 </body>

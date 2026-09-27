@@ -109,6 +109,11 @@
     '.lvd-mark{margin:10px 0 2px;padding:7px 12px;border-radius:10px;background:#EFF4F0;font-size:12.5px;font-weight:800;' +
       'letter-spacing:.06em;text-transform:uppercase;color:#4E5A53;display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap}' +
     '.lvd-mark span+span{text-transform:none;letter-spacing:0;font-weight:700;color:#11492E}' +
+    /* Match stats button added to finished results on the Results tab */
+    '.lv-statsbtn{display:inline-flex;align-items:center;gap:6px;margin-top:11px;padding:7px 14px;border-radius:999px;cursor:pointer;' +
+      'font:800 12.5px Archivo,-apple-system,"Helvetica Neue",Arial,sans-serif;color:#12703F;' +
+      'background:linear-gradient(180deg,#FFFFFF,#EAF6EF);border:1px solid rgba(31,130,74,.3);box-shadow:0 1px 2px rgba(17,73,46,.08)}' +
+    '.lv-statsbtn:active{transform:translateY(1px);box-shadow:none}' +
     '@media (prefers-reduced-motion:reduce){.lv-pill i{animation:none}}';
   var st = document.createElement('style');
   st.textContent = css;
@@ -327,7 +332,7 @@
   }
   function renderSheet() {
     if (!openId) return;
-    var m = matches[openId];
+    var m = openId === STATS_OPEN ? statsMatch : matches[openId];
     if (!m) { closeSheet(); return; }
     if (!sheet) {
       sheet = document.createElement('div');
@@ -344,7 +349,7 @@
     sheet.firstChild.innerHTML = detail(m);                   /* the panel stays put, so its scroll position does too */
   }
   function closeSheet() {
-    openId = null;
+    openId = null; statsMatch = null;
     if (sheet) { sheet.remove(); sheet = null; }
     document.documentElement.style.overflow = '';
   }
@@ -437,8 +442,65 @@
     });
   }
 
+  /* ---------- match stats on the Results tab ----------
+     The scorer moves each finished match to live/stats once its county
+     board result is on the site, with a link to that result (date, branch,
+     grade, opposition). Each result card on the Results tab is matched to
+     one of those by the same four things, and gets a Match stats button that
+     opens the full details. No change to the rest of the site is needed. */
+  var STATS_OPEN = '__stats', statsMatch = null, STATS = {}, statsIdx = {};
+  var MON = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  var DAY = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+  function longDate(s) { var p = String(s).split('-'), x = new Date(+p[0], p[1] - 1, +p[2]); return DAY[x.getDay()] + ' ' + x.getDate() + ' ' + MON[x.getMonth()]; }
+  function statsKey(day, branch, grade, opp) { return [day, branch, String(grade).trim(), looseKey(opp)].join('|'); }
+  function loadStats() {
+    fetch(DB + '/live/stats.json?t=' + Date.now(), { cache: 'no-store' })
+      .then(function (r) { if (!r.ok) throw 0; return r.json(); })
+      .then(function (j) {
+        STATS = j || {}; statsIdx = {};
+        Object.keys(STATS).forEach(function (id) {
+          var l = STATS[id] && STATS[id].link; if (!l) return;
+          statsIdx[statsKey(longDate(l.date), l.branch, l.grade, l.opp)] = id;
+        });
+        addStatsButtons();
+      })
+      .catch(function () { /* no buttons this time */ });
+  }
+  function addStatsButtons() {
+    var out = document.getElementById('out'); if (!out) return;
+    var cards = out.querySelectorAll('.card.win,.card.loss,.card.draw');
+    Array.prototype.forEach.call(cards, function (card) {
+      if (card.querySelector('.lv-statsbtn')) return;
+      var dh = card.previousElementSibling;
+      while (dh && !dh.classList.contains('dayhead')) dh = dh.previousElementSibling;
+      var gr = card.querySelector('.fx-grade');
+      if (!dh || !gr) return;
+      var names = Array.prototype.map.call(card.querySelectorAll('.sl .n > span:not(.mini)'), function (x) { return x.textContent.trim(); });
+      var opp = names.filter(function (n) { return n !== 'Killeshin'; })[0];
+      if (!opp) return;
+      var id = statsIdx[statsKey(dh.textContent.trim(), card.classList.contains('lad') ? 'ladies' : 'men', gr.textContent, opp)];
+      if (!id) return;
+      var b = document.createElement('button');
+      b.className = 'lv-statsbtn'; b.type = 'button'; b.setAttribute('data-stats', id);
+      b.textContent = 'Match stats \u203a';
+      card.appendChild(b);
+    });
+  }
+  document.addEventListener('click', function (ev) {
+    var b = ev.target.closest && ev.target.closest('.lv-statsbtn'); if (!b) return;
+    var m = STATS[b.getAttribute('data-stats')]; if (!m) return;
+    statsMatch = m; openId = STATS_OPEN; renderSheet();
+  });
+  (function watchResults() {
+    var out = document.getElementById('out');
+    if (!out || !window.MutationObserver) return;
+    new MutationObserver(addStatsButtons).observe(out, { childList: true });   /* the site redraws the list: put the buttons back */
+  })();
+
   mount();
   loadCrests();
+  loadStats();
+  setInterval(function () { if (!document.hidden) loadStats(); }, 10 * 60000);
   pull();
   setInterval(function () { if (!document.hidden) pull(); }, PULL_EVERY);
   setInterval(render, TICK_EVERY);                              /* moves the clock and drops finished games */
