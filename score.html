@@ -132,8 +132,18 @@ input::placeholder{color:rgba(255,255,255,.35)}
   var C = window.KGAA_LIVE || {};
   var DB = (C.dbUrl || '').replace(/\/$/, ''), KEY = C.apiKey || '';
   var app = document.getElementById('app');
-  var TEAMS = ['Senior', 'Junior A', 'Junior C', 'U21', 'Minor', 'U16', 'U15', 'U14', 'U13', 'U12',
-    'Ladies Intermediate', 'Ladies Junior', 'Ladies Minor', 'Girls U16', 'Girls U14', 'Girls U12'];
+  /* The club's teams. Picking one from this list at setup is what ties a
+     match, its players and its results to the same team every time. */
+  var TEAM_LIST = [
+    ['men', ['Senior', 'Junior A', 'Junior C', 'U20', 'U17', 'U16', 'U15', 'U14', 'U13', 'U12']],
+    ['ladies', ['Intermediate', 'Junior', 'Minor', 'U16', 'U14', 'U12']]
+  ];
+  var TEAMS = {};                                /* id -> {label, branch} */
+  TEAM_LIST.forEach(function (g) {
+    g[1].forEach(function (n) {
+      TEAMS[g[0] + '-' + n.toLowerCase().replace(/[^a-z0-9]+/g, '-')] = { label: (g[0] === 'ladies' ? 'Ladies ' : '') + n, branch: g[0] };
+    });
+  });
   var COMPS = ['Senior Football Championship', 'ACFL Division 2', 'Junior Football Championship', 'ACFL Division 4',
     'Junior C Football Championship', 'ACFL Division 7', 'Kelly Cup', 'U20 Football Championship',
     'U17 Football Championship', 'U17 Football League', 'U15 Football Championship', 'U15 Football League',
@@ -156,7 +166,7 @@ input::placeholder{color:rgba(255,255,255,.35)}
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
   function uid(p) { return p + Date.now().toString(36) + Math.random().toString(36).slice(2, 6); }
   function fmt(g, p) { return g + '-' + (p < 10 ? '0' : '') + p; }
-  function club(m) { return m.branch === 'ladies' ? 'Killeshin' : 'Gleann Uise\u00e1n'; }
+  function club() { return 'Killeshin'; }
   /* v is 'g' (goal, 3), '2' (two-pointer, 2 in the points column) or 'p' (point, 1). */
   function tally(m) {
     var r = { kg: 0, kp: 0, og: 0, op: 0 }, ev = m.events || {};
@@ -216,7 +226,24 @@ input::placeholder{color:rgba(255,255,255,.35)}
      per team: every name used or added in an earlier match for the same team
      (Senior, U17...) comes back in the picker, so the panel builds itself. */
   function nkey(n) { return String(n || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 40); }
-  function teamKey(t) { return String(t || '').toLowerCase().replace(/\s+/g, ' ').trim(); }
+  /* "Senior", "Seniors" and "Senior football" are the same team; so are
+     "U14" and "U14s". */
+  function teamKey(t) {
+    return String(t || '').toLowerCase().replace(/\b(football|team|gaa|lgfa|squad|panel)\b/g, ' ')
+      .replace(/[^a-z0-9]+/g, ' ').trim().split(' ').map(function (w) { return w.length > 2 ? w.replace(/s$/, '') : w; }).join(' ');
+  }
+  /* Each team's panel is also kept in its own record that never gets
+     deleted, so removing a match (or a test match) never loses the names.
+     It sits with the matches but is never live, so the website ignores it. */
+  /* Which team a match belongs to. New matches carry the id picked from the
+     list; older ones typed by hand are matched up from their name. */
+  function teamIdOf(x) {
+    if (!x) return '';
+    if (x.teamId) return x.teamId;
+    var t = String(x.team || ''), b = x.branch || (/ladies|girls|lgfa/i.test(t) ? 'ladies' : 'men');
+    return b + '-' + teamKey(t.replace(/\b(ladies|girls|lgfa)\b/ig, ' ')).replace(/ /g, '-');
+  }
+  function rosterId(m) { return 'roster-' + teamIdOf(m); }
   function pts(r) { return r.g * 3 + r.p; }
   function byPlayer(m, into) {
     var ev = m.events || {};
@@ -231,10 +258,10 @@ input::placeholder{color:rgba(255,255,255,.35)}
   /* Today's scorers first (highest first), then the team's season scorers,
      then the rest of the panel A to Z. */
   function candidates(v, m) {
-    var today = byPlayer(m, {}), season = {}, names = {}, tk = teamKey(m.team), k;
+    var today = byPlayer(m, {}), season = {}, names = {}, tk = teamIdOf(m), k;
     var added = {}, hidden = {};                 /* latest add / remove time per player, across the team's matches */
     Object.keys(v).forEach(function (id) {
-      var x = v[id]; if (!x || teamKey(x.team) !== tk) return;
+      var x = v[id]; if (!x || teamIdOf(x) !== tk) return;
       var a = x.squadAt || {}, h = x.hide || {}, q;
       for (q in a) added[q] = Math.max(added[q] || 0, a[q]);
       for (q in h) hidden[q] = Math.max(hidden[q] || 0, h[q]);
@@ -286,10 +313,21 @@ input::placeholder{color:rgba(255,255,255,.35)}
   /* Add names to this match's panel in one write, so a whole team goes up in
      a single tap even on poor signal. */
   function addToSquad(base, list) {
-    var m = view()[cur]; if (!m || !list.length) return;
+    var v = view(), m = v[cur]; if (!m || !list.length) return;
     var sq = JSON.parse(JSON.stringify(m.squad || {})), at = JSON.parse(JSON.stringify(m.squadAt || {})), now = Date.now();
     list.forEach(function (n) { var k = nkey(n); if (k) { sq[k] = n; at[k] = now; } });
     queue.push({ m: 'PATCH', p: base, b: { squad: sq, squadAt: at } });
+    var rid = rosterId(m), r = v[rid] || {};
+    var rsq = JSON.parse(JSON.stringify(r.squad || {})), rat = JSON.parse(JSON.stringify(r.squadAt || {}));
+    list.forEach(function (n) { var k = nkey(n); if (k) { rsq[k] = n; rat[k] = now; } });
+    queue.push({ m: 'PATCH', p: '/live/matches/' + rid, b: { team: m.team, teamId: teamIdOf(m), branch: m.branch || 'men', roster: true, live: false, created: 0, squad: rsq, squadAt: rat } });
+  }
+  /* Copy names already sitting in older matches into the team's permanent
+     record, the first time a match for that team is opened. */
+  function saveRoster(v, m) {
+    if (!loaded || v[rosterId(m)]) return;
+    var names = candidates(v, m).map(function (p) { return p.n; });
+    if (names.length) { addToSquad('/live/matches/' + cur, names); LS.set('kl_queue', queue); flush(); }
   }
 
   /* ---------- sign-in (Firebase email/password over REST) ---------- */
@@ -402,10 +440,17 @@ input::placeholder{color:rgba(255,255,255,.35)}
     app.innerHTML = h;
   }
   function drawNew(err) {
-    var opts = TEAMS.map(function (t) { return '<option value="' + esc(t) + '">'; }).join('');
+    var vv = view(), counts = {};                   /* how many players each team has saved */
+    Object.keys(vv).forEach(function (id) { var x = vv[id]; if (x && x.roster) counts[teamIdOf(x)] = Object.keys(x.squad || {}).length; });
+    var opts = '<option value="">Choose a team\u2026</option>' + TEAM_LIST.map(function (g) {
+      return '<optgroup label="' + (g[0] === 'ladies' ? 'Ladies' : 'Men') + '">' + Object.keys(TEAMS).filter(function (id) { return TEAMS[id].branch === g[0]; }).map(function (id) {
+        var n = counts[id];
+        return '<option value="' + id + '"' + (draft.teamId === id ? ' selected' : '') + '>' + esc(TEAMS[id].label) + (n ? ' (' + n + ' players)' : '') + '</option>';
+      }).join('') + '</optgroup>';
+    }).join('');
     var comps = COMPS.map(function (t) { return '<option value="' + esc(t) + '">'; }).join('');
     app.innerHTML = '<div class="top"><button class="link" data-act="back">\u2039 Matches</button></div>' +
-      '<label for="tm">Our team</label><input id="tm" list="teams" placeholder="e.g. Senior" value="' + esc(draft.team || '') + '"><datalist id="teams">' + opts + '</datalist>' +
+      '<label for="tm">Our team</label><select id="tm">' + opts + '</select>' +
       '<label for="op">Opposition</label><input id="op" placeholder="e.g. Portlaoise" value="' + esc(draft.opp || '') + '">' +
       '<label for="cp">Competition <small>(pick one or type your own)</small></label><input id="cp" list="comps" placeholder="e.g. Senior Football Championship" value="' + esc(draft.comp || '') + '"><datalist id="comps">' + comps + '</datalist>' +
       '<label>Venue</label><div class="seg">' +
@@ -544,6 +589,7 @@ input::placeholder{color:rgba(255,255,255,.35)}
       ? '<div class="scorers">' + scl.map(function (r) { return esc(r.n) + '<b>' + fmt(r.g, r.p) + '</b>'; }).join(' \u00b7 ') +
         (unnamed ? (scl.length ? ' \u00b7 ' : '') + '<span class="tag">' + unnamed + ' not named</span>' : '') + '</div>'
       : '';
+    saveRoster(v, m);
     var squadN = candidates(v, m).length;
     /* Everything in the match, newest first. Tap a score to change who or
        how; tap a sub or card to remove it. */
@@ -591,7 +637,7 @@ input::placeholder{color:rgba(255,255,255,.35)}
       (picking ? drawPicker(v, m) : '');
   }
   function render() {
-    if (document.activeElement && /^(INPUT|TEXTAREA)$/.test(document.activeElement.tagName)) return; /* don't wipe what's being typed */
+    if (document.activeElement && /^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement.tagName)) return; /* don't wipe what's being typed */
     if (screen === 'signin') drawSignin(); else if (screen === 'list') drawList(); else if (screen === 'new') drawNew(); else drawMatch();
   }
   function go(s) { picking = null; screen = s; if (s === 'match') { LS.set('kl_cur', cur); keepAwake(); } else if (s === 'list') { LS.del('kl_cur'); cur = null; } render(); }
@@ -600,7 +646,8 @@ input::placeholder{color:rgba(255,255,255,.35)}
     try { if ('wakeLock' in navigator && !wake) navigator.wakeLock.request('screen').then(function (w) { wake = w; w.addEventListener('release', function () { wake = null; }); }).catch(function () {}); } catch (e) {}
   }
   function keepDraft() {
-    draft.team = document.getElementById('tm').value; draft.opp = document.getElementById('op').value; draft.comp = document.getElementById('cp').value;
+    var tm = document.getElementById('tm'), op = document.getElementById('op'), cp = document.getElementById('cp');
+    if (tm) draft.teamId = tm.value; if (op) draft.opp = op.value; if (cp) draft.comp = cp.value;
   }
   function blur() { if (document.activeElement && document.activeElement.blur) document.activeElement.blur(); }
 
@@ -642,11 +689,11 @@ input::placeholder{color:rgba(255,255,255,.35)}
     else if (a === 'venue') { keepDraft(); draft.venue = b.dataset.v; drawNew(); }
     else if (a === 'create') {
       keepDraft();
-      var team = draft.team.trim(), opp = draft.opp.trim(), comp = draft.comp.trim();
-      if (!team || !opp) return drawNew('Enter our team and the opposition.');
+      var tdef = TEAMS[draft.teamId], opp = (draft.opp || '').trim(), comp = (draft.comp || '').trim();
+      if (!tdef || !opp) return drawNew(!tdef ? 'Choose our team from the list.' : 'Enter the opposition.');
       cur = uid('m');
       blur();
-      var rec = { team: team, opp: opp, venue: draft.venue, branch: /ladies|girls|lgfa/i.test(team) ? 'ladies' : 'men', status: 'pre', live: false, created: Date.now() };
+      var rec = { team: tdef.label, teamId: draft.teamId, opp: opp, venue: draft.venue, branch: tdef.branch, status: 'pre', live: false, created: Date.now() };
       if (comp) rec.comp = comp;
       enqueue({ m: 'PUT', p: '/live/matches/' + cur, b: rec });
       go('match');
@@ -691,8 +738,11 @@ input::placeholder{color:rgba(255,255,255,.35)}
       LS.set('kl_queue', queue); render(); flush();
     } else if (a === 'drop') {
       var mh = view()[cur]; if (!mh) return;
-      var hide = JSON.parse(JSON.stringify(mh.hide || {})); hide[b.dataset.k] = Date.now();
-      enqueue({ m: 'PATCH', p: base, b: { hide: hide } });
+      var hide = JSON.parse(JSON.stringify(mh.hide || {})), stamp_ = Date.now(); hide[b.dataset.k] = stamp_;
+      queue.push({ m: 'PATCH', p: base, b: { hide: hide } });
+      var rv = view()[rosterId(mh)];
+      if (rv) { var rh = JSON.parse(JSON.stringify(rv.hide || {})); rh[b.dataset.k] = stamp_; queue.push({ m: 'PATCH', p: '/live/matches/' + rosterId(mh), b: { hide: rh } }); }
+      LS.set('kl_queue', queue); render(); flush();
     } else if (a === 'stype') {
       var evt = picking && picking.ev; if (!evt) return;
       enqueue({ m: 'PATCH', p: base + '/events/' + evt, b: { t: b.dataset.t === 'play' ? null : b.dataset.t } });
@@ -751,6 +801,9 @@ input::placeholder{color:rgba(255,255,255,.35)}
       enqueue({ m: 'DELETE', p: base }); go('list');
     }
   });
+  /* Keep what's typed on the setup screen, so a refresh never wipes it. */
+  app.addEventListener('input', function () { if (screen === 'new') keepDraft(); });
+  app.addEventListener('change', function () { if (screen === 'new') keepDraft(); });
   /* Return on the keyboard adds the name. */
   app.addEventListener('keydown', function (ev) {
     if (ev.key === 'Enter' && ev.target && ev.target.id === 'nn') {

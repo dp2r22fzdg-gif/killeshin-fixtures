@@ -95,7 +95,7 @@
 
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
   function fmt(g, p) { return g + '-' + (p < 10 ? '0' : '') + p; }
-  function club(m) { return m.branch === 'ladies' ? 'Killeshin' : 'Gleann Uise\u00e1n'; }
+  function club() { return 'Killeshin'; }
   /* v is 'g' (goal, 3), '2' (two-pointer, 2 in the points column) or 'p' (point, 1). */
   function tally(m) {
     var r = { kg: 0, kp: 0, og: 0, op: 0 }, ev = m.events || {};
