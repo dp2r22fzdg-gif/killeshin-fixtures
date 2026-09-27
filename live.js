@@ -3,7 +3,10 @@
    taps Go live, and comes off by itself 5 minutes after full time.
 
    The banner is pinned to the bottom of the screen, sitting just above the
-   tab bar, so the score stays in view while the page scrolls behind it. */
+   tab bar, so the score stays in view while the page scrolls behind it.
+   With one match live it shows the full scoreboard. With two or more, each
+   shrinks to a slim version so the stack doesn't swallow the page; the full
+   details are still a tap away. */
 (function () {
   var C = window.KGAA_LIVE || {};
   var DB = (C.dbUrl || '').replace(/\/$/, '');
@@ -58,6 +61,24 @@
     '.lv-card{cursor:pointer}' +
     '.lv-more{flex:none;font-size:12px;font-weight:800;color:#12703F;background:#E8F6EE;border:1px solid #BFDFCD;' +
       'border-radius:999px;padding:4px 10px;white-space:nowrap}' +
+    /* slim scoreboard, used when more than one match is live */
+    '.lv-card.mini{padding:10px 12px 9px;margin-top:6px;border-radius:14px}' +
+    '.lv-card.mini:first-child{margin-top:0}' +
+    '.lv-card.mini::before{height:3px}' +
+    '.lv-card.mini .lv-top{margin-bottom:6px;gap:8px}' +
+    '.lv-card.mini .lv-pill{font-size:10.5px;padding:3px 9px;gap:6px}' +
+    '.lv-card.mini .lv-pill i{width:6px;height:6px}' +
+    '.lv-card.mini .lv-comp{font-size:12px;font-weight:700;color:#11492E}' +
+    '.lv-card.mini .lv-more{font-size:11px;padding:2px 9px}' +
+    '.lv-mrow{display:flex;align-items:center;gap:8px;min-width:0}' +
+    '.lv-ms-side{flex:1;min-width:0;display:flex;align-items:center;gap:7px}' +
+    '.lv-ms-side.r{flex-direction:row-reverse}' +
+    '.lv-ms-side .lv-c{width:24px;height:24px}' +
+    '.lv-ms-side .lv-c b{font-size:9px}' +
+    '.lv-ms-side .lv-n{font-size:13.5px}' +
+    '.lv-ms{flex:none;font-family:"Bricolage Grotesque",Archivo,sans-serif;font-weight:800;font-size:20px;line-height:1;' +
+      'letter-spacing:-.02em;font-variant-numeric:tabular-nums;white-space:nowrap;color:#11492E}' +
+    '.lv-dash{flex:none;color:#9AA7A0;font-weight:700}' +
     /* match details sheet */
     '.lvd{position:fixed;inset:0;z-index:90;background:rgba(10,30,20,.5);display:flex;align-items:flex-end;' +
       'font-family:Archivo,-apple-system,"Helvetica Neue",Arial,sans-serif}' +
@@ -120,6 +141,20 @@
       case 'et2': return { t: 'Live \u00b7 ET 2nd half' + mins(m.tet2), on: true };
       case 'ft': return { t: 'Full time', on: false };
       default: return { t: 'Throw-in soon', on: false };
+    }
+  }
+  /* The same, in as few characters as possible, for the slim scoreboard. */
+  function shortState(m) {
+    switch (m.status) {
+      case '1h': return { t: '1H' + mins(m.t1h), on: true };
+      case 'ht': return { t: 'HT', on: false };
+      case '2h': return { t: '2H' + mins(m.t2h), on: true };
+      case 'etb': return { t: 'ET next', on: false };
+      case 'et1': return { t: 'ET1' + mins(m.tet1), on: true };
+      case 'etht': return { t: 'ET HT', on: false };
+      case 'et2': return { t: 'ET2' + mins(m.tet2), on: true };
+      case 'ft': return { t: 'FT', on: false };
+      default: return { t: 'Soon', on: false };
     }
   }
 
@@ -329,6 +364,27 @@
       '<div class="lv-row">' + (m.venue === 'away' ? them + us : us + them) + '</div>' + scorersLine(m) + '</div>';
   }
 
+  /* Slim scoreboard for when two or more matches are live: the team (so two
+     Killeshin games can be told apart), the clock, then one line of score.
+     No scorers line; that is in the details, a tap away. */
+  function miniCard(m, id) {
+    var t = tally(m), s = shortState(m);
+    var opp = m.opp || 'Opposition', away = m.venue === 'away';
+    function half(name, crest, right) {
+      return '<span class="lv-ms-side' + (right ? ' r' : '') + '">' + crest + '<span class="lv-n">' + esc(name) + '</span></span>';
+    }
+    var usHalf = half(club(m), ourCrest(m), away), themHalf = half(opp, theirCrest(opp), !away);
+    var usScore = '<span class="lv-ms">' + fmt(t.kg, t.kp) + '</span>', themScore = '<span class="lv-ms">' + fmt(t.og, t.op) + '</span>';
+    var row = away
+      ? themHalf + themScore + '<span class="lv-dash">\u2013</span>' + usScore + usHalf
+      : usHalf + usScore + '<span class="lv-dash">\u2013</span>' + themScore + themHalf;
+    var info = [m.team, m.comp].filter(Boolean).map(esc).join(' \u00b7 ');
+    return '<div class="lv-card mini" data-id="' + esc(id) + '" role="button" tabindex="0" aria-label="Match details">' +
+      '<div class="lv-top"><span class="lv-pill' + (s.on ? '' : ' idle') + '">' + (s.on ? '<i></i>' : '') + esc(s.t) + '</span>' +
+      '<span class="lv-comp">' + info + '</span><span class="lv-more">Details \u203a</span></div>' +
+      '<div class="lv-mrow">' + row + '</div></div>';
+  }
+
   /* Sit just above the tab bar, and pad the page so the last card can
      always be scrolled clear of the banner. */
   function layout() {
@@ -347,7 +403,10 @@
     if (!ids.length) {
       box.hidden = true; box.innerHTML = '';
     } else {
-      box.innerHTML = '<div class="lv-stack">' + ids.map(function (k) { return card(matches[k], k); }).join('') + '</div>';
+      var slim = ids.length > 1;                                /* two or more live: slim scoreboards */
+      box.innerHTML = '<div class="lv-stack">' + ids.map(function (k) {
+        return slim ? miniCard(matches[k], k) : card(matches[k], k);
+      }).join('') + '</div>';
       box.hidden = false;
     }
     layout();
