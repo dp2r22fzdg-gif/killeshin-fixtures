@@ -70,6 +70,16 @@ input::placeholder{color:rgba(255,255,255,.35)}
 .stage{display:block;width:100%;margin-top:12px;padding:17px;border-radius:12px;background:#fff;color:var(--deep);font-weight:700;font-size:18px}
 .stage.end{background:var(--warn);color:#2B1D00}
 .stage.et{background:transparent;color:#fff;border:1.5px solid rgba(255,255,255,.5)}
+/* Stage buttons need a press and hold, so a stray tap never changes the half. */
+.stage{position:relative;overflow:hidden;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+.stage .fill{position:absolute;inset:0;background:rgba(0,0,0,.2);transform:scaleX(0);transform-origin:left;pointer-events:none}
+.stage.et .fill{background:rgba(255,255,255,.22)}
+.stage.holding .fill{transform:scaleX(1);transition:transform .8s linear}
+.stage .lbl{position:relative;pointer-events:none}
+.stage .lbl small{display:block;font-size:12px;font-weight:600;opacity:.7;margin-top:2px}
+#holdhint.warn{color:var(--warn);font-weight:600}
+#compchips{margin-top:10px}
+#compchips button{font-size:14px;padding:9px 12px;text-align:left}
 .quiet{display:block;margin:22px auto 0;color:var(--mute);font-size:14px;padding:10px;text-decoration:underline}
 .quiet + .quiet{margin-top:4px}
 .flash{animation:fl .5s}
@@ -181,6 +191,7 @@ input::placeholder{color:rgba(255,255,255,.35)}
   var server = {}, loaded = false, online = true, blocked = '', flushing = false;
   var screen = auth ? 'list' : 'signin', cur = LS.get('kl_cur', null), draft = { venue: 'home' }, wake = null;
   var picking = null;                          /* {ev: eventId} while naming a scorer, {manage: true} for the players list */
+  var HOLD_MS = 800, holdT = null, holdBtn = null;   /* press-and-hold on the half / full-time buttons */
   if (cur && screen === 'list') screen = 'match';
 
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
@@ -459,18 +470,20 @@ input::placeholder{color:rgba(255,255,255,.35)}
     h += '<button class="quiet" data-act="signout">Sign out</button>';
     app.innerHTML = h;
   }
-  function compOptions(id) { return compsFor(id).map(function (t) { return '<option value="' + esc(t) + '">'; }).join(''); }
-  /* When the team changes, swap the competition list to that team's, and
-     clear a listed competition that belongs to a different team. Anything
-     typed by hand is left alone. */
+  /* The team's competitions as buttons under the box: tap one to fill it in. */
+  function compChips(id, chosen) {
+    if (!id) return '<p class="note">Choose our team first to see its competitions.</p>';
+    return compsFor(id).map(function (t) {
+      return '<button data-act="comppick" data-c="' + esc(t) + '" class="' + (chosen === t ? 'on' : '') + '">' + esc(t) + '</button>';
+    }).join('');
+  }
+  /* When the team changes, show that team's competitions, and clear a listed
+     competition that belongs to a different team. Anything typed by hand is
+     left alone. */
   function refreshComps(id) {
-    var dl = document.getElementById('comps'), cp = document.getElementById('cp');
-    if (dl) dl.innerHTML = compOptions(id);
-    if (cp) {
-      var list = compsFor(id);
-      if (cp.value && ALL_COMPS.indexOf(cp.value) > -1 && list.indexOf(cp.value) < 0) cp.value = '';
-      cp.placeholder = 'e.g. ' + list[0];
-    }
+    var cp = document.getElementById('cp'), ch = document.getElementById('compchips');
+    if (cp && cp.value && ALL_COMPS.indexOf(cp.value) > -1 && compsFor(id).indexOf(cp.value) < 0) cp.value = '';
+    if (ch) ch.innerHTML = compChips(id, cp ? cp.value : '');
   }
   function drawNew(err) {
     var vv = view(), counts = {};                   /* how many players each team has saved */
@@ -484,7 +497,8 @@ input::placeholder{color:rgba(255,255,255,.35)}
     app.innerHTML = '<div class="top"><button class="link" data-act="back">\u2039 Matches</button></div>' +
       '<label for="tm">Our team</label><select id="tm">' + opts + '</select>' +
       '<label for="op">Opposition</label><input id="op" placeholder="e.g. Portlaoise" value="' + esc(draft.opp || '') + '">' +
-      '<label for="cp">Competition <small>(pick one or type your own)</small></label><input id="cp" list="comps" autocomplete="off" placeholder="e.g. ' + esc(compsFor(draft.teamId)[0]) + '" value="' + esc(draft.comp || '') + '"><datalist id="comps">' + compOptions(draft.teamId) + '</datalist>' +
+      '<label for="cp">Competition <small>(tap one below or type your own)</small></label><input id="cp" autocomplete="off" autocapitalize="words" placeholder="Type a competition" value="' + esc(draft.comp || '') + '">' +
+      '<div class="chips" id="compchips">' + compChips(draft.teamId, draft.comp || '') + '</div>' +
       '<label>Venue</label><div class="seg">' +
       [['home', 'Home'], ['away', 'Away'], ['neutral', 'Neutral']].map(function (o) {
         return '<button data-act="venue" data-v="' + o[0] + '" class="' + (draft.venue === o[0] ? 'on' : '') + '">' + o[1] + '</button>';
@@ -608,8 +622,9 @@ input::placeholder{color:rgba(255,255,255,.35)}
     }
 
     var stageBtns = steps(m).map(function (s) {
-      return '<button class="stage' + (s[0] === 'ft' ? ' end' : s[0] === 'etb' ? ' et' : '') + '" data-act="stage" data-to="' + s[0] + '">' + esc(s[1]) + '</button>';
-    }).join('');
+      return '<button class="stage' + (s[0] === 'ft' ? ' end' : s[0] === 'etb' ? ' et' : '') + '" data-act="stage" data-to="' + s[0] + '">' +
+        '<i class="fill"></i><span class="lbl">' + esc(s[1]) + '<small>Press and hold</small></span></button>';
+    }).join('') + '<p class="note" id="holdhint" style="text-align:center;margin-top:6px">Hold the button for a second to change the half. A quick tap does nothing.</p>';
 
     /* Scorers so far, top scorer first, plus any scores still to be named. */
     var sc = byPlayer(m, {}), scl = Object.keys(sc).map(function (k) { return sc[k]; })
@@ -669,6 +684,7 @@ input::placeholder{color:rgba(255,255,255,.35)}
       (picking ? drawPicker(v, m) : '');
   }
   function render() {
+    if (holdT) return;                            /* a stage button is being held: don't redraw under the finger */
     if (document.activeElement && /^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement.tagName)) return; /* don't wipe what's being typed */
     if (screen === 'signin') drawSignin(); else if (screen === 'list') drawList(); else if (screen === 'new') drawNew(); else drawMatch();
   }
@@ -817,17 +833,11 @@ input::placeholder{color:rgba(255,255,255,.35)}
       var m = view()[cur], k = m && lastEvent(m);
       if (k) { if (picking && picking.ev === k) picking = null; enqueue({ m: 'DELETE', p: base + '/events/' + k }); }
     } else if (a === 'stage') {
-      var to = b.dataset.to, mm = view()[cur], patch = { status: to };
-      if (!mm) return;
-      if (to === 'ft' && !confirm('Mark as full time? The score comes off the website 5 minutes later.')) return;
-      if (to === 'etb' && !confirm('Go to extra time? Two halves of 10 minutes.')) return;
-      if (mm.status === 'ft') { patch.tft = null; patch.ftFrom = null; }          /* reopening */
-      else {
-        var stamp = { '1h': 't1h', ht: 'tht', '2h': 't2h', etb: 'tetb', et1: 'tet1', etht: 'tetht', et2: 'tet2', ft: 'tft' }[to];
-        if (stamp) patch[stamp] = Date.now();
-        if (to === 'ft') patch.ftFrom = mm.status;
-      }
-      enqueue({ m: 'PATCH', p: base, b: patch });
+      /* A quick tap never changes the half: just remind how it works. */
+      var hh = document.getElementById('holdhint');
+      if (hh) { hh.textContent = 'Keep your finger on the button until it fills up.'; hh.classList.add('warn'); }
+    } else if (a === 'comppick') {
+      keepDraft(); draft.comp = b.dataset.c; drawNew();
     } else if (a === 'remove') {
       if (!confirm('Remove this match? Use this only for a match set up by mistake.')) return;
       enqueue({ m: 'DELETE', p: base }); go('list');
@@ -835,7 +845,47 @@ input::placeholder{color:rgba(255,255,255,.35)}
   });
   /* Keep what's typed on the setup screen, so a refresh never wipes it.
      Picking a team also swaps the competition list to that team's. */
-  app.addEventListener('input', function () { if (screen === 'new') keepDraft(); });
+  app.addEventListener('input', function (ev) {
+    if (screen !== 'new') return;
+    keepDraft();
+    if (ev.target && ev.target.id === 'cp') {       /* typing: light up a chip only if it matches exactly */
+      var ch = document.getElementById('compchips');
+      if (ch) Array.prototype.forEach.call(ch.querySelectorAll('button'), function (x) { x.classList.toggle('on', x.dataset.c === ev.target.value); });
+    }
+  });
+
+  /* Change the half / full time. Only reached after a press and hold. */
+  function doStage(to) {
+    var mm = view()[cur], base = '/live/matches/' + cur, patch = { status: to };
+    if (!mm) return;
+    if (to === 'ft' && !confirm('Mark as full time? The score comes off the website 5 minutes later.')) return;
+    if (to === 'etb' && !confirm('Go to extra time? Two halves of 10 minutes.')) return;
+    if (mm.status === 'ft') { patch.tft = null; patch.ftFrom = null; }          /* reopening */
+    else {
+      var stamp = { '1h': 't1h', ht: 'tht', '2h': 't2h', etb: 'tetb', et1: 'tet1', etht: 'tetht', et2: 'tet2', ft: 'tft' }[to];
+      if (stamp) patch[stamp] = Date.now();
+      if (to === 'ft') patch.ftFrom = mm.status;
+    }
+    enqueue({ m: 'PATCH', p: base, b: patch });
+  }
+  function cancelHold() {
+    if (holdT) { clearTimeout(holdT); holdT = null; }
+    if (holdBtn) { holdBtn.classList.remove('holding'); holdBtn = null; }
+  }
+  app.addEventListener('pointerdown', function (ev) {
+    var b = ev.target.closest && ev.target.closest('.stage'); if (!b || screen !== 'match') return;
+    cancelHold();
+    holdBtn = b; b.classList.add('holding');
+    var to = b.dataset.to;
+    holdT = setTimeout(function () {
+      holdT = null; cancelHold();
+      if (navigator.vibrate) navigator.vibrate(40);
+      doStage(to);
+    }, HOLD_MS);
+  });
+  ['pointerup', 'pointercancel'].forEach(function (t) { app.addEventListener(t, cancelHold); });
+  app.addEventListener('pointerout', function (ev) { if (holdBtn && ev.target === holdBtn && !holdBtn.contains(ev.relatedTarget)) cancelHold(); });
+  app.addEventListener('contextmenu', function (ev) { if (ev.target.closest && ev.target.closest('.stage')) ev.preventDefault(); });
   app.addEventListener('change', function (ev) {
     if (screen !== 'new') return;
     if (ev.target && ev.target.id === 'tm') refreshComps(ev.target.value);
