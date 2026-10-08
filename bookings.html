@@ -186,7 +186,7 @@ input[type=date]::-webkit-calendar-picker-indicator{opacity:.6}
 /* bottom bar, as on the main site */
 .bar{position:fixed;left:0;right:0;bottom:0;z-index:60;background:rgba(17,73,46,.96);-webkit-backdrop-filter:blur(16px);
   backdrop-filter:blur(16px);border-top:1px solid rgba(255,255,255,.1);padding-bottom:env(safe-area-inset-bottom)}
-.bar .in{display:grid;grid-template-columns:repeat(3,1fr);max-width:600px;margin:0 auto}
+.bar .in{display:grid;grid-template-columns:repeat(4,1fr);max-width:600px;margin:0 auto}
 .bar button{display:flex;flex-direction:column;align-items:center;gap:5px;padding:10px 2px 8px;font-size:10.5px;font-weight:700;
   letter-spacing:.07em;text-transform:uppercase;color:#F0F7F3;background:none;border:0;position:relative}
 .bar svg{width:23px;height:23px;stroke:currentColor;stroke-width:1.9;fill:none;stroke-linecap:round;stroke-linejoin:round}
@@ -242,8 +242,9 @@ body.embed main{padding:4px}
       <label>Mobile number<input id="b-phone" type="tel" autocomplete="tel" placeholder="086 123 4567"></label>
       <label>Email<input id="b-email" type="email" autocomplete="email" placeholder="you@example.com"></label>
     </div>
-    <p class="sub" style="margin:0 0 12px">Your confirmation and any changes are emailed to you. Your number and email are never shown publicly. This phone remembers your details for next time.</p>
+    <p class="sub" style="margin:0 0 12px">Your confirmation and any changes are emailed to you. Your number and email are never shown publicly. This phone remembers your details for next time. <a href="#" id="forget-me" style="color:var(--green-dk);font-weight:700">Not you? Clear saved details</a></p>
     <label class="chk"><input type="checkbox" id="b-weekly"><span>Book this same day and time <b>every week</b> until the end of the season (<span id="season-end">1 December</span>)</span></label>
+    <label id="b-code-wrap" hidden>Club booking code<input id="b-code" autocomplete="off" autocapitalize="none" placeholder="From the coaches' WhatsApp group"></label>
     <button class="btn block" id="b-go">Book these halves</button>
     <div id="b-result"></div>
   </div>
@@ -262,8 +263,13 @@ body.embed main{padding:4px}
   </div>
   <div id="s-list"><p class="empty">Loading…</p></div>
 
+</section>
+
+<!-- MY BOOKINGS -->
+<section class="view" id="v-mine">
+  <h2>My bookings</h2>
+  <p class="sub">Move to another pitch, or cancel a week or a whole run. Enter the mobile number you booked with.</p>
   <div id="mine">
-  <h3>Find my bookings</h3>
   <div class="panel">
     <div class="row" style="align-items:flex-end">
       <label style="flex:3 1 180px">Mobile number<input id="f-phone" type="tel" placeholder="086 123 4567"></label>
@@ -299,15 +305,37 @@ body.embed main{padding:4px}
     </div>
     <h3>Upcoming fixtures</h3>
     <div id="m-list"></div>
+
+    <h3>Training bookings</h3>
+    <div class="panel">
+      <p class="sub" style="margin:0 0 10px">See who has booked, with their number, and cancel any booking. The coach is emailed automatically.</p>
+      <div class="datebar">
+        <button class="navbtn" id="o-prev" aria-label="Previous day">‹</button>
+        <input type="date" id="o-date">
+        <button class="navbtn" id="o-next" aria-label="Next day">›</button>
+      </div>
+      <div id="o-list"></div>
+    </div>
+
+    <h3>Coaches' booking code</h3>
+    <div class="panel">
+      <label class="chk"><input type="checkbox" id="o-code-on"><span><b>Require a booking code</b><br>When on, coaches must enter the club code to book. Use it if outsiders start making bookings.</span></label>
+      <div class="row" id="o-code-row" hidden style="align-items:flex-end">
+        <label style="flex:3 1 160px">New code<input id="o-code" autocomplete="off" autocapitalize="none" placeholder="e.g. gleann27"></label>
+        <div style="flex:1 1 90px;margin-bottom:12px"><button class="btn block" id="o-code-go">Set code</button></div>
+      </div>
+      <div id="o-code-msg"></div>
+    </div>
   </div>
 </section>
 
-<p class="demo">Version 8 Oct · 5<br><a href="/" style="color:var(--green-dk);font-weight:700;text-decoration:none">Back to killeshingaa.ie</a></p>
+<p class="demo">Version 8 Oct · 9<br><a href="/" style="color:var(--green-dk);font-weight:700;text-decoration:none">Back to killeshingaa.ie</a></p>
 </main>
 
 <nav class="bar" id="tabs" aria-label="Sections"><div class="in">
   <button data-v="book" class="on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="15" rx="2"/><path d="M3 10h18M8 3v4M16 3v4M12 13v4M10 15h4"/></svg>Book</button>
   <button data-v="sched"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M12 4v16M3 12h18"/></svg>Schedule</button>
+  <button data-v="mine"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg>My bookings</button>
   <button data-v="match"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 21V4M18 21V4M6 10h12"/></svg>Fixtures</button>
 </div></nav>
 
@@ -324,7 +352,7 @@ const PITCHES = [
   {id:3, name:'Pitch 3', ground:'Seamus Hearns Park', halves:[5,6]},
 ];
 
-let CLOSED = [6];   // halves closed to training; the database is the authority
+let CLOSED = [6], CODE_REQ = false;   // halves closed to training; the database is the authority
 const configured = !SUPABASE_URL.includes('YOUR-PROJECT') && !!window.supabase;
 const sb = configured ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
 if(!configured) document.getElementById('cfg-warn').hidden = false;
@@ -484,6 +512,8 @@ async function loadRules(){
   const {data,error}=await sb.from('booking_rules').select('*').maybeSingle();
   if(error || !data) return;
   if(Array.isArray(data.training_closed)){ CLOSED=data.training_closed; renderBookQuick(); refreshBook(false); }
+  CODE_REQ=!!data.code_required; $('b-code-wrap').hidden=!CODE_REQ;
+  if($('o-code-on')){ $('o-code-on').checked=CODE_REQ; $('o-code-row').hidden=!CODE_REQ; }
   if(data.season_end) $('season-end').textContent=new Date(data.season_end+'T12:00').toLocaleDateString('en-IE',{day:'numeric',month:'long'});
 }
 $('b-quick').addEventListener('click',e=>{ const b=e.target.closest('button'); if(!b) return;
@@ -494,10 +524,11 @@ $('b-quick').addEventListener('click',e=>{ const b=e.target.closest('button'); i
 
 $('b-go').addEventListener('click', async ()=>{
   const out=$('b-result'), [d,s,e]=bookTimes();
-  const team=chosenTeam(), name=$('b-name').value.trim(), phone=$('b-phone').value.trim(), email=$('b-email').value.trim(), weekly=$('b-weekly').checked;
+  const code=$('b-code').value.trim(), team=chosenTeam(), name=$('b-name').value.trim(), phone=$('b-phone').value.trim(), email=$('b-email').value.trim(), weekly=$('b-weekly').checked;
   const errs=[];
   if(!bookSel.size) errs.push('Tap at least one half on the map.');
   if(!team) errs.push('Choose your team.');
+  if(CODE_REQ && !code) errs.push('Enter the club booking code.');
   if(!name) errs.push('Add your name.');
   if(!validPhone(phone)) errs.push('Enter a valid mobile number, e.g. 086 123 4567.');
   if(!/^\S+@\S+\.\S+$/.test(email)) errs.push('Add your email so we can send your confirmation.');
@@ -505,10 +536,11 @@ $('b-go').addEventListener('click', async ()=>{
   if(!sb){ out.innerHTML='<div class="notice bad"><b>Not connected</b>This page isn\'t linked to the booking database yet.</div>'; return; }
   const btn=$('b-go'); btn.disabled=true; btn.textContent='Checking…';
   const halves=[...bookSel].sort((a,b)=>a-b);
-  const {data,error}=await sb.rpc('book_training',{p_day:d,p_start:s,p_end:e,p_halves:halves,p_team:team,p_name:name,p_phone:phone,p_email:email,p_weekly:weekly});
+  const {data,error}=await sb.rpc('book_training',{p_day:d,p_start:s,p_end:e,p_halves:halves,p_team:team,p_name:name,p_phone:phone,p_email:email,p_weekly:weekly,p_code:code});
   btn.disabled=false; btn.textContent='Book these halves';
-  if(error){ out.innerHTML=`<div class="notice bad"><b>Couldn't book</b>${esc(cleanErr(error))}</div>`; refreshBook(true); return; }
-  saveMe({name, phone, email, team});
+  if(error){ const m=cleanErr(error); if(/booking code/i.test(m)) saveMe({code:''});
+    out.innerHTML=`<div class="notice bad"><b>Couldn't book</b>${esc(m)}</div>`; refreshBook(true); return; }
+  saveMe({name, phone, email, team, code});
   bookSel.clear(); $('b-weekly').checked=false; refreshBook(true);
   const booked=data.booked||[], skipped=data.skipped||[];
   out.innerHTML=`<div class="notice ${skipped.length?'warn':'ok'}"><b>Booked${booked.length>1?' · '+booked.length+' weeks':' · '+esc(data.ref)}</b>${esc(team)}, ${s}–${e}<br>${esc(describeHalves(halves))}
@@ -622,7 +654,7 @@ $('m-quick').addEventListener('click',e=>{ const b=e.target.closest('button'); i
   if(b.dataset.p==='clear') matchSel.clear(); else if(b.dataset.p==='main') [3,4,5,6].forEach(h=>matchSel.add(h));
   else PITCHES.find(p=>p.id==b.dataset.p).halves.forEach(h=>matchSel.add(h)); refreshMatch(false); });
 ['m-date','m-start','m-end'].forEach(id=>$(id).addEventListener('change',()=>refreshMatch(true)));
-$('m-unlock').onclick=()=>{ if(!$('m-pin').value) return; PIN=$('m-pin').value; $('m-lock').hidden=true; $('m-body').hidden=false; refreshMatch(); renderMatches(); };
+$('m-unlock').onclick=()=>{ if(!$('m-pin').value) return; PIN=$('m-pin').value; $('m-lock').hidden=true; $('m-body').hidden=false; refreshMatch(); renderMatches(); renderOfficer(); };
 $('m-pin').addEventListener('keydown',e=>{ if(e.key==='Enter') $('m-unlock').click(); });
 function relock(msg){ PIN=''; $('m-body').hidden=true; $('m-lock').hidden=false; $('m-pin').value=''; $('m-pin').placeholder=msg||'••••'; }
 
@@ -647,6 +679,53 @@ $('m-go').onclick=async ()=>{
       +aff.map(a=>`<div style="margin-top:10px"><b style="font-size:16px">${esc(a.name||'')} · ${esc(a.team)}</b><div class="sendrow">${waButtons(a)}</div></div>`).join('')
       :'<br>No training was affected.'}</div>`;
 };
+/* Officers: every booking on a day, cancel any of them */
+async function renderOfficer(){
+  const L=$('o-list'), d=$('o-date').value;
+  if(!PIN||!sb) return;
+  L.innerHTML='<p class="empty">Loading…</p>';
+  const {data,error}=await sb.rpc('officer_bookings',{p_pin:PIN,p_day:d});
+  if(error){ const m=cleanErr(error); if(/PIN/i.test(m)) return relock('Wrong PIN'); L.innerHTML=`<p class="empty">${esc(m)}</p>`; return; }
+  L.innerHTML = data.length ? data.map(b=>`<div class="mbk ${b.status==='moved'?'moved':''}">
+    <div class="mbk-when"><b>${hm(b.start_time)}–${hm(b.end_time)}</b><span style="font-size:13px;font-family:Archivo,sans-serif;color:var(--grey)">${esc(b.ref)}</span></div>
+    <div>${b.kind==='match'?'<span class="tag m">Match</span>':'<span class="tag tr">Training</span>'}${b.status==='moved'?'<span class="tag x">Moved for match</span>':''}${b.weekly?'<span class="tag tr">Weekly</span>':''}
+      <span class="who">${esc(b.team)}</span></div>
+    <div class="meta">${esc(describeHalves(b.halves))}</div>
+    ${b.kind==='training'?`<div class="meta">${esc(b.contact_name||'')}${b.phone?` · <a href="tel:+${esc(b.phone)}" style="color:var(--green-dk);font-weight:700">+${esc(b.phone)}</a>`:''}</div>
+    <div class="acts"><button class="btn small ghost" data-ocancel="${esc(b.ref)}">Cancel</button>
+      ${b.weekly?`<button class="btn small ghost" data-ocancelall="${esc(b.ref)}">Cancel from here on</button>`:''}</div>`:''}
+  </div>`).join('') : '<p class="empty">No bookings that day.</p>';
+}
+$('o-date').value=today();
+$('o-date').onchange=renderOfficer;
+$('o-prev').onclick=()=>{ $('o-date').value=addDays($('o-date').value,-1); renderOfficer(); };
+$('o-next').onclick=()=>{ $('o-date').value=addDays($('o-date').value,1); renderOfficer(); };
+$('o-list').addEventListener('click',async e=>{
+  const one=e.target.closest('[data-ocancel]'), all=e.target.closest('[data-ocancelall]'); const btn=one||all; if(!btn) return;
+  const ref=btn.dataset.ocancel||btn.dataset.ocancelall;
+  if(!confirm(all?'Cancel this week and every later week of this booking? The coach will be emailed.':'Cancel this booking? The coach will be emailed.')) return;
+  btn.disabled=true;
+  const {error}=await sb.rpc('officer_cancel',{p_pin:PIN,p_ref:ref,p_all:!!all});
+  if(error){ const m=cleanErr(error); if(/PIN/i.test(m)) return relock('Wrong PIN'); alert(m); btn.disabled=false; return; }
+  renderOfficer(); refreshMatch(true); refreshBook(true);
+});
+$('o-code-on').onchange=async e=>{
+  const M=$('o-code-msg');
+  if(e.target.checked){ $('o-code-row').hidden=false; M.innerHTML='<p class="sub" style="margin:0">Type a code and tap Set code to switch it on.</p>'; $('o-code').focus(); return; }
+  const {error}=await sb.rpc('officer_set_code',{p_pin:PIN,p_code:''});
+  if(error){ e.target.checked=true; const m=cleanErr(error); if(/PIN/i.test(m)) return relock('Wrong PIN'); M.innerHTML=`<div class="notice bad"><b>Not changed</b>${esc(m)}</div>`; return; }
+  CODE_REQ=false; $('b-code-wrap').hidden=true; $('o-code-row').hidden=true;
+  M.innerHTML='<div class="notice ok"><b>Booking code off</b>Anyone with the link can book again.</div>';
+};
+$('o-code-go').onclick=async ()=>{
+  const c=$('o-code').value.trim(), M=$('o-code-msg');
+  if(c.length<4){ M.innerHTML='<div class="notice bad"><b>Too short</b>Make the code at least 4 letters or numbers.</div>'; return; }
+  const {error}=await sb.rpc('officer_set_code',{p_pin:PIN,p_code:c});
+  if(error){ const m=cleanErr(error); if(/PIN/i.test(m)) return relock('Wrong PIN'); M.innerHTML=`<div class="notice bad"><b>Not changed</b>${esc(m)}</div>`; return; }
+  $('o-code').value=''; CODE_REQ=true; $('b-code-wrap').hidden=false;
+  M.innerHTML=`<div class="notice ok"><b>Booking code on</b>The new code is <b style="display:inline;font-size:inherit">${esc(c.toLowerCase())}</b>. Post it in the coaches' WhatsApp group. Capital letters don't matter.</div>`;
+};
+
 async function renderMatches(){
   let rows=[]; try{ rows=(await loadRange(today(),addDays(today(),120))).filter(b=>b.kind==='match'&&b.status==='confirmed'); }catch(err){}
   $('m-list').innerHTML = rows.length ? `<div class="panel">${rows.map(b=>`<div class="slot"><div class="t">${hm(b.start_time)}<small>${niceDate(b.day)}</small></div>
@@ -664,7 +743,7 @@ $('m-list').addEventListener('click',async e=>{ const b=e.target.closest('[data-
 function show(v){
   document.querySelectorAll('#tabs button').forEach(b=>b.classList.toggle('on',b.dataset.v===v));
   document.querySelectorAll('.view').forEach(x=>x.classList.toggle('on',x.id==='v-'+v));
-  if(v==='sched') renderSched(); if(v==='book') refreshBook(true); if(v==='match' && PIN) { refreshMatch(true); renderMatches(); }
+  if(v==='sched') renderSched(); if(v==='mine' && validPhone($('f-phone').value) && !$('f-list').innerHTML.trim()) $('f-go').onclick(); if(v==='book') refreshBook(true); if(v==='match' && PIN) { refreshMatch(true); renderMatches(); }
 }
 document.querySelectorAll('#tabs button').forEach(b=>b.addEventListener('click',()=>{ show(b.dataset.v); window.scrollTo(0,0); }));
 
@@ -675,12 +754,17 @@ if(['book','sched','schedule','match'].includes(qs.get('view'))) show(qs.get('vi
 setInterval(()=>{ if($('v-sched').classList.contains('on')) renderSched(); }, 60000);
 loadRules();
 loadTeams();
+$('forget-me').addEventListener('click',e=>{ e.preventDefault();
+  try{ localStorage.removeItem(ME_KEY); }catch(err){}
+  ['b-name','b-phone','b-email','f-phone','b-team-other','b-code'].forEach(id=>$(id).value='');
+  $('b-team-sel').value=''; $('b-team-other-wrap').hidden=true; $('f-list').innerHTML='';
+  e.target.textContent='Cleared'; setTimeout(()=>{ e.target.textContent='Not you? Clear saved details'; },2000); });
 $('b-team-sel').addEventListener('change',()=>{ $('b-team-other-wrap').hidden=$('b-team-sel').value!=='__other'; });
 (function(){ const me=loadMe();
-  if(me.name) $('b-name').value=me.name; if(me.phone){ $('b-phone').value=me.phone; $('f-phone').value=me.phone; } if(me.email) $('b-email').value=me.email;
+  if(me.name) $('b-name').value=me.name; if(me.phone){ $('b-phone').value=me.phone; $('f-phone').value=me.phone; } if(me.email) $('b-email').value=me.email; if(me.code) $('b-code').value=me.code;
   const ref=qs.get('ref');
-  if(ref){ FOCUS_REF=ref.toUpperCase(); show('sched');
-    setTimeout(()=>{ $('mine').scrollIntoView({block:'start'}); if(me.phone) $('f-go').onclick(); else $('f-phone').focus(); },300); }
+  if(ref){ FOCUS_REF=ref.toUpperCase(); show('mine');
+    setTimeout(()=>{ if(me.phone) $('f-go').onclick(); else $('f-phone').focus(); },300); }
 })();
 </script>
 
