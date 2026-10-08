@@ -1,0 +1,161 @@
+-- =====================================================================
+-- Killeshin GAA Pitch Bookings: update 4
+--  * Coaches can book practice matches themselves
+--    (free halves only, never bumps training; can use half 6; one-off)
+-- Run in Supabase > SQL Editor AFTER update-3. Safe to run twice.
+-- =====================================================================
+
+alter table public.bookings add column if not exists practice boolean not null default false;
+alter table public.bookings add column if not exists opponent text;
+
+create or replace view public.public_schedule as
+  select id, kind, day, start_time, end_time, halves, team, status, (source_key is not null) as auto, practice, opponent
+  from public.bookings
+  where status <> 'cancelled';
+grant select on public.public_schedule to anon, authenticated;
+
+drop function if exists public.book_training(date,time,time,int[],text,text,text,text,boolean,text);
+create or replace function public.book_training(
+  p_day date, p_start time, p_end time, p_halves int[],
+  p_team text, p_name text, p_phone text, p_email text, p_weekly boolean default false, p_code text default null,
+  p_practice boolean default false, p_opponent text default null)
+returns json
+language plpgsql security definer set search_path = public as $$
+declare
+  c record; d date; v_ref text; v_id uuid; v_phone text := norm_phone(p_phone); v_shut int[];
+  v_series uuid := case when p_weekly then gen_random_uuid() end;
+  v_dates date[]; booked json[] := '{}'; skipped json[] := '{}';
+  v_lines text := ''; v_skip_lines text := ''; v_first text;
+begin
+  if coalesce((select value from settings where key = 'booking_code'),'') <> ''
+     and lower(trim(coalesce(p_code,''))) <> (select value from settings where key = 'booking_code') then
+    raise exception 'Wrong booking code. Ask a club officer or check the coaches'' WhatsApp group.';
+  end if;
+  if p_day < (now() at time zone 'Europe/Dublin')::date then raise exception 'That date has passed.'; end if;
+  if p_end <= p_start then raise exception 'Finish time must be after the start.'; end if;
+  if coalesce(trim(p_team),'') = '' or coalesce(trim(p_name),'') = '' then raise exception 'Team and name are required.'; end if;
+  if v_phone !~ '^\d{10,14}$' then raise exception 'Enter a valid mobile number, e.g. 086 123 4567.'; end if;
+  if coalesce(p_email,'') !~ '^\S+@\S+\.\S+$' then raise exception 'Enter a valid email so we can send your confirmation.'; end if;
+  if p_halves is null or cardinality(p_halves) = 0 or not (p_halves <@ array[1,2,3,4,5,6]) then raise exception 'Pick at least one half.'; end if;
+  if p_practice and coalesce(trim(p_opponent),'') = '' then raise exception 'Enter who you are playing.'; end if;
+  if p_practice then p_weekly := false; end if;
+  select array_agg(h order by h) into v_shut from unnest(p_halves) h where h = any(training_closed()) and not p_practice;
+  if v_shut is not null then
+    raise exception 'Half % is for matches only and can''t be booked for training. Please pick another half.', array_to_string(v_shut, ' & ');
+  end if;
+
+  if p_weekly and season_end() > p_day then
+    select array_agg(x::date order by x) into v_dates from generate_series(p_day, season_end(), interval '7 days') x;
+  else
+    v_dates := array[p_day];
+  end if;
+  if cardinality(v_dates) > 40 then raise exception 'That is more than 40 weeks. Check the season end date.'; end if;
+
+  foreach d in array v_dates loop                         -- lock every day up front, in date order
+    perform pg_advisory_xact_lock(hashtext('kg-' || d::text));
+  end loop;
+
+  foreach d in array v_dates loop
+    select * into c from bookings b
+     where b.day = d and b.status = 'confirmed' and b.halves && p_halves
+       and b.start_time < p_end and p_start < b.end_time
+     order by (b.kind = 'match') desc limit 1;
+    if found then
+      skipped := skipped || json_build_object('day', d, 'reason',
+        case when c.kind = 'match' then 'Match on: ' || c.team else 'Already booked by ' || c.team end);
+      v_skip_lines := v_skip_lines || '  ' || nice_day(d) || ': ' ||
+        case when c.kind = 'match' then 'match on (' || c.team || ')' else 'already booked by ' || c.team end || E'\n';
+      continue;
+    end if;
+    v_ref := new_ref('KG');
+    insert into bookings(ref, kind, day, start_time, end_time, halves, team, contact_name, phone, email, series_id, practice, opponent)
+    values (v_ref, 'training', d, p_start, p_end, p_halves, trim(p_team), trim(p_name), v_phone, trim(p_email), v_series,
+            coalesce(p_practice,false), nullif(trim(coalesce(p_opponent,'')),''))
+    returning id into v_id;
+    v_first := coalesce(v_first, v_ref);
+    booked := booked || json_build_object('day', d, 'ref', v_ref);
+    v_lines := v_lines || '  ' || nice_day(d) || '  (ref ' || v_ref || ')' || E'\n';
+  end loop;
+
+  if cardinality(booked) = 0 then
+    raise exception '%', (skipped[1]->>'reason') || ' at that time. Try another time or pitch.';
+  end if;
+
+  insert into notifications(booking_id, to_email, subject, body) values (v_id, trim(p_email),
+    'Killeshin GAA: ' || case when p_practice then 'practice match' else 'pitch' end || ' booked (' || v_first || case when cardinality(booked) > 1 then ', ' || cardinality(booked) || ' weeks' else '' end || ')',
+    'Hi ' || trim(p_name) || ',' || E'\n\n' ||
+    'Your pitch booking is confirmed.' || E'\n\n' ||
+    'Team: ' || trim(p_team) || case when p_practice then ' v ' || trim(p_opponent) || ' (practice match)' else '' end || E'\n' ||
+    'Time: ' || hhmi(p_start) || ' to ' || hhmi(p_end) || E'\n' ||
+    'Where: ' || halves_text(p_halves) || E'\n\n' ||
+    'Booked:' || E'\n' || v_lines ||
+    case when v_skip_lines <> '' then E'\nNot booked, the pitch is taken:\n' || v_skip_lines else '' end || E'\n' ||
+    'Matches take priority over training. If a fixture needs your pitch we will email you, and you can move to a free pitch in one tap.' || E'\n\n' ||
+    'Manage your bookings: ' || site_url() || '?ref=' || v_first || E'\n\n' ||
+    'Killeshin GAA');
+
+  return json_build_object('ref', v_first, 'booked', array_to_json(booked), 'skipped', array_to_json(skipped));
+end $$;
+grant execute on function public.book_training(date,time,time,int[],text,text,text,text,boolean,text,boolean,text) to anon, authenticated;
+
+drop function if exists public.my_bookings(text);
+create or replace function public.my_bookings(p_phone text)
+returns table(ref text, day date, start_time time, end_time time, halves int[], team text, status text,
+              weekly boolean, practice boolean, opponent text)
+language sql security definer set search_path = public as $$
+  select ref, day, start_time, end_time, halves, team, status, (series_id is not null), practice, opponent
+    from bookings
+   where kind = 'training' and phone = norm_phone(p_phone) and status <> 'cancelled'
+     and day >= (now() at time zone 'Europe/Dublin')::date
+   order by day, start_time;
+$$;
+grant execute on function public.my_bookings(text) to anon, authenticated;
+
+drop function if exists public.officer_bookings(text,date);
+create or replace function public.officer_bookings(p_pin text, p_day date)
+returns table(ref text, kind text, start_time time, end_time time, halves int[], team text,
+              contact_name text, phone text, status text, weekly boolean, practice boolean, opponent text)
+language plpgsql security definer set search_path = public as $$
+begin
+  perform check_pin(p_pin);
+  return query
+    select b.ref, b.kind, b.start_time, b.end_time, b.halves, b.team, b.contact_name, b.phone, b.status,
+           (b.series_id is not null), b.practice, b.opponent
+      from bookings b
+     where b.day = p_day and b.status <> 'cancelled'
+     order by b.start_time, b.halves[1];
+end $$;
+grant execute on function public.officer_bookings(text,date) to anon, authenticated;
+
+-- A coach moving a practice match may use half 6 too
+create or replace function public.move_booking(p_ref text, p_phone text, p_halves int[]) returns json
+language plpgsql security definer set search_path = public as $$
+declare r record; c record; v_shut int[];
+begin
+  select * into r from bookings
+   where ref = p_ref and phone = norm_phone(p_phone) and kind = 'training'
+     and status in ('confirmed','moved') and day >= (now() at time zone 'Europe/Dublin')::date;
+  if not found then raise exception 'Booking not found for that number.'; end if;
+  if p_halves is null or cardinality(p_halves) = 0 or not (p_halves <@ array[1,2,3,4,5,6]) then raise exception 'Pick at least one half.'; end if;
+  select array_agg(h order by h) into v_shut from unnest(p_halves) h where h = any(training_closed()) and not r.practice;
+  if v_shut is not null then raise exception 'Half % is for matches only.', array_to_string(v_shut, ' & '); end if;
+
+  perform pg_advisory_xact_lock(hashtext('kg-' || r.day::text));
+  select * into c from bookings b
+   where b.id <> r.id and b.day = r.day and b.status = 'confirmed' and b.halves && p_halves
+     and b.start_time < r.end_time and r.start_time < b.end_time
+   order by (b.kind = 'match') desc limit 1;
+  if found then
+    raise exception '% is taken by % at that time.',
+      halves_text(array(select unnest(c.halves) intersect select unnest(p_halves))), c.team;
+  end if;
+
+  update bookings set halves = p_halves, status = 'confirmed' where id = r.id;
+  if coalesce(r.email,'') <> '' then
+    insert into notifications(booking_id, to_email, subject, body) values (r.id, r.email,
+      'Killeshin GAA: booking moved to ' || halves_text(p_halves) || ' (' || r.ref || ')',
+      'Your ' || r.team || coalesce(' v ' || r.opponent, '') || ' booking on ' || nice_day(r.day) || ', ' ||
+      hhmi(r.start_time) || ' to ' || hhmi(r.end_time) || ' is now on ' || halves_text(p_halves) || '.' || E'\n\nKilleshin GAA');
+  end if;
+  return json_build_object('ref', r.ref, 'halves', p_halves);
+end $$;
