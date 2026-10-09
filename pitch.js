@@ -51,6 +51,11 @@
         '<span class="tile">' + ICON + '</span>' +
         '<span class="tx"><b>Pitch Bookings</b>' +
         '<span>Book a pitch for training or a practice match, and see what\u2019s on</span></span>' +
+        '<span class="go">\u203A</span></a>' +
+      '<a class="ptile" href="' + URL + '?view=today">' +
+        '<span class="tile"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></span>' +
+        '<span class="tx"><b>What\u2019s on today</b>' +
+        '<span>Training, practice matches and home games on the club pitches</span></span>' +
         '<span class="go">\u203A</span></a>';
     return wrap;
   }

@@ -123,6 +123,22 @@ label>input:focus,label>select:focus{border-color:var(--forest);outline:none;box
 .movebox .pill{white-space:normal;text-align:left}
 .row>label.w-date{flex:1 1 100%}
 .row>label{min-width:0}
+.tnow{display:flex;align-items:center;gap:8px;font-size:11px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--green-dk);margin:16px 2px 8px}
+.tnow i{width:9px;height:9px;border-radius:50%;background:var(--green);box-shadow:0 0 0 0 rgba(58,205,119,.6);animation:pulse 1.6s infinite}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(58,205,119,.55)}70%{box-shadow:0 0 0 9px rgba(58,205,119,0)}100%{box-shadow:0 0 0 0 rgba(58,205,119,0)}}
+@media (prefers-reduced-motion:reduce){.tnow i{animation:none}}
+.tgrp{font-size:11px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--grey);margin:18px 2px 8px}
+.titem{display:grid;grid-template-columns:78px 1fr;gap:12px;align-items:start;background:#fff;border:1px solid var(--line);
+  border-radius:16px;padding:13px 14px;margin-bottom:8px;box-shadow:0 2px 8px rgba(17,73,46,.06)}
+.titem.live{border-color:var(--green);box-shadow:0 0 0 3px rgba(58,205,119,.18),0 4px 14px rgba(17,73,46,.1)}
+.titem.match{background:linear-gradient(180deg,#FFFDF6,#FBF1DC);border-color:rgba(184,125,18,.35)}
+.titem.done{opacity:.55}
+.titem .tt{font-family:var(--dsp);font-weight:800;font-size:22px;line-height:1;color:var(--deep);font-variant-numeric:tabular-nums}
+.titem .tt small{display:block;font-family:Archivo,sans-serif;font-size:12px;font-weight:600;color:var(--grey);margin-top:5px}
+.titem .who{display:block;font-weight:800;font-size:16.5px;margin-top:5px;line-height:1.3}
+.titem .where{display:flex;align-items:center;gap:6px;font-size:13.5px;color:var(--grey);margin-top:4px}
+.titem .where svg{width:14px;height:14px;flex:none;stroke:var(--green-dk);stroke-width:2;fill:none}
 .mbk{padding:13px 14px;margin-top:10px;border-radius:14px;background:#fff;border:1px solid var(--line)}
 .mbk.hl{border-color:var(--green);box-shadow:0 0 0 3px rgba(58,205,119,.2)}
 .mbk.moved .who{text-decoration:line-through;opacity:.65}
@@ -186,9 +202,9 @@ input[type=date]::-webkit-calendar-picker-indicator{opacity:.6}
 /* bottom bar, as on the main site */
 .bar{position:fixed;left:0;right:0;bottom:0;z-index:60;background:rgba(17,73,46,.96);-webkit-backdrop-filter:blur(16px);
   backdrop-filter:blur(16px);border-top:1px solid rgba(255,255,255,.1);padding-bottom:env(safe-area-inset-bottom)}
-.bar .in{display:grid;grid-template-columns:repeat(4,1fr);max-width:600px;margin:0 auto}
-.bar button{display:flex;flex-direction:column;align-items:center;gap:5px;padding:10px 2px 8px;font-size:10.5px;font-weight:700;
-  letter-spacing:.07em;text-transform:uppercase;color:#F0F7F3;background:none;border:0;position:relative}
+.bar .in{display:grid;grid-template-columns:repeat(5,1fr);max-width:600px;margin:0 auto}
+.bar button{display:flex;flex-direction:column;align-items:center;gap:5px;padding:10px 1px 8px;font-size:9.5px;font-weight:700;
+  letter-spacing:.04em;line-height:1.15;text-align:center;text-transform:uppercase;color:#F0F7F3;background:none;border:0;position:relative}
 .bar svg{width:23px;height:23px;stroke:currentColor;stroke-width:1.9;fill:none;stroke-linecap:round;stroke-linejoin:round}
 .bar button.on{color:#fff;font-weight:800}
 .bar button.on svg{stroke-width:2.4;stroke:var(--green)}
@@ -254,6 +270,14 @@ body.embed main{padding:4px}
     <button class="btn block" id="b-go">BOOK</button>
     <div id="b-result"></div>
   </div>
+</section>
+
+<!-- TODAY -->
+<section class="view" id="v-today">
+  <h2>What's on today</h2>
+  <p class="sub" id="t-date"></p>
+  <div id="t-list"><p class="empty">Loading…</p></div>
+  <p class="sub" style="margin-top:14px;font-size:12.5px">Training, practice matches and home games on the club pitches. Updates by itself every minute.</p>
 </section>
 
 <!-- SCHEDULE -->
@@ -335,11 +359,12 @@ body.embed main{padding:4px}
   </div>
 </section>
 
-<p class="demo">Version 9 Oct · 12<br><a href="/" style="color:var(--green-dk);font-weight:700;text-decoration:none">Back to killeshingaa.ie</a></p>
+<p class="demo">Version 9 Oct · 13<br><a href="/" style="color:var(--green-dk);font-weight:700;text-decoration:none">Back to killeshingaa.ie</a></p>
 </main>
 
 <nav class="bar" id="tabs" aria-label="Sections"><div class="in">
   <button data-v="book" class="on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="15" rx="2"/><path d="M3 10h18M8 3v4M16 3v4M12 13v4M10 15h4"/></svg>Book</button>
+  <button data-v="today"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>Today</button>
   <button data-v="sched"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M12 4v16M3 12h18"/></svg>Schedule</button>
   <button data-v="mine"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg>My bookings</button>
   <button data-v="match"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 21V4M18 21V4M6 10h12"/></svg>Fixtures</button>
@@ -400,6 +425,7 @@ function loadMe(){ try{ return JSON.parse(localStorage.getItem(ME_KEY)||'{}')||{
 function saveMe(o){ try{ localStorage.setItem(ME_KEY, JSON.stringify(Object.assign(loadMe(),o))); }catch(e){} }
 
 /* ---------- Teams: the club's own grades, read from the main site's data.json ---------- */
+let SITE=null;
 let TEAMS={men:['Senior','Junior A','Junior C','U20','U17','U15','U13','Féile','Kelly Cup'],
            ladies:['Intermediate','Junior','Minor','U16','U14']};
 const teamLabel=(b,g)=>(b==='ladies'?'Ladies ':"Men's ")+g;
@@ -415,8 +441,9 @@ function renderTeams(){
 }
 async function loadTeams(){
   try{ const r=await fetch('data.json',{cache:'no-store'}); if(!r.ok) throw 0; const j=await r.json();
-    if(j && j.gradesBy && (j.gradesBy.men||j.gradesBy.ladies)) TEAMS=j.gradesBy; }catch(e){ /* built-in list stands in */ }
+    SITE=j; if(j && j.gradesBy && (j.gradesBy.men||j.gradesBy.ladies)) TEAMS=j.gradesBy; }catch(e){ /* built-in list stands in */ }
   renderTeams();
+  if($('v-today') && $('v-today').classList.contains('on')) renderToday();
 }
 const chosenTeam=()=>$('b-team-sel').value==='__other' ? $('b-team-other').value.trim() : $('b-team-sel').value;
 
@@ -666,6 +693,52 @@ $('f-list').addEventListener('click',async e=>{
     $('f-go').click(); renderSched(); }
 });
 
+/* ---------- TODAY ---------- */
+const PIN_ICON='<svg viewBox="0 0 24 24"><path d="M12 21s7-5.7 7-11a7 7 0 1 0-14 0c0 5.3 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/></svg>';
+const nowMin=()=>{ const n=new Date(); return n.getHours()*60+n.getMinutes(); };
+function siteHomeGamesToday(){
+  // Home games from the club website, in case the automatic sync hasn't booked one yet
+  if(!SITE || !Array.isArray(SITE.fixtures)) return [];
+  const t=today();
+  return SITE.fixtures.filter(f=>{
+    if(f.date!==t || !/^\d{1,2}:\d{2}$/.test(f.time||'')) return false;
+    const v=(f.venue||'').toLowerCase();
+    return v.includes('killeshin')||v.includes('hearns')||v.includes('sonny byrne')||(f.isHome&&(!f.venue||/^tbc/i.test(f.venue)));
+  }).map(f=>({kind:'match', site:true, start_time:f.time.padStart(5,'0'), end_time:fromMin(Math.min(toMin(f.time.padStart(5,'0'))+90,23*60+59)),
+              team:(f.branch==='ladies'?'Ladies ':'')+f.grade+' v '+f.opponent, halves:[], status:'confirmed'}));
+}
+async function renderToday(){
+  const L=$('t-list'), d=today();
+  $('t-date').textContent=new Date(d+'T12:00').toLocaleDateString('en-IE',{weekday:'long',day:'numeric',month:'long'});
+  let rows=[];
+  try{ rows=(await loadRange(d,d)).filter(b=>b.status==='confirmed'); }
+  catch(err){ L.innerHTML=`<p class="empty">Could not load today: ${esc(cleanErr(err))}</p>`; return; }
+  // add any home game the website knows about that isn't booked yet
+  siteHomeGamesToday().forEach(f=>{
+    const st=toMin(f.start_time);
+    if(!rows.some(b=>b.kind==='match' && Math.abs(toMin(hm(b.start_time))-st)<=90)) rows.push(f);
+  });
+  rows.sort((a,b)=>hm(a.start_time).localeCompare(hm(b.start_time)));
+  if(!rows.length){ L.innerHTML='<p class="empty" style="padding:22px 2px">Nothing on the club pitches today.</p>'; return; }
+  const n=nowMin();
+  const live=rows.filter(b=>toMin(hm(b.start_time))<=n && n<toMin(hm(b.end_time)));
+  const later=rows.filter(b=>toMin(hm(b.start_time))>n);
+  const done=rows.filter(b=>toMin(hm(b.end_time))<=n);
+  const card=(b,cls)=>{
+    const isMatch=b.kind==='match'||b.practice;
+    const tag=b.kind==='match'?'<span class="tag m">Match</span>':b.practice?'<span class="tag m">Practice match</span>':'<span class="tag tr">Training</span>';
+    const where=b.halves&&b.halves.length?describeHalves(b.halves):'Club grounds · pitch to be confirmed';
+    return `<div class="titem ${cls} ${isMatch?'match':''}"><div class="tt">${hm(b.start_time)}<small>to ${hm(b.end_time)}</small></div>
+      <div>${tag}<span class="who">${esc(b.team)}${b.opponent?' v '+esc(b.opponent):''}</span>
+      <span class="where">${PIN_ICON}${esc(where)}</span></div></div>`;
+  };
+  let html='';
+  if(live.length) html+='<div class="tnow"><i></i>On now</div>'+live.map(b=>card(b,'live')).join('');
+  if(later.length) html+=`<div class="tgrp">${live.length?'Later today':'Coming up'}</div>`+later.map(b=>card(b,'')).join('');
+  if(done.length) html+='<div class="tgrp">Earlier today</div>'+done.map(b=>card(b,'done')).join('');
+  L.innerHTML=html;
+}
+
 /* ---------- FIXTURES (officers) ---------- */
 let PIN=''; const matchSel=new Set();
 $('map-match').innerHTML=mapSVG('match');
@@ -773,15 +846,15 @@ $('m-list').addEventListener('click',async e=>{ const b=e.target.closest('[data-
 function show(v){
   document.querySelectorAll('#tabs button').forEach(b=>b.classList.toggle('on',b.dataset.v===v));
   document.querySelectorAll('.view').forEach(x=>x.classList.toggle('on',x.id==='v-'+v));
-  if(v==='sched') renderSched(); if(v==='mine' && validPhone($('f-phone').value) && !$('f-list').innerHTML.trim()) $('f-go').onclick(); if(v==='book') refreshBook(true); if(v==='match' && PIN) { refreshMatch(true); renderMatches(); }
+  if(v==='sched') renderSched(); if(v==='today') renderToday(); if(v==='mine' && validPhone($('f-phone').value) && !$('f-list').innerHTML.trim()) $('f-go').onclick(); if(v==='book') refreshBook(true); if(v==='match' && PIN) { refreshMatch(true); renderMatches(); }
 }
 document.querySelectorAll('#tabs button').forEach(b=>b.addEventListener('click',()=>{ show(b.dataset.v); window.scrollTo(0,0); }));
 
 // killeshingaa.ie embed:  bookings.html?view=schedule&embed=1  shows just the public schedule
 const qs=new URLSearchParams(location.search);
 if(qs.get('embed')==='1'){ document.body.classList.add('embed'); }
-if(['book','sched','schedule','match'].includes(qs.get('view'))) show(qs.get('view')==='schedule'?'sched':qs.get('view')); else refreshBook(true);
-setInterval(()=>{ if($('v-sched').classList.contains('on')) renderSched(); }, 60000);
+if(['book','sched','schedule','match','today'].includes(qs.get('view'))) show(qs.get('view')==='schedule'?'sched':qs.get('view')); else refreshBook(true);
+setInterval(()=>{ if($('v-sched').classList.contains('on')) renderSched(); if($('v-today').classList.contains('on')) renderToday(); }, 60000);
 loadRules();
 loadTeams();
 $('forget-me').addEventListener('click',e=>{ e.preventDefault();
