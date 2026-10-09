@@ -1,6 +1,7 @@
 /* Pitch Bookings add-on for killeshingaa.ie
    1. "Today at the Club" strip on the home page, below Buy tickets and above
-      Next match. Tap = full Today view. Long press = overview bubble.
+      Next match. For supporters: tap = full list for today, long press = quick
+      overview bubble. Stays on the main site, no link to Pitch Bookings.
    2. "Pitch bookings" and "What's on today" tiles at the top of the Club page.
    3. "Pitch bookings" button in the More menu.
    Loaded by one line at the bottom of index.html:  <script src="pitch.js"></script> */
@@ -36,7 +37,7 @@
     '.sheet a.pbtn{display:flex;align-items:center;gap:14px;width:100%;text-align:left;padding:15px 17px;margin-bottom:9px;border-radius:14px;font-size:16.5px;font-weight:700;background:var(--green-lt);color:var(--green-dk);border:1.5px solid #BFDFCD;box-shadow:0 3px 0 #BFDFCD;text-decoration:none}' +
     '.sheet a.pbtn svg{width:22px;height:22px;stroke:currentColor;stroke-width:1.9;fill:none;stroke-linecap:round;stroke-linejoin:round;flex:none}' +
     /* the Today at the Club strip */
-    '#tatc{display:flex;align-items:center;gap:13px;width:calc(100% - 32px);margin:12px 16px 2px;padding:13px 15px;text-align:left;border-radius:18px;cursor:pointer;color:#fff;position:relative;overflow:hidden;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none;background:linear-gradient(150deg,var(--forest) 0%,var(--deep) 100%);border:1px solid rgba(17,73,46,.4);box-shadow:0 5px 16px -6px rgba(17,73,46,.45)}' +
+    '#tatc{box-sizing:border-box;display:flex;align-items:center;gap:13px;width:calc(100% - 32px);margin:12px 16px 2px;padding:13px 15px;text-align:left;border-radius:18px;cursor:pointer;color:#fff;position:relative;overflow:hidden;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none;background:linear-gradient(150deg,var(--forest) 0%,var(--deep) 100%);border:1px solid rgba(17,73,46,.4);box-shadow:0 5px 16px -6px rgba(17,73,46,.45)}' +
     '#tatc::before{content:"";position:absolute;inset:-20%;pointer-events:none;background:repeating-linear-gradient(114deg,rgba(255,255,255,.05) 0 1px,transparent 1px 9px),repeating-linear-gradient(114deg,rgba(58,205,119,.14) 0 2px,transparent 2px 34px)}' +
     '#tatc>*{position:relative;z-index:1}' +
     '#tatc .ic{width:42px;height:42px;flex:none;border-radius:13px;display:grid;place-items:center;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.18)}' +
@@ -69,8 +70,21 @@
     '#tatcSheet .it .w{display:block;font-weight:800;font-size:15px;line-height:1.3}' +
     '#tatcSheet .it .p{display:flex;gap:5px;align-items:center;font-size:12.5px;color:var(--grey);margin-top:2px}' +
     '#tatcSheet .it .p svg{width:12px;height:12px;stroke:var(--green-dk);stroke-width:2;fill:none;flex:none}' +
+    '#tatcBubble{box-sizing:border-box;position:absolute;z-index:80;background:#fff;border-radius:16px;padding:8px 12px;border:1px solid rgba(31,130,74,.3);box-shadow:0 14px 34px -8px rgba(10,30,20,.45);animation:tatcPop .14s ease-out}' +
+    '#tatcBubble .arrow{position:absolute;top:-7px;left:34px;width:14px;height:14px;background:#fff;border-left:1px solid rgba(31,130,74,.3);border-top:1px solid rgba(31,130,74,.3);transform:rotate(45deg)}' +
+    '#tatcBubble .bi{display:flex;gap:11px;padding:8px 0;border-top:1px solid var(--line)}' +
+    '#tatcBubble .bi:first-of-type{border-top:0}' +
+    '#tatcBubble .bt{flex:none;width:48px;font-family:"Bricolage Grotesque",Archivo,sans-serif;font-weight:800;font-size:16px;color:var(--deep)}' +
+    '#tatcBubble .bw{flex:1;min-width:0}' +
+    '#tatcBubble .bw em{display:block;font-style:normal;font-size:10px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--grey)}' +
+    '#tatcBubble .bw em.on{color:var(--green-dk)}' +
+    '#tatcBubble .bw b{display:block;font-size:14.5px;line-height:1.3}' +
+    '#tatcBubble .bw small{display:block;font-size:12px;color:var(--grey)}' +
+    '#tatcBubble .bnone{font-size:14px;color:var(--grey);padding:8px 0}' +
+    '#tatcBubble .bmore{font-size:12px;font-weight:700;color:var(--green-dk);padding:7px 0 3px;border-top:1px solid var(--line)}' +
+    '@keyframes tatcPop{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}' +
     '#tatcSheet .none{font-size:14.5px;color:var(--grey);padding:10px 2px}' +
-    '#tatcSheet .open{display:block;text-align:center;margin-top:14px;padding:15px;border-radius:12px;background:var(--forest);color:#fff;font-weight:800;font-size:15px;border:1.5px solid #0F5C34;box-shadow:0 3px 0 #0F5C34;text-decoration:none}';
+    '#tatcSheet .open{display:block;width:100%;text-align:center;margin-top:14px;padding:15px;border-radius:12px;background:var(--forest);color:#fff;font-weight:800;font-size:15px;border:1.5px solid #0F5C34;box-shadow:0 3px 0 #0F5C34;text-decoration:none}';
   document.head.appendChild(css);
 
   /* ---------- data ---------- */
@@ -151,7 +165,7 @@
     el = document.createElement('button');
     el.id = 'tatc';
     el.type = 'button';
-    el.setAttribute('aria-label', 'Today at the Club. Tap for the full list, press and hold for an overview.');
+    el.setAttribute('aria-label', 'Today at the Club. Tap for everything on today, press and hold for a quick look.');
     el.innerHTML = '<span class="ic">' + ICON.clock + '</span>' +
       '<span class="tx"><b><i></i>Today at the Club</b><span id="tatcLine">Checking what\u2019s on\u2026</span><small id="tatcSub"></small></span>' +
       '<span class="go">\u203A</span>';
@@ -164,7 +178,7 @@
     var s = split(), line, sub;
     if(!ITEMS.length){
       line = LOADED ? 'Nothing on the club pitches today' : 'Tap to see what\u2019s on';
-      sub = 'Tap to book a pitch';
+      sub = LOADED ? 'Check back later' : '';
     } else if(s.live.length){
       line = 'On now: ' + title(s.live[0]) + (s.live.length > 1 ? ' +' + (s.live.length-1) + ' more' : '');
       sub = s.later.length ? 'Next: ' + hm(s.later[0].start_time) + ' ' + title(s.later[0]) : 'Nothing else later today';
@@ -190,7 +204,7 @@
       timer = setTimeout(function(){
         held = true; el.classList.remove('pressing');
         if(navigator.vibrate) try { navigator.vibrate(12); } catch(err){}
-        openSheet();
+        openBubble();
       }, 450);
     });
     el.addEventListener('pointermove', function(e){
@@ -202,7 +216,7 @@
     el.addEventListener('contextmenu', function(e){ e.preventDefault(); });
     el.addEventListener('click', function(e){
       if(held){ e.preventDefault(); held = false; return; }
-      location.href = BOOKINGS + '?view=today';
+      openSheet();
     });
   }
 
@@ -216,7 +230,8 @@
     sh.setAttribute('role', 'dialog');
     sh.setAttribute('aria-label', 'Today at the Club');
     sh.innerHTML = '<div class="panel"><div class="grab"></div><div id="tatcBody"></div></div>';
-    sh.addEventListener('click', function(e){ if(!e.target.closest('.panel')) sh.classList.remove('open'); });
+    sh.addEventListener('click', function(e){
+      if(!e.target.closest('.panel') || e.target.closest('#tatcClose')) sh.classList.remove('open'); });
     document.body.appendChild(sh);
     return sh;
   }
@@ -233,9 +248,36 @@
     if(s.live.length)  html += '<div class="grp now">On now</div>' + s.live.map(function(b){ return item(b,'live'); }).join('');
     if(s.later.length) html += '<div class="grp">' + (s.live.length ? 'Later today' : 'Coming up') + '</div>' + s.later.map(function(b){ return item(b,''); }).join('');
     if(s.done.length)  html += '<div class="grp">Earlier today</div>' + s.done.map(function(b){ return item(b,'done'); }).join('');
-    html += '<a class="open" href="' + BOOKINGS + '?view=today">Open full view</a>';
+    html += '<button class="open" type="button" id="tatcClose">Close</button>';
     document.getElementById('tatcBody').innerHTML = html;
   }
+  /* Quick look: a small bubble just under the strip, on now and next only */
+  function openBubble(){
+    closeBubble();
+    var el = document.getElementById('tatc'); if(!el) return;
+    var s = split(), r = el.getBoundingClientRect();
+    var rows = s.live.map(function(b){ return ['On now', b]; })
+      .concat(s.later.slice(0, Math.max(1, 3 - s.live.length)).map(function(b){ return ['Next', b]; }));
+    var body = rows.length ? rows.map(function(x){ var b = x[1];
+        return '<div class="bi"><span class="bt">' + hm(b.start_time) + '</span><span class="bw"><em class="' +
+          (x[0] === 'On now' ? 'on' : '') + '">' + x[0] + ' \u00b7 ' + kindOf(b) + '</em><b>' + esc(title(b)) +
+          '</b><small>' + esc(where(b.halves)) + '</small></span></div>'; }).join('')
+      : '<div class="bnone">' + (ITEMS.length ? 'All done for today.' : 'Nothing on the club pitches today.') + '</div>';
+    var bub = document.createElement('div');
+    bub.id = 'tatcBubble';
+    bub.style.top = (r.bottom + window.scrollY + 10) + 'px';
+    bub.style.left = (r.left + window.scrollX) + 'px';
+    bub.style.width = r.width + 'px';
+    bub.innerHTML = '<span class="arrow"></span>' + body +
+      (ITEMS.length > rows.length ? '<div class="bmore">Tap the strip to see all ' + ITEMS.length + ' today</div>' : '');
+    document.body.appendChild(bub);
+    setTimeout(function(){
+      document.addEventListener('pointerdown', closeBubble, {once: true});
+      window.addEventListener('scroll', closeBubble, {once: true, passive: true});
+    }, 0);
+  }
+  function closeBubble(){ var b = document.getElementById('tatcBubble'); if(b) b.remove(); }
+
   function openSheet(){ var sh = sheet(); paintSheet(); requestAnimationFrame(function(){ sh.classList.add('open'); }); }
 
   /* Only on the home (Fixtures) page, between the filters and Next match */
@@ -256,7 +298,7 @@
       '<a class="ptile" href="' + BOOKINGS + '"><span class="tile">' + ICON.pitch + '</span>' +
         '<span class="tx"><b>Pitch Bookings</b><span>Book a pitch for training or a practice match, and see what\u2019s on</span></span>' +
         '<span class="go">\u203A</span></a>' +
-      '<a class="ptile" href="' + BOOKINGS + '?view=today"><span class="tile">' + ICON.clock + '</span>' +
+      '<a class="ptile" href="#" id="tatcTile"><span class="tile">' + ICON.clock + '</span>' +
         '<span class="tx"><b>Today at the Club</b><span>Training, practice matches and home games on the club pitches</span></span>' +
         '<span class="go">\u203A</span></a>';
     return wrap;
@@ -265,7 +307,9 @@
     var out = document.getElementById('out');
     if(!out || document.getElementById('pitchBookings')) return;
     if(!out.querySelector('.feat[data-feat], a.act')) return;
-    out.insertBefore(clubTiles(), out.firstChild);
+    var t = clubTiles();
+    out.insertBefore(t, out.firstChild);
+    t.querySelector('#tatcTile').addEventListener('click', function(e){ e.preventDefault(); openSheet(); });
   }
   function addToMore(){
     var panel = document.querySelector('#sheet .panel');
