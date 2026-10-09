@@ -98,7 +98,7 @@ label>input:focus,label>select:focus{border-color:var(--forest);outline:none;box
 .half:focus-visible .area{stroke:var(--green);stroke-width:8}
 .half text{font-family:var(--dsp);font-weight:800;fill:#fff;pointer-events:none;text-anchor:middle;dominant-baseline:central;
   paint-order:stroke;stroke:rgba(10,30,20,.65);stroke-linejoin:round}
-.half .num{font-size:52px;stroke-width:8px}
+.half .num{font-size:34px;stroke-width:7px}
 .half .st{font-family:Archivo,sans-serif;font-size:24px;font-weight:800;letter-spacing:.04em;stroke-width:6px}
 .half.sel .area{fill:rgba(58,205,119,.42);stroke-width:9}
 .half.match .mark{fill:rgba(184,125,18,.68)}
@@ -214,7 +214,12 @@ body.embed main{padding:4px}
 <!-- BOOK -->
 <section class="view on" id="v-book">
   <h2>Book a pitch</h2>
-  <p class="sub">Pick a time, then tap the halves you need. Two halves of the same pitch gives you the full pitch.</p>
+  <p class="sub" style="margin-bottom:6px"><b style="color:var(--ink)">What's it for?</b></p>
+  <div class="seg" id="b-kind" role="tablist" aria-label="What is the booking for">
+    <button class="on" data-k="training">Training</button><button data-k="practice">Practice match</button>
+  </div>
+  <p class="sub" id="b-kind-help" style="margin-top:-2px">Pick a time, then tap the side you need. Both sides of a pitch gives you the whole pitch.</p>
+  <p class="sub" id="b-kind-note" hidden style="margin-top:-2px">Pick a time, then tap the pitch you want: Old, Juvenile or Senior. Practice matches book a whole pitch. Official fixtures still take priority.</p>
   <div class="panel">
     <div class="row">
       <label class="w-date">Date<input type="date" id="b-date"></label>
@@ -232,20 +237,21 @@ body.embed main{padding:4px}
       <span><i style="background:#6B4E26"></i>Matches only</span>
     </div>
     <div class="quick" id="b-quick"></div>
-    <div class="selnote" id="b-selnote">No halves picked yet.</div>
+    <div class="selnote" id="b-selnote">Nothing picked yet.</div>
   </div>
   <div class="panel">
     <label>Team<select id="b-team-sel"><option value="">Choose your team</option></select></label>
     <label id="b-team-other-wrap" hidden>Team name<input id="b-team-other" placeholder="e.g. Cúl Camp"></label>
+    <label id="b-opp-wrap" hidden>Playing against<input id="b-opp" placeholder="e.g. Portlaoise U14"></label>
     <label>Your name<input id="b-name" autocomplete="name" placeholder="Trainer's name"></label>
     <div class="row">
       <label>Mobile number<input id="b-phone" type="tel" autocomplete="tel" placeholder="086 123 4567"></label>
       <label>Email<input id="b-email" type="email" autocomplete="email" placeholder="you@example.com"></label>
     </div>
     <p class="sub" style="margin:0 0 12px">Your confirmation and any changes are emailed to you. Your number and email are never shown publicly. This phone remembers your details for next time. <a href="#" id="forget-me" style="color:var(--green-dk);font-weight:700">Not you? Clear saved details</a></p>
-    <label class="chk"><input type="checkbox" id="b-weekly"><span>Book this same day and time <b>every week</b> until the end of the season (<span id="season-end">1 December</span>)</span></label>
+    <label class="chk" id="b-weekly-wrap"><input type="checkbox" id="b-weekly"><span>Book this same day and time <b>every week</b> until the end of the season (<span id="season-end">1 December</span>)</span></label>
     <label id="b-code-wrap" hidden>Club booking code<input id="b-code" autocomplete="off" autocapitalize="none" placeholder="From the coaches' WhatsApp group"></label>
-    <button class="btn block" id="b-go">Book these halves</button>
+    <button class="btn block" id="b-go">BOOK</button>
     <div id="b-result"></div>
   </div>
 </section>
@@ -329,7 +335,7 @@ body.embed main{padding:4px}
   </div>
 </section>
 
-<p class="demo">Version 8 Oct · 9<br><a href="/" style="color:var(--green-dk);font-weight:700;text-decoration:none">Back to killeshingaa.ie</a></p>
+<p class="demo">Version 9 Oct · 12<br><a href="/" style="color:var(--green-dk);font-weight:700;text-decoration:none">Back to killeshingaa.ie</a></p>
 </main>
 
 <nav class="bar" id="tabs" aria-label="Sections"><div class="in">
@@ -347,12 +353,16 @@ const SUPABASE_ANON_KEY = 'sb_publishable_THA4FVrKQzkCl6TcAmhk-A_tyMYNdPJ';
 /* ============================================================== */
 
 const PITCHES = [
-  {id:1, name:'Pitch 1', ground:'Sonny Byrne Park',   halves:[1,2]},
-  {id:2, name:'Pitch 2', ground:'Seamus Hearns Park', halves:[3,4]},
-  {id:3, name:'Pitch 3', ground:'Seamus Hearns Park', halves:[5,6]},
+  {id:1, name:'Old Pitch',      ground:'Sonny Byrne Park',   halves:[1,2]},
+  {id:2, name:'Juvenile Pitch', ground:'Seamus Hearns Park', halves:[3,4]},
+  {id:3, name:'Senior Pitch',   ground:'Seamus Hearns Park', halves:[5,6]},
 ];
+// The side of each pitch, as the club calls it
+const SIDE = {1:'Clubhouse', 2:'Cappalug', 3:'Front', 4:'Back', 5:'Back', 6:'Front'};
+const sideName = h => `${pitchOf(h).name} \u00b7 ${SIDE[h]}`;
 
-let CLOSED = [6], CODE_REQ = false;   // halves closed to training; the database is the authority
+let CLOSED = [6], CODE_REQ = false, PRACTICE = false;
+const closedNow = h => !PRACTICE && CLOSED.includes(h);   // halves closed to training; the database is the authority
 const configured = !SUPABASE_URL.includes('YOUR-PROJECT') && !!window.supabase;
 const sb = configured ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
 if(!configured) document.getElementById('cfg-warn').hidden = false;
@@ -374,8 +384,8 @@ const validPhone = p => /^\d{10,14}$/.test(normPhone(p));
 function describeHalves(hs){
   const out=[];
   PITCHES.forEach(p=>{ const got=p.halves.filter(h=>hs.includes(h));
-    if(got.length===2) out.push(`${p.name} full (${p.ground})`);
-    else if(got.length===1) out.push(`${p.name} half ${got[0]} (${p.ground})`); });
+    if(got.length===2) out.push(`${p.name} (whole pitch)`);
+    else if(got.length===1) out.push(`${p.name} \u00b7 ${SIDE[got[0]]} side`); });
   return out.join(', ');
 }
 function timeOptions(sel, from, to, def){
@@ -434,16 +444,17 @@ function mapSVG(prefix){
   let g='';
   Object.entries(HALF_POLYS).forEach(([h,pts])=>{
     const pt=pts.map(p=>p.join(',')).join(' '), [cx,cy]=centre(pts);
-    g+=`<g class="half" data-h="${h}" role="button" tabindex="0" aria-label="Half ${h}, ${pitchOf(+h).name}, ${pitchOf(+h).ground}">
+    g+=`<g class="half" data-h="${h}" role="button" tabindex="0" aria-label="${pitchOf(+h).name}, ${SIDE[h]} side">
       <polygon class="area" points="${pt}"/><polygon class="mark" points="${pt}"/>
-      <text class="num" x="${cx}" y="${cy+6}">${h}</text>
+      <text class="num" x="${cx}" y="${cy+6}">${SIDE[h]}</text>
       <text class="st" x="${cx}" y="${cy+58}" id="${prefix}-st-${h}"></text></g>`;
   });
   // Pitch name on each pitch, near its top edge
   const tags=PITCHES.map(p=>{ const pts=p.halves.flatMap(h=>HALF_POLYS[h]);
     const xs=pts.map(q=>q[0]), ys=pts.map(q=>q[1]);
     const x=(Math.min(...xs)+Math.max(...xs))/2, y=Math.min(...ys)+58;
-    return `<g class="ptag" transform="translate(${x},${y})"><rect x="-82" y="-24" width="164" height="48" rx="24"/><text>${p.name.toUpperCase()}</text></g>`; }).join('');
+    const w=Math.round(p.name.length*17+40);
+    return `<g class="ptag" transform="translate(${x},${y})"><rect x="${-w/2}" y="-24" width="${w}" height="48" rx="24"/><text>${p.name.toUpperCase()}</text></g>`; }).join('');
   return `<div class="mapbox"><img class="mapimg" src="${AERIAL}" alt="" decoding="async"><svg class="map" viewBox="0 0 ${MAP_W} ${MAP_H}" preserveAspectRatio="none" role="group" aria-label="Aerial map of the pitches">
     <defs><pattern id="hatch-${prefix}" width="22" height="22" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
       <rect width="22" height="22" fill="rgba(16,26,20,.55)"/><rect width="10" height="22" fill="rgba(226,234,229,.45)"/></pattern></defs>
@@ -457,15 +468,23 @@ function paintMap(prefix, rows, s, e, selected, isMatch){
   const wrap=$('map-'+prefix);
   Object.keys(HALF_RECTS).forEach(k=>{
     const h=+k, el=wrap.querySelector(`.half[data-h="${h}"]`), st=$(prefix+'-st-'+h);
-    const hit=rows.filter(b=>clash(b,s,e,[h])); const m=hit.find(b=>b.kind==='match'), t=hit.find(b=>b.kind==='training');
-    const shut = !isMatch && !m && CLOSED.includes(h);
+    const hit=rows.filter(b=>clash(b,s,e,[h])); const m=hit.find(b=>b.kind==='match'||(!isMatch&&b.practice)), t=hit.find(b=>b.kind==='training'&&(isMatch||!b.practice));
+    const shut = !isMatch && !m && closedNow(h);
     el.classList.toggle('match',!!m); el.classList.toggle('closed',shut);
     el.classList.toggle('busy',!m&&!shut&&!!t&&!isMatch); el.classList.toggle('sel',selected.has(h));
     st.textContent = m ? 'MATCH' : shut ? 'MATCHES ONLY' : t ? (isMatch?'training (will move)':t.team.slice(0,16)) : selected.has(h)?'picked':'';
   });
 }
-function wireMap(wrapId,set,refresh,allowBusy){
+function wireMap(wrapId,set,refresh,allowBusy,whole){
+  const blocked=el=>el.classList.contains('match')||el.classList.contains('closed')||(!allowBusy&&el.classList.contains('busy'));
   const toggle=h=>{ const el=$(wrapId).querySelector(`.half[data-h="${h}"]`);
+    if(whole && whole()){                                   // practice match: whole pitch at a time
+      const hs=pitchOf(h).halves, els=hs.map(x=>$(wrapId).querySelector(`.half[data-h="${x}"]`));
+      if(els.some(blocked)) return;
+      const on=hs.every(x=>set.has(x));
+      set.clear(); if(!on) hs.forEach(x=>set.add(x));
+      $(wrapId).querySelectorAll('.half').forEach(e2=>e2.classList.toggle('sel', set.has(+e2.dataset.h)));
+      requestAnimationFrame(()=>refresh(false)); return; }
     if(el.classList.contains('match')||el.classList.contains('closed')||(!allowBusy&&el.classList.contains('busy'))) return;
     set.has(h)?set.delete(h):set.add(h);
     el.classList.toggle('sel', set.has(h));                       // instant feedback
@@ -497,16 +516,23 @@ const bookTimes=()=>{ const s=$('b-start').value; return [$('b-date').value, s, 
 async function refreshBook(fresh=true){
   const [d,s,e]=bookTimes(); let rows=[];
   try{ rows=await dayRows(d,fresh); }catch(err){ $('b-selnote').textContent='Could not load bookings: '+cleanErr(err); }
-  [...bookSel].forEach(h=>{ if(CLOSED.includes(h)||rows.some(b=>clash(b,s,e,[h]))) bookSel.delete(h); });
+  [...bookSel].forEach(h=>{ if(closedNow(h)||rows.some(b=>clash(b,s,e,[h]))) bookSel.delete(h); });
   paintMap('book',rows,s,e,bookSel,false);
-  $('b-selnote').textContent = bookSel.size ? 'You\'re booking: '+describeHalves([...bookSel]) : 'No halves picked yet.';
+  $('b-selnote').textContent = bookSel.size ? 'You\'re booking: '+describeHalves([...bookSel]) : (PRACTICE?'Tap a pitch on the map.':'Tap a side on the map.');
 }
-wireMap('map-book',bookSel,refreshBook,false);
+wireMap('map-book',bookSel,refreshBook,false,()=>PRACTICE);
 function renderBookQuick(){
-  $('b-quick').innerHTML=PITCHES.filter(p=>!p.halves.some(h=>CLOSED.includes(h)))
-    .map(p=>`<button class="pill" data-p="${p.id}">${p.name} full</button>`).join('')+'<button class="pill" data-p="clear">Clear</button>';
+  $('b-quick').innerHTML=PITCHES.filter(p=>!p.halves.some(h=>closedNow(h)))
+    .map(p=>`<button class="pill" data-p="${p.id}">${PRACTICE?p.name:'Whole '+p.name}</button>`).join('')+'<button class="pill" data-p="clear">Clear</button>';
 }
 renderBookQuick();
+$('b-kind').addEventListener('click',e=>{ const b=e.target.closest('button'); if(!b) return;
+  PRACTICE = b.dataset.k==='practice';
+  $('b-kind').querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b));
+  bookSel.clear(); $('b-kind-help').hidden=PRACTICE; $('b-kind-note').hidden=!PRACTICE; $('b-opp-wrap').hidden=!PRACTICE; $('b-weekly-wrap').hidden=PRACTICE;
+  if(PRACTICE) $('b-weekly').checked=false;
+  $('b-go').textContent = 'BOOK';
+  renderBookQuick(); refreshBook(false); });
 async function loadRules(){
   if(!sb) return;
   const {data,error}=await sb.from('booking_rules').select('*').maybeSingle();
@@ -518,17 +544,20 @@ async function loadRules(){
 }
 $('b-quick').addEventListener('click',e=>{ const b=e.target.closest('button'); if(!b) return;
   if(b.dataset.p==='clear') bookSel.clear();
-  else { const [d,s,en]=bookTimes(); PITCHES.find(p=>p.id==b.dataset.p).halves.forEach(h=>{ if(!(cache[d]||[]).some(x=>clash(x,s,en,[h]))) bookSel.add(h); }); }
+  else { const [d,s,en]=bookTimes(), pt=PITCHES.find(p=>p.id==b.dataset.p);
+    if(PRACTICE){ if(pt.halves.some(h=>(cache[d]||[]).some(x=>clash(x,s,en,[h])))){ $('b-selnote').textContent=pt.name+' is not free then.'; return; } bookSel.clear(); }
+    pt.halves.forEach(h=>{ if(!(cache[d]||[]).some(x=>clash(x,s,en,[h]))) bookSel.add(h); }); }
   refreshBook(false); });
 ['b-date','b-start','b-dur'].forEach(id=>$(id).addEventListener('change',()=>refreshBook(true)));
 
 $('b-go').addEventListener('click', async ()=>{
   const out=$('b-result'), [d,s,e]=bookTimes();
-  const code=$('b-code').value.trim(), team=chosenTeam(), name=$('b-name').value.trim(), phone=$('b-phone').value.trim(), email=$('b-email').value.trim(), weekly=$('b-weekly').checked;
+  const opp=$('b-opp').value.trim(), code=$('b-code').value.trim(), team=chosenTeam(), name=$('b-name').value.trim(), phone=$('b-phone').value.trim(), email=$('b-email').value.trim(), weekly=$('b-weekly').checked;
   const errs=[];
-  if(!bookSel.size) errs.push('Tap at least one half on the map.');
+  if(!bookSel.size) errs.push(PRACTICE?'Tap a pitch on the map.':'Tap at least one side on the map.');
   if(!team) errs.push('Choose your team.');
   if(CODE_REQ && !code) errs.push('Enter the club booking code.');
+  if(PRACTICE && !opp) errs.push('Enter who you are playing.');
   if(!name) errs.push('Add your name.');
   if(!validPhone(phone)) errs.push('Enter a valid mobile number, e.g. 086 123 4567.');
   if(!/^\S+@\S+\.\S+$/.test(email)) errs.push('Add your email so we can send your confirmation.');
@@ -536,14 +565,15 @@ $('b-go').addEventListener('click', async ()=>{
   if(!sb){ out.innerHTML='<div class="notice bad"><b>Not connected</b>This page isn\'t linked to the booking database yet.</div>'; return; }
   const btn=$('b-go'); btn.disabled=true; btn.textContent='Checking…';
   const halves=[...bookSel].sort((a,b)=>a-b);
-  const {data,error}=await sb.rpc('book_training',{p_day:d,p_start:s,p_end:e,p_halves:halves,p_team:team,p_name:name,p_phone:phone,p_email:email,p_weekly:weekly,p_code:code});
-  btn.disabled=false; btn.textContent='Book these halves';
+  const {data,error}=await sb.rpc('book_training',{p_day:d,p_start:s,p_end:e,p_halves:halves,p_team:team,p_name:name,p_phone:phone,p_email:email,p_weekly:PRACTICE?false:weekly,p_code:code,p_practice:PRACTICE,p_opponent:PRACTICE?opp:null});
+  btn.disabled=false; btn.textContent='BOOK';
   if(error){ const m=cleanErr(error); if(/booking code/i.test(m)) saveMe({code:''});
     out.innerHTML=`<div class="notice bad"><b>Couldn't book</b>${esc(m)}</div>`; refreshBook(true); return; }
   saveMe({name, phone, email, team, code});
   bookSel.clear(); $('b-weekly').checked=false; refreshBook(true);
   const booked=data.booked||[], skipped=data.skipped||[];
-  out.innerHTML=`<div class="notice ${skipped.length?'warn':'ok'}"><b>Booked${booked.length>1?' · '+booked.length+' weeks':' · '+esc(data.ref)}</b>${esc(team)}, ${s}–${e}<br>${esc(describeHalves(halves))}
+  const wasPractice=PRACTICE; if(PRACTICE) $('b-opp').value='';
+  out.innerHTML=`<div class="notice ${skipped.length?'warn':'ok'}"><b>${wasPractice?'Practice match booked':'Booked'}${booked.length>1?' · '+booked.length+' weeks':' · '+esc(data.ref)}</b>${esc(team)}${wasPractice?' v '+esc(opp):''}, ${s}–${e}<br>${esc(describeHalves(halves))}
     <br>${booked.map(x=>niceDate(x.day)).join(', ')}
     ${skipped.length?`<br><br><b style="font-size:15px">Not booked, pitch taken:</b>${skipped.map(x=>esc(niceDate(x.day)+': '+x.reason)).join('<br>')}<br>Pick another pitch for those weeks.`:''}
     <br><br>A confirmation is on its way to ${esc(email)}.</div>`;
@@ -559,7 +589,7 @@ $('s-date').onchange=renderSched;
 function slotHTML(b, showDate){
   const moved=b.status==='moved';
   return `<div class="slot ${moved?'moved':''}"><div class="t">${hm(b.start_time)}<small>to ${hm(b.end_time)}</small></div>
-    <div><div>${b.kind==='match'?'<span class="tag m">Match</span>':'<span class="tag tr">Training</span>'}${moved?'<span class="tag x">Moved for match</span>':''}<span class="who">${esc(b.team)}</span></div>
+    <div><div>${b.kind==='match'?'<span class="tag m">Match</span>':b.practice?'<span class="tag m">Practice match</span>':'<span class="tag tr">Training</span>'}${moved?'<span class="tag x">Moved for match</span>':''}<span class="who">${esc(b.team)}${b.opponent?' v '+esc(b.opponent):''}</span></div>
     <div class="meta">${showDate?niceDate(b.day)+' · ':''}${esc(describeHalves(b.halves))}</div></div></div>`;
 }
 async function renderSched(){
@@ -567,7 +597,7 @@ async function renderSched(){
   let rows; try{ rows=await loadRange(from,to); }catch(err){ L.innerHTML=`<p class="empty">Could not load the schedule: ${esc(cleanErr(err))}</p>`; return; }
   if(mode==='day'){
     L.innerHTML=PITCHES.map(p=>{ const items=rows.filter(b=>b.halves.some(h=>p.halves.includes(h)));
-      return `<div class="pitchblock"><h4>${p.name}<span>${p.ground} · halves ${p.halves.join(' & ')}</span></h4>${items.length?items.map(b=>slotHTML(b,false)).join(''):'<p class="empty">Free all day.</p>'}</div>`; }).join('');
+      return `<div class="pitchblock"><h4>${p.name}<span>${p.ground} · ${p.halves.map(h=>SIDE[h]).join(' & ')}</span></h4>${items.length?items.map(b=>slotHTML(b,false)).join(''):'<p class="empty">Free all day.</p>'}</div>`; }).join('');
   } else {
     let html=''; for(let d=from; d<=to; d=addDays(d,1)){ const items=rows.filter(b=>b.day===d);
       html+=`<div class="pitchblock"><h4>${niceDate(d)}<span>${items.length?items.length+' on':'all pitches free'}</span></h4>${items.map(b=>slotHTML(b,false)).join('')}</div>`; }
@@ -585,7 +615,7 @@ $('f-go').onclick=async ()=>{
   MINE_ROWS=data;
   L.innerHTML = data.length ? data.map(b=>`<div class="mbk ${b.status==='moved'?'moved':''} ${b.ref===FOCUS_REF?'hl':''}" id="mb-${esc(b.ref)}">
     <div class="mbk-when"><b>${niceDate(b.day)}</b><span>${hm(b.start_time)}–${hm(b.end_time)}</span></div>
-    <div><div>${b.status==='moved'?'<span class="tag x">Moved for match</span>':''}${b.weekly?'<span class="tag tr">Weekly</span>':''}<span class="who">${esc(b.team)}</span></div>
+    <div><div>${b.practice?'<span class="tag m">Practice match</span>':''}${b.status==='moved'?'<span class="tag x">Moved for match</span>':''}${b.weekly?'<span class="tag tr">Weekly</span>':''}<span class="who">${esc(b.team)}${b.opponent?' v '+esc(b.opponent):''}</span></div>
     <div class="meta">${b.status==='moved'?'Was on ':''}${esc(describeHalves(b.halves))} · Ref ${esc(b.ref)}</div>
     <div class="acts">
       <button class="btn small ${b.status==='moved'?'':'ghost'}" data-move="${esc(b.ref)}">${b.status==='moved'?'Move to a free pitch':'Change pitch'}</button>
@@ -605,10 +635,10 @@ async function showMoves(b){
   let rows=[]; try{ rows=await dayRows(b.day,true); }catch(e){}
   const s=hm(b.start_time), e=hm(b.end_time);
   const mine=x=>x.kind==='training'&&x.team===b.team&&hm(x.start_time)===s&&String(x.halves)===String(b.halves);
-  const free=[1,2,3,4,5,6].filter(h=>!CLOSED.includes(h) && !rows.some(x=>!mine(x)&&clash(x,s,e,[h])));
+  const free=[1,2,3,4,5,6].filter(h=>(b.practice || !CLOSED.includes(h)) && !rows.some(x=>!mine(x)&&clash(x,s,e,[h])));
   const opts=[];
-  PITCHES.forEach(p=>{ if(p.halves.every(h=>free.includes(h))) opts.push([p.halves, `${p.name} full · ${p.ground}`]); });
-  free.forEach(h=>opts.push([[h], `Half ${h} · ${pitchOf(h).name}`]));
+  PITCHES.forEach(p=>{ if(p.halves.every(h=>free.includes(h))) opts.push([p.halves, b.practice?p.name:`Whole ${p.name}`]); });
+  if(!b.practice) free.forEach(h=>opts.push([[h], sideName(h)]));
   const cur=opts.filter(o=>String(o[0])!==String(b.halves));
   box.innerHTML = cur.length
     ? `<p>Free ${niceDate(b.day)}, ${s}–${e}. Tap one to move there:</p><div class="opts">${cur.map(o=>`<button class="pill" data-to="${o[0].join(',')}" data-ref="${esc(b.ref)}">${esc(o[1])}</button>`).join('')}</div>`
@@ -646,10 +676,10 @@ async function refreshMatch(fresh=true){
   const [d,s,e]=matchTimes(); let rows=[]; try{ rows=await dayRows(d,fresh); }catch(err){}
   paintMap('match',rows,s,e,matchSel,true);
   const n=rows.filter(b=>b.kind==='training'&&clash(b,s,e,[...matchSel])).length;
-  $('m-selnote').innerHTML = !matchSel.size?'Tap the halves the match needs.' : esc(describeHalves([...matchSel]))+(n?`<br><span style="color:var(--red);font-weight:700">${n} training booking${n>1?'s':''} will be moved and emailed.</span>`:'');
+  $('m-selnote').innerHTML = !matchSel.size?'Tap the pitch or sides the match needs.' : esc(describeHalves([...matchSel]))+(n?`<br><span style="color:var(--red);font-weight:700">${n} training booking${n>1?'s':''} will be moved and emailed.</span>`:'');
 }
 wireMap('map-match',matchSel,refreshMatch,true);
-$('m-quick').innerHTML=PITCHES.map(p=>`<button class="pill" data-p="${p.id}">${p.name} full</button>`).join('')+'<button class="pill" data-p="main">Pitches 2 + 3</button><button class="pill" data-p="clear">Clear</button>';
+$('m-quick').innerHTML=PITCHES.map(p=>`<button class="pill" data-p="${p.id}">${p.name}</button>`).join('')+'<button class="pill" data-p="main">Juvenile + Senior</button><button class="pill" data-p="clear">Clear</button>';
 $('m-quick').addEventListener('click',e=>{ const b=e.target.closest('button'); if(!b) return;
   if(b.dataset.p==='clear') matchSel.clear(); else if(b.dataset.p==='main') [3,4,5,6].forEach(h=>matchSel.add(h));
   else PITCHES.find(p=>p.id==b.dataset.p).halves.forEach(h=>matchSel.add(h)); refreshMatch(false); });
@@ -664,7 +694,7 @@ function waButtons(a){ const t=encodeURIComponent(a.message);
 
 $('m-go').onclick=async ()=>{
   const out=$('m-result'), [d,s,e]=matchTimes(), title=$('m-title').value.trim(), errs=[];
-  if(!title) errs.push('Name the fixture.'); if(!matchSel.size) errs.push('Tap the halves the match needs.');
+  if(!title) errs.push('Name the fixture.'); if(!matchSel.size) errs.push('Tap the pitch or sides the match needs.');
   if(toMin(e)<=toMin(s)) errs.push('Finish time must be after the start.');
   if(errs.length){ out.innerHTML=`<div class="notice bad"><b>Fixture not added</b>${errs.join('<br>')}</div>`; return; }
   const btn=$('m-go'); btn.disabled=true;
@@ -688,8 +718,8 @@ async function renderOfficer(){
   if(error){ const m=cleanErr(error); if(/PIN/i.test(m)) return relock('Wrong PIN'); L.innerHTML=`<p class="empty">${esc(m)}</p>`; return; }
   L.innerHTML = data.length ? data.map(b=>`<div class="mbk ${b.status==='moved'?'moved':''}">
     <div class="mbk-when"><b>${hm(b.start_time)}–${hm(b.end_time)}</b><span style="font-size:13px;font-family:Archivo,sans-serif;color:var(--grey)">${esc(b.ref)}</span></div>
-    <div>${b.kind==='match'?'<span class="tag m">Match</span>':'<span class="tag tr">Training</span>'}${b.status==='moved'?'<span class="tag x">Moved for match</span>':''}${b.weekly?'<span class="tag tr">Weekly</span>':''}
-      <span class="who">${esc(b.team)}</span></div>
+    <div>${b.kind==='match'?'<span class="tag m">Match</span>':b.practice?'<span class="tag m">Practice match</span>':'<span class="tag tr">Training</span>'}${b.status==='moved'?'<span class="tag x">Moved for match</span>':''}${b.weekly?'<span class="tag tr">Weekly</span>':''}
+      <span class="who">${esc(b.team)}${b.opponent?' v '+esc(b.opponent):''}</span></div>
     <div class="meta">${esc(describeHalves(b.halves))}</div>
     ${b.kind==='training'?`<div class="meta">${esc(b.contact_name||'')}${b.phone?` · <a href="tel:+${esc(b.phone)}" style="color:var(--green-dk);font-weight:700">+${esc(b.phone)}</a>`:''}</div>
     <div class="acts"><button class="btn small ghost" data-ocancel="${esc(b.ref)}">Cancel</button>
