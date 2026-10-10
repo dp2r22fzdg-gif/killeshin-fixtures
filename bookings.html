@@ -225,7 +225,7 @@ body.embed main{padding:4px}
 
 <main class="wrap">
 
-<div id="cfg-warn" class="notice bad" hidden><b>Not connected yet</b>Add your Supabase URL and anon key at the top of the script in this file.</div>
+<div id="cfg-warn"></div>
 
 <!-- BOOK -->
 <section class="view on" id="v-book">
@@ -359,7 +359,7 @@ body.embed main{padding:4px}
   </div>
 </section>
 
-<p class="demo">Version 10 Oct · 15<br><a href="/" style="color:var(--green-dk);font-weight:700;text-decoration:none">Back to killeshingaa.ie</a></p>
+<p class="demo">Version 10 Oct · 16<br><a href="/" style="color:var(--green-dk);font-weight:700;text-decoration:none">Back to killeshingaa.ie</a></p>
 </main>
 
 <nav class="bar" id="tabs" aria-label="Sections"><div class="in">
@@ -390,7 +390,8 @@ let CLOSED = [6], CODE_REQ = false, PRACTICE = false;
 const closedNow = h => !PRACTICE && CLOSED.includes(h);   // halves closed to training; the database is the authority
 const configured = !SUPABASE_URL.includes('YOUR-PROJECT') && !!window.supabase;
 const sb = configured ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
-if(!configured) document.getElementById('cfg-warn').hidden = false;
+if(!configured) document.getElementById('cfg-warn').innerHTML =
+  '<div class="notice bad"><b>Bookings are offline</b>The booking system can\u2019t be reached right now. Please try again shortly.</div>';
 
 /* ---------- Helpers ---------- */
 const $ = id => document.getElementById(id);
