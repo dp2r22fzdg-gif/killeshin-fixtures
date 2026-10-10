@@ -153,6 +153,43 @@ input::placeholder{color:rgba(255,255,255,.35)}
 .sr .k.cy{color:#F2C94C}.sr .k.cb{color:#fff}.sr .k.cr{color:#FF8A80}
 .addrow input{flex:1;min-width:0}
 .addrow button{flex:none;padding:0 16px;border-radius:10px;background:var(--accent);color:#0B2B1A;font-weight:700}
+/* ---------- compact match screen: everything to score fits one phone screen ---------- */
+.top{min-height:40px;margin-bottom:2px}
+.meta{font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:8px}
+.ctl{display:flex;gap:8px;align-items:stretch;margin-bottom:8px}
+.ctl .golive,.ctl .delay{width:auto;margin:0}
+.ctl .golive{flex:1.3;padding:12px;font-size:17px}
+.ctl .delay{flex:1;padding:11px 8px;font-size:15px}
+.ctl .webstate{flex:1.3;margin:0;font-size:14px}
+.board2{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:6px;padding:8px 0;
+  border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.tm{display:flex;flex-direction:column;min-width:0}
+.tm.r{align-items:flex-end;text-align:right}
+.tm .n{font-weight:700;font-size:15px;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tm.us .n{color:var(--accent)}.tm.them .n{color:#C9D3DC}
+.tm .sc{font:800 46px/1 var(--num);font-variant-numeric:tabular-nums;white-space:nowrap;margin-top:2px}
+.tm .tot{font:600 16px/1.1 var(--num);color:var(--mute)}
+.mid{text-align:center;min-width:80px;max-width:104px;display:flex;flex-direction:column;align-items:center}
+.mid b{font-size:12px;font-weight:700;line-height:1.2;color:var(--accent)}
+.mid b.ht{color:var(--warn)}.mid b.idle{color:var(--mute)}
+.mid .big{font:800 32px/1.1 var(--num);font-variant-numeric:tabular-nums}
+.mid .big.ht{color:var(--warn);font-size:20px}.mid .big.idle{color:var(--mute)}
+.mid button.big{padding:0;color:#fff;border-bottom:2px dashed rgba(255,255,255,.35)}
+.mid .tap{font-size:11px;color:var(--mute);margin-top:2px}
+.stage{margin-top:8px;padding:13px;font-size:17px}
+.stage .lbl small{display:inline;font-size:12px;margin:0 0 0 8px}
+#holdhint{text-align:center;margin:4px 0 0;min-height:0}
+#holdhint:empty{display:none}
+.pad{gap:7px;margin-top:6px}
+.pad h2{font-size:14px;margin:6px 0 -2px}
+.pad h2.them{margin-top:8px}
+.hit{padding:13px 4px;font-size:23px;white-space:nowrap;overflow:hidden}
+.hit span{margin-top:3px;font-size:12px}
+.extra3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px;margin-top:10px}
+.extra3 button{min-width:0;padding:9px 6px;border-radius:12px;border:1px solid var(--line);background:rgba(255,255,255,.07);font-weight:700;font-size:15px}
+.extra3 button small{display:block;font-size:11px;font-weight:600;opacity:.65;margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.extra3 button:disabled{opacity:.35}
+.scorers{padding-top:10px}
 @media (prefers-reduced-motion:reduce){.flash,.webstate.on i{animation:none}.hit:active,.pl:active{transform:none}}
 </style>
 </head>
@@ -714,34 +751,45 @@ input::placeholder{color:rgba(255,255,255,.35)}
     var v = view(), m = v[cur];
     if (!m) { if (loaded) { cur = null; LS.del('kl_cur'); screen = 'list'; picking = null; return drawList(); } app.innerHTML = '<p class="empty">Loading\u2026</p>'; return; }
     var t = tally(m), c = clock(m), us = club(m), them = m.opp || 'Opposition', live = isLive(m);
-    var usRow = '<div class="side us"><span class="n">' + esc(us) + '</span><span class="sc" id="s-k">' + fmt(t.kg, t.kp) + '<small>(' + (t.kg * 3 + t.kp) + ')</small></span></div>';
-    var thRow = '<div class="side them"><span class="n">' + esc(them) + '</span><span class="sc" id="s-o">' + fmt(t.og, t.op) + '<small>(' + (t.og * 3 + t.op) + ')</small></span></div>';
-    var last = lastEvent(m), lastTxt = 'Undo last score';
-    if (last) { var e = m.events[last]; lastTxt = 'Undo ' + (e.s === 'k' ? us : them) + ' ' + word(e.v) + (e.n ? ' (' + e.n + ')' : ''); }
+    var last = lastEvent(m), lastTxt = '';
+    if (last) { var e = m.events[last]; lastTxt = (e.s === 'k' ? us : them) + ' ' + word(e.v) + (e.n ? ' (' + e.n + ')' : ''); }
     var off = m.status === 'pre' || !m.status ? ' disabled' : '';
+    var away = m.venue === 'away';
 
+    /* Website status and delayed, side by side on one line. */
+    var delayBtn = m.status === 'ft' ? '' :
+      '<button class="delay' + (m.delayed ? ' on' : '') + '" data-act="delay">' + (m.delayed ? '\u23F8 Delayed' : 'Mark delayed') + '</button>';
     var web;
     if (!live) {
-      web = '<div class="webstate off"><i></i>Not on the website yet</div>' +
-        '<button class="golive" data-act="golive">Go live<span>Put this match on the website</span></button>';
+      web = '<button class="golive" data-act="golive">Go live</button>';
     } else if (m.status === 'ft' && m.tft) {
       var gone = Date.now() - m.tft >= AFTER_FT;
-      web = '<div class="webstate ' + (gone ? 'off' : 'on') + '"><i></i>' +
-        (gone ? 'Taken off the website' : 'On the website until ' + hhmm(m.tft + AFTER_FT)) + '</div>';
+      web = '<span class="webstate ' + (gone ? 'off' : 'on') + '"><i></i>' + (gone ? 'Off the website' : 'On website till ' + hhmm(m.tft + AFTER_FT)) + '</span>';
     } else {
-      web = '<div class="webstate on"><i></i>Live on the website</div>';
+      web = '<span class="webstate on"><i></i>Live on website</span>';
     }
+
+    /* Scoreboard: Killeshin, clock in the middle, opposition. */
+    function col(side, right) {
+      var k = side === 'k', g = k ? t.kg : t.og, pp = k ? t.kp : t.op;
+      return '<div class="tm ' + (k ? 'us' : 'them') + (right ? ' r' : '') + '"><span class="n">' + esc(k ? us : them) + '</span>' +
+        '<span class="sc" id="s-' + side + '">' + fmt(g, pp) + '</span><span class="tot">(' + (g * 3 + pp) + ')</span></div>';
+    }
+    var bc = bigClock(m), run = RUN[m.status] && m[RUN[m.status]];
+    var mid = '<div class="mid"><b class="' + c.k + '">' + c.l + '</b>' +
+      (run ? '<button class="big ' + bc.k + '" id="clk" data-act="clockedit" aria-label="Set the clock">' + esc(bc.t) + '</button><span class="tap">tap to set</span>'
+           : '<span class="big ' + bc.k + '" id="clk">' + esc(bc.t) + '</span>') + '</div>';
+    var board = '<div class="board2">' + (away ? col('o', false) + mid + col('k', true) : col('k', false) + mid + col('o', true)) + '</div>';
 
     var stageBtns = steps(m).map(function (s) {
       return '<button class="stage' + (s[0] === 'ft' ? ' end' : s[0] === 'etb' ? ' et' : '') + '" data-act="stage" data-to="' + s[0] + '">' +
-        '<i class="fill"></i><span class="lbl">' + esc(s[1]) + '<small>Press and hold</small></span></button>';
-    }).join('') + '<p class="note" id="holdhint" style="text-align:center;margin-top:6px">Hold the button for a second to change the half. A quick tap does nothing.</p>';
+        '<i class="fill"></i><span class="lbl">' + esc(s[1]) + '<small>hold</small></span></button>';
+    }).join('') + '<p class="note" id="holdhint"></p>';
 
     /* Scorers so far, top scorer first, plus any scores still to be named. */
     var sc = byPlayer(m, {}), scl = Object.keys(sc).map(function (k) { return sc[k]; })
       .sort(function (a, b) { return pts(b) - pts(a) || a.n.localeCompare(b.n); });
-    var ours = Object.keys(m.events || {}).filter(function (k) { var x = m.events[k]; return x && x.s === 'k'; })
-      .sort(function (a, b) { return m.events[b].ts - m.events[a].ts; });
+    var ours = Object.keys(m.events || {}).filter(function (k) { var x = m.events[k]; return x && x.s === 'k'; });
     var unnamed = ours.filter(function (k) { return !m.events[k].n; }).length;
     var scorers = (scl.length || unnamed)
       ? '<div class="scorers">' + scl.map(function (r) { return esc(r.n) + '<b>' + fmt(r.g, r.p) + '</b>'; }).join(' \u00b7 ') +
@@ -772,23 +820,12 @@ input::placeholder{color:rgba(255,255,255,.35)}
           }).join('')
         : '<p class="note" style="padding:10px 0">Scores, subs and cards appear here. Tap a score to change who got it or how.</p>') + '</div>';
 
+    var venueTxt = away ? 'Away' : m.venue === 'neutral' ? 'Neutral' : 'Home';
     app.innerHTML = '<div class="top"><button class="link" data-act="back">\u2039 Matches</button>' + syncLine() + '</div>' +
-      '<div class="meta">' + esc(m.team) + ', ' + (m.venue === 'away' ? 'away' : m.venue === 'neutral' ? 'neutral venue' : 'home') + (m.comp ? ' \u00b7 ' + esc(m.comp) : '') + '</div>' +
-      web +
-      (m.status === 'ft' ? '' : '<button class="delay' + (m.delayed ? ' on' : '') + '" data-act="delay">' +
-        (m.delayed ? '\u23F8 Match delayed<span>Showing on the website. Tap when it\u2019s back under way.</span>'
-                   : 'Mark as delayed<span>' + (live ? 'Shows \u201cMatch delayed\u201d on the website' : 'Shows on the website once you tap Go live') + '</span>') +
-        '</button>') +
-      '<div class="board">' + (m.venue === 'away' ? thRow + usRow : usRow + thRow) + '</div>' +
-      (function () {
-        var bc = bigClock(m), run = RUN[m.status] && m[RUN[m.status]];
-        return '<div class="clock"><b class="' + c.k + '">' + c.l + '</b>' +
-          (run ? '<button class="big ' + bc.k + '" id="clk" data-act="clockedit" aria-label="Set the clock">' + esc(bc.t) + '</button>'
-               : '<span class="big ' + bc.k + '" id="clk">' + esc(bc.t) + '</span>') + '</div>' +
-          (run ? '<p class="note clockhint">Missed the start? Tap the clock to set it.</p>' : '');
-      })() +
+      '<div class="meta">' + esc(m.team) + (m.comp ? ' \u00b7 ' + esc(m.comp) : '') + ' \u00b7 ' + venueTxt + '</div>' +
+      '<div class="ctl">' + web + delayBtn + '</div>' +
+      board +
       stageBtns +
-      scorers +
       '<div class="pad"><h2 class="us">' + esc(us) + '</h2>' +
       '<button class="hit us" data-act="score" data-s="k" data-v="g"' + off + '>GOAL<span>+3</span></button>' +
       '<button class="hit us" data-act="score" data-s="k" data-v="2"' + off + '>2 POINTS<span>+2</span></button>' +
@@ -797,8 +834,10 @@ input::placeholder{color:rgba(255,255,255,.35)}
       '<button class="hit them" data-act="score" data-s="o" data-v="g"' + off + '>GOAL<span>+3</span></button>' +
       '<button class="hit them" data-act="score" data-s="o" data-v="2"' + off + '>2 POINTS<span>+2</span></button>' +
       '<button class="hit them" data-act="score" data-s="o" data-v="p"' + off + '>POINT<span>+1</span></button></div>' +
-      '<button class="undo" data-act="undo"' + (last ? '' : ' disabled') + '>' + esc(lastTxt) + '</button>' +
-      '<div class="extra"><button data-act="subopen">\u21c4 Substitution</button><button data-act="cardopen">\u25ae Card</button></div>' +
+      '<div class="extra3"><button data-act="undo"' + (last ? '' : ' disabled') + '>\u21b6 Undo<small>' + esc(lastTxt || 'nothing yet') + '</small></button>' +
+      '<button data-act="subopen">\u21c4 Sub<small>substitution</small></button>' +
+      '<button data-act="cardopen">\u25ae Card<small>yellow, black, red</small></button></div>' +
+      scorers +
       slist +
       (live ? '<button class="quiet" data-act="unlive">Take off the website</button>' : '') +
       '<button class="quiet" data-act="remove">Remove this match</button>' +
