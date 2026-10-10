@@ -8,6 +8,7 @@
 (function(){
   "use strict";
   var BOOKINGS = 'bookings.html';
+  var SCORER = 'score.html';
   var SUPA_URL = 'https://joyfilfyeruaifpwlkfo.supabase.co';
   var SUPA_KEY = 'sb_publishable_THA4FVrKQzkCl6TcAmhk-A_tyMYNdPJ';
 
@@ -17,6 +18,7 @@
 
   var ICON = {
     pitch: '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M12 4v16M3 12h4M17 12h4"/><circle cx="12" cy="12" r="2.6"/></svg>',
+    score: '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2.5" y="5" width="19" height="13" rx="2"/><path d="M12 5v13M7 15V9l-1.5 1M15.5 9h2.5l-2.5 6"/><path d="M8 21h8"/></svg>',
     clock: '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>',
     pin:   '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s7-5.7 7-11a7 7 0 1 0-14 0c0 5.3 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/></svg>'
   };
@@ -34,12 +36,19 @@
     '.ptile .tx span{display:block;font-size:13px;color:var(--grey);margin-top:3px;line-height:1.4}' +
     '.ptile .go{flex:none;position:relative;z-index:1;width:30px;height:30px;border-radius:50%;display:grid;place-items:center;background:var(--green-lt);color:var(--green-dk);font-size:15px;font-weight:800}' +
     '.ptile:active{transform:translateY(1px)}' +
+    '.pgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}' +
+    '.ptile.half{flex-direction:column;align-items:flex-start;gap:11px;margin:0;padding:15px 14px 14px}' +
+    '.ptile.half .tile{width:46px;height:46px;border-radius:13px}' +
+    '.ptile.half .tile svg{width:23px;height:23px}' +
+    '.ptile.half .tx b{font-size:16px}' +
+    '.ptile.half .tx span{font-size:12.5px}' +
     '.sheet a.pbtn{display:flex;align-items:center;gap:14px;width:100%;text-align:left;padding:15px 17px;margin-bottom:9px;border-radius:14px;font-size:16.5px;font-weight:700;background:var(--green-lt);color:var(--green-dk);border:1.5px solid #BFDFCD;box-shadow:0 3px 0 #BFDFCD;text-decoration:none}' +
     '.sheet a.pbtn svg{width:22px;height:22px;stroke:currentColor;stroke-width:1.9;fill:none;stroke-linecap:round;stroke-linejoin:round;flex:none}' +
     /* the Today at the Club strip */
     '#tatc{box-sizing:border-box;display:flex;align-items:center;gap:13px;width:calc(100% - 32px);margin:12px 16px 2px;padding:13px 15px;text-align:left;border-radius:18px;cursor:pointer;color:#fff;position:relative;overflow:hidden;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none;background:linear-gradient(150deg,var(--forest) 0%,var(--deep) 100%);border:1px solid rgba(17,73,46,.4);box-shadow:0 5px 16px -6px rgba(17,73,46,.45)}' +
     '#tatc::before{content:"";position:absolute;inset:-20%;pointer-events:none;background:repeating-linear-gradient(114deg,rgba(255,255,255,.05) 0 1px,transparent 1px 9px),repeating-linear-gradient(114deg,rgba(58,205,119,.14) 0 2px,transparent 2px 34px)}' +
     '#tatc>*{position:relative;z-index:1}' +
+    '#tatc[hidden]{display:none!important}' +
     '#tatc .ic{width:42px;height:42px;flex:none;border-radius:13px;display:grid;place-items:center;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.18)}' +
     '#tatc .ic svg{width:22px;height:22px;stroke:#fff;stroke-width:1.9;fill:none;stroke-linecap:round;stroke-linejoin:round}' +
     '#tatc .tx{flex:1;min-width:0}' +
@@ -444,10 +453,13 @@
     var wrap = document.createElement('div');
     wrap.id = 'pitchBookings';
     wrap.innerHTML =
-      '<div class="sec"><span class="lbl">Pitch bookings</span></div>' +
-      '<a class="ptile" href="' + BOOKINGS + '"><span class="tile">' + ICON.pitch + '</span>' +
-        '<span class="tx"><b>Pitch Bookings</b><span>Book a pitch for training or a practice match, and see what\u2019s on</span></span>' +
-        '<span class="go">\u203A</span></a>' +
+      '<div class="sec"><span class="lbl">Club apps</span></div>' +
+      '<div class="pgrid">' +
+        '<a class="ptile half" href="' + BOOKINGS + '"><span class="tile">' + ICON.pitch + '</span>' +
+          '<span class="tx"><b>Pitch Bookings</b><span>Book training or a practice match</span></span></a>' +
+        '<a class="ptile half" href="' + SCORER + '"><span class="tile">' + ICON.score + '</span>' +
+          '<span class="tx"><b>Live Scorer</b><span>Score a match live for the website</span></span></a>' +
+      '</div>' +
       '<a class="ptile" href="#" id="tatcTile"><span class="tile">' + ICON.clock + '</span>' +
         '<span class="tx"><b>Today at the Club</b><span>Training, practice matches and home games on the club pitches</span></span>' +
         '<span class="go">\u203A</span></a>';
