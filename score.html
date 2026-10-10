@@ -576,7 +576,7 @@ input::placeholder{color:rgba(255,255,255,.35)}
       app.innerHTML = '<div class="top"><h1>Scorer</h1></div><p class="err">live-config.js still has placeholder values. Add the Firebase database URL and Web API key.</p>';
       return;
     }
-    app.innerHTML = '<div class="top"><h1>Scorer sign-in</h1></div>' +
+    app.innerHTML = '<div class="top"><a class="link" href="./">\u2039 Back to website</a></div><h1 style="font-size:20px;margin:4px 0 0">Scorer sign-in</h1>' +
       '<label for="em">Email</label><input id="em" type="email" autocomplete="username" inputmode="email" value="' + esc(LS.get('kl_email', '')) + '">' +
       '<label for="pw">Password</label><input id="pw" type="password" autocomplete="current-password">' +
       '<button class="primary" data-act="signin">Sign in</button>' + (err ? '<p class="err">' + esc(err) + '</p>' : '');
@@ -584,7 +584,7 @@ input::placeholder{color:rgba(255,255,255,.35)}
   function drawList() {
     var v = view(), ids = Object.keys(v).sort(function (a, b) { return (v[b].created || 0) - (v[a].created || 0); });
     var recent = ids.filter(function (id) { return v[id] && Date.now() - (v[id].created || 0) < 24 * 3600000; });
-    var h = '<div class="top"><h1>Matches</h1>' + syncLine() + '</div>';
+    var h = '<div class="top"><a class="link" href="./">\u2039 Back to website</a>' + syncLine() + '</div><h1 style="font-size:20px;margin:4px 0 0">Matches</h1>';
     h += '<button class="primary" data-act="new" style="margin:6px 0 18px">Set up a new match</button>';
     if (!loaded && !recent.length) h += '<p class="empty">Loading\u2026</p>';
     else if (!recent.length) h += '<p class="empty">No matches today. Set one up before throw-in.</p>';
