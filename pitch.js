@@ -47,7 +47,10 @@
     '#tatc .tx b i{width:8px;height:8px;border-radius:50%;background:var(--green);display:none;animation:tatcPulse 1.6s infinite}' +
     '#tatc.live .tx b i{display:inline-block}' +
     '#tatc .tx span{display:block;font-size:15px;font-weight:700;margin-top:3px;line-height:1.35;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}' +
-    '#tatc .tx small{display:block;font-size:12px;color:#A9CFBB;margin-top:2px}' +
+    '#tatc .tx small{display:block;font-size:12px;color:#A9CFBB;margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}' +
+    '#tatc .wxs{flex:none;display:flex;flex-direction:column;align-items:center;line-height:1.1;min-width:38px}' +
+    '#tatc .wxs span{font-size:20px}' +
+    '#tatc .wxs b{font-size:14px;font-weight:800;color:#fff;margin-top:2px}' +
     '#tatc .go{flex:none;width:30px;height:30px;border-radius:50%;display:grid;place-items:center;background:rgba(58,205,119,.22);color:#C9F0DA;font-weight:800;font-size:15px}' +
     '#tatc:active{transform:translateY(1px)}' +
     '#tatc.pressing{transform:scale(.985);transition:transform .35s}' +
@@ -92,9 +95,65 @@
     '#tatcSheet .dd em{font-style:normal;color:var(--green-dk);font-size:11px}' +
     '#tatcSheet .dpick{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;-webkit-appearance:none;appearance:none}' +
     '#tatcSheet .tchip{display:block;margin:6px auto 2px;padding:7px 14px;border-radius:999px;font-size:13px;font-weight:700;background:#fff;color:var(--green-dk);border:1px solid #BFDFCD}' +
+    '#tatcSheet .wxb{display:flex;align-items:center;gap:12px;margin:8px 0 2px;padding:11px 13px;border-radius:14px;background:linear-gradient(160deg,#F2FBF6,#E4F5EB);border:1px solid rgba(31,130,74,.22)}' +
+    '#tatcSheet .wxb .wi{font-size:28px;line-height:1}' +
+    '#tatcSheet .wxb b{display:block;font-size:15px}' +
+    '#tatcSheet .wxb small{display:block;font-size:12.5px;color:var(--grey);margin-top:1px}' +
+    '#tatcSheet .wxc{display:inline-block;margin-top:5px;font-size:12px;font-weight:700;color:var(--green-dk);background:var(--green-lt);border-radius:999px;padding:2px 9px}' +
+    '#tatcBubble .bwx{font-size:13px;font-weight:700;color:var(--green-dk);padding:7px 0 8px;border-bottom:1px solid var(--line)}' +
     '#tatcSheet .none{font-size:14.5px;color:var(--grey);padding:10px 2px}' +
     '#tatcSheet .open{display:block;width:100%;text-align:center;margin-top:14px;padding:15px;border-radius:12px;background:var(--forest);color:#fff;font-weight:800;font-size:15px;border:1.5px solid #0F5C34;box-shadow:0 3px 0 #0F5C34;text-decoration:none}';
   document.head.appendChild(css);
+
+  /* ---------- weather (Killeshin, from open-meteo) ---------- */
+  var WX = null, WX_AT = 0;
+  var WXT = {0:'Clear',1:'Mostly clear',2:'Partly cloudy',3:'Overcast',45:'Fog',48:'Fog',51:'Light drizzle',53:'Drizzle',
+    55:'Heavy drizzle',61:'Light rain',63:'Rain',65:'Heavy rain',66:'Freezing rain',67:'Freezing rain',71:'Light snow',
+    73:'Snow',75:'Heavy snow',80:'Showers',81:'Showers',82:'Heavy showers',95:'Thunderstorms',96:'Thunderstorms',99:'Thunderstorms'};
+  function wxIcon(c){
+    if(c === 0 || c === 1) return '\u2600\uFE0F';
+    if(c === 2) return '\u26C5';
+    if(c === 3 || c === 45 || c === 48) return '\u2601\uFE0F';
+    if(c >= 71 && c <= 77) return '\u2744\uFE0F';
+    if(c >= 95) return '\u26C8\uFE0F';
+    if(c >= 51) return '\uD83C\uDF27\uFE0F';
+    return '\u2601\uFE0F';
+  }
+  function weather(){
+    if(WX && Date.now() - WX_AT < 30*60000) return Promise.resolve(WX);
+    return fetch('https://api.open-meteo.com/v1/forecast?latitude=52.85&longitude=-7.02' +
+        '&current=temperature_2m,weather_code' +
+        '&hourly=temperature_2m,precipitation_probability,weather_code' +
+        '&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max' +
+        '&timezone=Europe%2FDublin&past_days=7&forecast_days=16')
+      .then(function(r){ if(!r.ok) throw 0; return r.json(); })
+      .then(function(j){ WX = j; WX_AT = Date.now(); return j; })
+      .catch(function(){ return null; });
+  }
+  function wxAt(day, time){            // the forecast for one hour
+    if(!WX || !WX.hourly) return null;
+    var i = WX.hourly.time.indexOf(day + 'T' + String(time).slice(0,2) + ':00');
+    if(i < 0) return null;
+    return {t: Math.round(WX.hourly.temperature_2m[i]), rain: WX.hourly.precipitation_probability[i], code: WX.hourly.weather_code[i]};
+  }
+  function wxDay(day){                 // the forecast for the whole day
+    if(!WX || !WX.daily) return null;
+    var i = WX.daily.time.indexOf(day);
+    if(i < 0) return null;
+    return {hi: Math.round(WX.daily.temperature_2m_max[i]), lo: Math.round(WX.daily.temperature_2m_min[i]),
+            rain: WX.daily.precipitation_probability_max[i], code: WX.daily.weather_code[i]};
+  }
+  function wxChip(day, time){
+    var w = wxAt(day, time);
+    return w ? '<span class="wxc">' + wxIcon(w.code) + ' ' + w.t + '\u00b0' + (w.rain >= 30 ? ' \u00b7 ' + w.rain + '% rain' : '') + '</span>' : '';
+  }
+  function wxBanner(day){
+    var w = wxDay(day);
+    if(!w) return '';
+    return '<div class="wxb"><span class="wi">' + wxIcon(w.code) + '</span><span><b>' + esc(WXT[w.code] || 'Forecast') +
+      '</b><small>High ' + w.hi + '\u00b0 \u00b7 low ' + w.lo + '\u00b0 \u00b7 ' + (w.rain == null ? '' : w.rain + '% chance of rain') +
+      '</small></span></div>';
+  }
 
   /* ---------- data ---------- */
   function pad(n){ return (n < 10 ? '0' : '') + n; }
@@ -200,7 +259,7 @@
     el.setAttribute('aria-label', 'Today at the Club. Tap for everything on today, press and hold for a quick look.');
     el.innerHTML = '<span class="ic">' + ICON.clock + '</span>' +
       '<span class="tx"><b><i></i>Today at the Club</b><span id="tatcLine">Checking what\u2019s on\u2026</span><small id="tatcSub"></small></span>' +
-      '<span class="go">\u203A</span>';
+      '<span class="wxs" id="tatcWx"></span><span class="go">\u203A</span>';
     wirePress(el);
     return el;
   }
@@ -224,6 +283,11 @@
     el.classList.toggle('live', s.live.length > 0);
     document.getElementById('tatcLine').textContent = line;
     document.getElementById('tatcSub').textContent = sub;
+    var wx = document.getElementById('tatcWx');
+    if(wx && WX && WX.current){
+      wx.innerHTML = '<span>' + wxIcon(WX.current.weather_code) + '</span><b>' + Math.round(WX.current.temperature_2m) + '\u00b0</b>';
+      wx.title = WXT[WX.current.weather_code] || '';
+    }
   }
 
   /* Tap opens the full view. Press and hold opens the overview bubble. */
@@ -280,11 +344,12 @@
     document.body.appendChild(sh);
     return sh;
   }
-  function item(b, cls){
+  function item(b, cls, day){
     var m = b.kind === 'match' || b.practice;
     return '<div class="it ' + cls + (m ? ' m' : '') + '"><div class="t">' + hm(b.start_time) +
       '<small>to ' + hm(b.end_time) + '</small></div><div><span class="k">' + kindOf(b) + '</span>' +
-      '<span class="w">' + esc(title(b)) + '</span><span class="p">' + ICON.pin + esc(where(b.halves)) + '</span></div></div>';
+      '<span class="w">' + esc(title(b)) + '</span><span class="p">' + ICON.pin + esc(where(b.halves)) + '</span>' +
+      (day ? wxChip(day, b.start_time) : '') + '</div></div>';
   }
   function dayTitle(day){
     var t = todayStr();
@@ -310,21 +375,22 @@
       (day !== t ? '<button class="tchip" type="button">Back to today</button>' : '');
   }
   function paintSheet(day, rows){
-    var t = todayStr(), s = split(rows, day), html = header(day);
+    var t = todayStr(), s = split(rows, day), html = header(day) + wxBanner(day);
     if(!rows.length) html += '<p class="none">' + (day === t ? 'Nothing on the club pitches today.'
       : day > t ? 'Nothing booked on the club pitches yet.' : 'Nothing was on the club pitches.') + '</p>';
     if(day === t){
-      if(s.live.length)  html += '<div class="grp now">On now</div>' + s.live.map(function(b){ return item(b,'live'); }).join('');
-      if(s.later.length) html += '<div class="grp">' + (s.live.length ? 'Later today' : 'Coming up') + '</div>' + s.later.map(function(b){ return item(b,''); }).join('');
-      if(s.done.length)  html += '<div class="grp">Earlier today</div>' + s.done.map(function(b){ return item(b,'done'); }).join('');
+      if(s.live.length)  html += '<div class="grp now">On now</div>' + s.live.map(function(b){ return item(b,'live',day); }).join('');
+      if(s.later.length) html += '<div class="grp">' + (s.live.length ? 'Later today' : 'Coming up') + '</div>' + s.later.map(function(b){ return item(b,'',day); }).join('');
+      if(s.done.length)  html += '<div class="grp">Earlier today</div>' + s.done.map(function(b){ return item(b,'done',day); }).join('');
     } else if(rows.length){
-      html += '<div class="grp">' + (day > t ? 'What\u2019s on' : 'What was on') + '</div>' + rows.map(function(b){ return item(b,''); }).join('');
+      html += '<div class="grp">' + (day > t ? 'What\u2019s on' : 'What was on') + '</div>' + rows.map(function(b){ return item(b,'',day); }).join('');
     }
     html += '<button class="open" type="button" id="tatcClose">Close</button>';
     document.getElementById('tatcBody').innerHTML = html;
   }
   function showDay(day){
     SHEET_DAY = day;
+    if(!WX) weather().then(function(){ if(SHEET_DAY === day) showDay(day); });
     var body = document.getElementById('tatcBody');
     if(day === todayStr() && LOADED){ paintSheet(day, ITEMS); return; }
     body.innerHTML = header(day) + '<p class="none">Loading\u2026</p>';
@@ -347,7 +413,9 @@
     bub.style.top = (r.bottom + window.scrollY + 10) + 'px';
     bub.style.left = (r.left + window.scrollX) + 'px';
     bub.style.width = r.width + 'px';
-    bub.innerHTML = '<span class="arrow"></span>' + body +
+    var now = (WX && WX.current) ? '<div class="bwx">' + wxIcon(WX.current.weather_code) + ' ' +
+      Math.round(WX.current.temperature_2m) + '\u00b0 \u00b7 ' + esc(WXT[WX.current.weather_code] || '') + ' now at the club</div>' : '';
+    bub.innerHTML = '<span class="arrow"></span>' + now + body +
       (ITEMS.length > rows.length ? '<div class="bmore">Tap the strip to see all ' + ITEMS.length + ' today</div>' : '');
     document.body.appendChild(bub);
     setTimeout(function(){
@@ -406,8 +474,10 @@
     if(out && window.MutationObserver) new MutationObserver(addToClub).observe(out, {childList: true});
     var top = document.getElementById('top');
     if(top && window.MutationObserver) new MutationObserver(placeStrip).observe(top, {attributes: true, attributeFilter: ['hidden']});
+    weather().then(paintStrip);
     load();
-    setInterval(load, 60000);          /* fresh bookings every minute */
+    setInterval(load, 60000);
+    setInterval(function(){ weather().then(paintStrip); }, 30*60000);          /* fresh bookings every minute */
     setInterval(paintStrip, 30000);    /* "on now" rolls over between loads */
   }
   if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start);
