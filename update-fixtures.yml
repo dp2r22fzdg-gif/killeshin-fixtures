@@ -28,6 +28,15 @@ jobs:
       - name: Update everything
         run: python update.py
 
+      # Book every home fixture onto its pitch in the booking app, move any
+      # training in the way and email the coach. Never stops the site update.
+      - name: Sync home fixtures to pitch bookings
+        continue-on-error: true
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+        run: python sync_bookings.py data.json
+
       - name: Commit if anything changed
         run: |
           git config user.name  "Killeshin GAA bot"
