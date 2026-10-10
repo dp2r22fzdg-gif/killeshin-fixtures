@@ -60,15 +60,26 @@ input::placeholder{color:rgba(255,255,255,.35)}
 .clock{display:flex;justify-content:space-between;align-items:center;font-size:15px;padding:10px 0 4px}
 .clock .big{font:800 40px/1 var(--num);font-variant-numeric:tabular-nums;letter-spacing:.01em}
 .clock .big.ht{color:var(--warn)}.clock .big.idle{color:var(--mute);font-size:28px}
+.clock button.big{padding:0;color:#fff;border-bottom:2px dashed rgba(255,255,255,.35)}
+.clockhint{text-align:right;margin:2px 0 0}
+.tset{display:flex;align-items:flex-end;gap:10px;margin-top:16px}
+.tset label{flex:1;margin:0}
+.tset input{font:800 36px var(--num);text-align:center;padding:10px}
+.tset span{font:800 36px var(--num);padding-bottom:10px}
 .clock b{color:var(--accent)}.clock b.ht{color:var(--warn)}.clock b.idle{color:var(--mute)}
 .note{font-size:13px;color:var(--mute);margin:2px 0 0}
 .pad{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:14px}
-.pad h2{grid-column:1/-1;font-size:14px;font-weight:600;color:var(--mute);margin:8px 0 -2px}
+.pad h2{grid-column:1/-1;display:flex;align-items:center;gap:9px;font-size:16px;font-weight:700;margin:10px 0 -2px}
+.pad h2::before{content:"";width:12px;height:12px;border-radius:3px;flex:none}
+.pad h2.us{color:var(--accent)}.pad h2.us::before{background:var(--accent)}
+.pad h2.them{color:#C9D3DC;margin-top:22px}.pad h2.them::before{background:#5E6B78}
 .hit{padding:22px 4px;border-radius:14px;font:800 26px/1 var(--num);letter-spacing:.01em}
 .hit span{display:block;font:600 13px var(--sans);opacity:.75;margin-top:6px;letter-spacing:0}
-.hit.us{background:var(--forest)}.hit.them{background:var(--them);border:1px solid var(--line)}
+/* Killeshin: bright club green. Opposition: slate grey. Never mixed up. */
+.hit.us{background:var(--accent);color:#0B2B1A;box-shadow:0 3px 0 #239A55}
+.hit.them{background:#4A5663;color:#fff;border:1px solid #6B7884;box-shadow:0 3px 0 #333C46}
 .hit:active{transform:scale(.97)}
-.hit:disabled{opacity:.35}
+.hit:disabled{opacity:.45;box-shadow:none}
 .undo{display:block;width:100%;margin-top:12px;padding:14px;border-radius:12px;border:1px solid var(--line);font-weight:600}
 .undo:disabled{opacity:.35}
 .stage{display:block;width:100%;margin-top:12px;padding:17px;border-radius:12px;background:#fff;color:var(--deep);font-weight:700;font-size:18px}
@@ -222,7 +233,7 @@ input::placeholder{color:rgba(255,255,255,.35)}
   function mins(t) { return Math.floor((Date.now() - t) / 60000) + 1 + '\u2032'; }
   /* The running clock: minutes and seconds since the current half started,
      ticking on screen every second. Half-time shows how long the break has
-     been; before throw-in it shows the time of day. */
+     been; before throw-in it reads 0:00. */
   function mmss(ms) { var t = Math.max(0, Math.floor(ms / 1000)), m = Math.floor(t / 60), s = t % 60; return m + ':' + (s < 10 ? '0' : '') + s; }
   function bigClock(m) {
     var run = { '1h': m.t1h, '2h': m.t2h, et1: m.tet1, et2: m.tet2 }[m.status];
@@ -230,8 +241,12 @@ input::placeholder{color:rgba(255,255,255,.35)}
     var brk = { ht: m.tht, etb: m.tetb, etht: m.tetht }[m.status];
     if (brk) return { t: 'Break ' + mmss(Date.now() - brk), k: 'ht' };
     if (m.status === 'ft') return { t: 'FT', k: 'idle' };
-    return { t: hhmm(Date.now()), k: 'idle' };
+    return { t: '0:00', k: 'idle' };
   }
+  /* The start time each running half counts from, and the break before it. */
+  var RUN = { '1h': 't1h', '2h': 't2h', et1: 'tet1', et2: 'tet2' };
+  var BREAK_BEFORE = { '2h': 'tht', et1: 'tetb', et2: 'tetht' };
+  var RUN_NAME = { '1h': '1st half', '2h': '2nd half', et1: 'extra time 1st half', et2: 'extra time 2nd half' };
   function hhmm(t) { var d = new Date(t); return (d.getHours() < 10 ? '0' : '') + d.getHours() + ':' + (d.getMinutes() < 10 ? '0' : '') + d.getMinutes(); }
   function isLive(m) { return m.live !== false; }   /* matches from before Go live existed count as live */
   function clock(m) {
@@ -637,7 +652,22 @@ input::placeholder{color:rgba(255,255,255,.35)}
     }
     return h + '<button class="undo" data-act="pickclose">Cancel</button></div></div>';
   }
+  /* Missed the start of a half: type how long has been played and the
+     clock carries on from there, here and on the website. */
+  function drawClockEdit(v, m) {
+    var f = RUN[m.status];
+    if (!f || !m[f]) { picking = null; return ''; }
+    var el = Math.max(0, Math.floor((Date.now() - m[f]) / 1000));
+    return '<div class="sheetbg" data-act="pickclose"><div class="sheet" data-act="none"><h3>Set the clock</h3>' +
+      '<p class="note">How much of the ' + RUN_NAME[m.status] + ' has been played? Type the time on the referee\u2019s or your watch.</p>' +
+      '<div class="tset"><label for="cm">Minutes<input id="cm" type="number" inputmode="numeric" min="0" max="60" value="' + Math.floor(el / 60) + '"></label>' +
+      '<span>:</span><label for="cs">Seconds<input id="cs" type="number" inputmode="numeric" min="0" max="59" value="' + (el % 60) + '"></label></div>' +
+      (picking.err ? '<p class="err">' + esc(picking.err) + '</p>' : '') +
+      '<button class="save" data-act="clocksave">Save and carry on</button>' +
+      '<button class="undo" data-act="pickclose">Cancel</button></div></div>';
+  }
   function drawPicker(v, m) {
+    if (picking.clock) return drawClockEdit(v, m);
     if (picking.sub) return drawSub(v, m);
     if (picking.card) return drawCard(v, m);
     var e = picking.ev ? (m.events || {})[picking.ev] : null;
@@ -750,19 +780,25 @@ input::placeholder{color:rgba(255,255,255,.35)}
                    : 'Mark as delayed<span>' + (live ? 'Shows \u201cMatch delayed\u201d on the website' : 'Shows on the website once you tap Go live') + '</span>') +
         '</button>') +
       '<div class="board">' + (m.venue === 'away' ? thRow + usRow : usRow + thRow) + '</div>' +
-      (function () { var bc = bigClock(m); return '<div class="clock"><b class="' + c.k + '">' + c.l + '</b><span class="big ' + bc.k + '" id="clk">' + esc(bc.t) + '</span></div>'; })() +
+      (function () {
+        var bc = bigClock(m), run = RUN[m.status] && m[RUN[m.status]];
+        return '<div class="clock"><b class="' + c.k + '">' + c.l + '</b>' +
+          (run ? '<button class="big ' + bc.k + '" id="clk" data-act="clockedit" aria-label="Set the clock">' + esc(bc.t) + '</button>'
+               : '<span class="big ' + bc.k + '" id="clk">' + esc(bc.t) + '</span>') + '</div>' +
+          (run ? '<p class="note clockhint">Missed the start? Tap the clock to set it.</p>' : '');
+      })() +
+      stageBtns +
       scorers +
-      '<div class="pad"><h2>' + esc(us) + '</h2>' +
+      '<div class="pad"><h2 class="us">' + esc(us) + '</h2>' +
       '<button class="hit us" data-act="score" data-s="k" data-v="g"' + off + '>GOAL<span>+3</span></button>' +
       '<button class="hit us" data-act="score" data-s="k" data-v="2"' + off + '>2 POINTS<span>+2</span></button>' +
       '<button class="hit us" data-act="score" data-s="k" data-v="p"' + off + '>POINT<span>+1</span></button>' +
-      '<h2>' + esc(them) + '</h2>' +
+      '<h2 class="them">' + esc(them) + '</h2>' +
       '<button class="hit them" data-act="score" data-s="o" data-v="g"' + off + '>GOAL<span>+3</span></button>' +
       '<button class="hit them" data-act="score" data-s="o" data-v="2"' + off + '>2 POINTS<span>+2</span></button>' +
       '<button class="hit them" data-act="score" data-s="o" data-v="p"' + off + '>POINT<span>+1</span></button></div>' +
       '<button class="undo" data-act="undo"' + (last ? '' : ' disabled') + '>' + esc(lastTxt) + '</button>' +
       '<div class="extra"><button data-act="subopen">\u21c4 Substitution</button><button data-act="cardopen">\u25ae Card</button></div>' +
-      stageBtns +
       slist +
       (live ? '<button class="quiet" data-act="unlive">Take off the website</button>' : '') +
       '<button class="quiet" data-act="remove">Remove this match</button>' +
@@ -896,6 +932,23 @@ input::placeholder{color:rgba(255,255,255,.35)}
       var evt = picking && picking.ev; if (!evt) return;
       picking.typed = true; picking.nudge = false;  /* players unlock */
       enqueue({ m: 'PATCH', p: base + '/events/' + evt, b: { t: b.dataset.t === 'play' ? null : b.dataset.t } });
+    } else if (a === 'clockedit') {
+      picking = { clock: true }; render();
+    } else if (a === 'clocksave') {
+      var mc = view()[cur], fld = mc && RUN[mc.status];
+      if (!fld) { picking = null; render(); return; }
+      var cmv = document.getElementById('cm').value.trim(), csv = document.getElementById('cs').value.trim();
+      var mmv = cmv === '' ? 0 : parseInt(cmv, 10), ssv = csv === '' ? 0 : parseInt(csv, 10);
+      blur();
+      if (isNaN(mmv) || isNaN(ssv) || mmv < 0 || mmv > 60 || ssv < 0 || ssv > 59) {
+        picking = { clock: true, err: 'Minutes 0 to 60, seconds 0 to 59.' }; render(); return;
+      }
+      var start = Date.now() - (mmv * 60 + ssv) * 1000, cp = {};
+      cp[fld] = start;
+      var bf = BREAK_BEFORE[mc.status];               /* half-time pressed late too: move it back to match */
+      if (bf && mc[bf] && start < mc[bf]) cp[bf] = start;
+      picking = null;
+      enqueue({ m: 'PATCH', p: base, b: cp });
     } else if (a === 'subopen') {
       picking = { sub: {} }; render();
     } else if (a === 'subpick') {
