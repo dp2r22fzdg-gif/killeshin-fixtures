@@ -359,7 +359,7 @@ body.embed main{padding:4px}
   </div>
 </section>
 
-<p class="demo">Version 9 Oct · 14<br><a href="/" style="color:var(--green-dk);font-weight:700;text-decoration:none">Back to killeshingaa.ie</a></p>
+<p class="demo">Version 10 Oct · 15<br><a href="/" style="color:var(--green-dk);font-weight:700;text-decoration:none">Back to killeshingaa.ie</a></p>
 </main>
 
 <nav class="bar" id="tabs" aria-label="Sections"><div class="in">
@@ -444,18 +444,50 @@ async function loadTeams(){
     SITE=j; if(j && j.gradesBy && (j.gradesBy.men||j.gradesBy.ladies)) TEAMS=j.gradesBy; }catch(e){ /* built-in list stands in */ }
   renderTeams();
   if($('v-today') && $('v-today').classList.contains('on')) renderToday();
+  Object.keys(cache).forEach(addSiteGames); refreshBook(false);
 }
 const chosenTeam=()=>$('b-team-sel').value==='__other' ? $('b-team-other').value.trim() : $('b-team-sel').value;
 
 /* ---------- Data ---------- */
 const cache = {};   // day -> rows
+/* Home games straight from the club website. They block their pitch even
+   before the automatic sync has copied them in, using the same pitches and
+   times as the sync: ladies U16/U14 on the Old Pitch, men's U13 on the
+   Juvenile Pitch, everyone else on the Senior Pitch, from 45 minutes before
+   throw-in to 2 hours 15 after. */
+const HOME_PITCH = {'ladies|U16':[1,2], 'ladies|U14':[1,2], 'men|U13':[3,4]};
+function siteHomeGames(day){
+  if(!SITE || !Array.isArray(SITE.fixtures)) return [];
+  return SITE.fixtures.filter(f=>{
+    if(f.date!==day || !/^\d{1,2}:\d{2}$/.test(f.time||'')) return false;
+    const v=(f.venue||'').toLowerCase();
+    return v.includes('killeshin')||v.includes('hearns')||v.includes('sonny byrne')||(f.isHome&&(!f.venue||/^tbc/i.test(f.venue)));
+  }).map(f=>{
+    const t=toMin(f.time.padStart(5,'0'));
+    return {kind:'match', site:true, auto:true, status:'confirmed', day,
+      start_time:fromMin(Math.max(0,t-45)), end_time:fromMin(Math.min(23*60+59,t+135)),
+      halves:HOME_PITCH[(f.branch||'men')+'|'+f.grade]||[5,6],
+      team:(f.branch==='ladies'?'Ladies ':'')+f.grade+' v '+f.opponent};
+  });
+}
+function addSiteGames(day){
+  const list=(cache[day] ||= []);
+  siteHomeGames(day).forEach(g=>{
+    const st=toMin(g.start_time);
+    const already=list.some(b=>b.kind==='match' && b.auto && Math.abs(toMin(hm(b.start_time))-st)<=90);
+    if(!already) list.push(g);
+  });
+  list.sort((a,b)=>hm(a.start_time).localeCompare(hm(b.start_time)));
+}
 async function loadRange(from, to){
-  if(!sb) return [];
+  if(!sb){ const all=[]; for(let d=from; d<=to; d=addDays(d,1)){ cache[d]=[]; addSiteGames(d); all.push(...cache[d]); } return all; }
   const {data, error} = await sb.from('public_schedule').select('*').gte('day',from).lte('day',to).order('day').order('start_time');
   if(error) throw error;
   for(let d=from; d<=to; d=addDays(d,1)) cache[d]=[];
   data.forEach(r=>{ (cache[r.day] ||= []).push(r); });
-  return data;
+  const all=[];
+  for(let d=from; d<=to; d=addDays(d,1)){ addSiteGames(d); all.push(...cache[d]); }
+  return all;
 }
 async function dayRows(day, fresh){ if(fresh || !cache[day]) await loadRange(day, day); return cache[day]||[]; }
 const live = b => b.status==='confirmed';
@@ -589,6 +621,8 @@ $('b-go').addEventListener('click', async ()=>{
   if(!validPhone(phone)) errs.push('Enter a valid mobile number, e.g. 086 123 4567.');
   if(!/^\S+@\S+\.\S+$/.test(email)) errs.push('Add your email so we can send your confirmation.');
   if(errs.length){ out.innerHTML=`<div class="notice bad"><b>Not booked yet</b>${errs.join('<br>')}</div>`; return; }
+  { const halves0=[...bookSel], game=(cache[d]||[]).find(b=>b.site && clash(b,s,e,halves0));
+    if(game){ out.innerHTML=`<div class="notice bad"><b>Match on</b>${esc(game.team)} has ${esc(describeHalves(game.halves))} from ${hm(game.start_time)} to ${hm(game.end_time)}. Pick another pitch or time.</div>`; refreshBook(false); return; } }
   if(!sb){ out.innerHTML='<div class="notice bad"><b>Not connected</b>This page isn\'t linked to the booking database yet.</div>'; return; }
   const btn=$('b-go'); btn.disabled=true; btn.textContent='Checking…';
   const halves=[...bookSel].sort((a,b)=>a-b);
@@ -833,7 +867,7 @@ async function renderMatches(){
   let rows=[]; try{ rows=(await loadRange(today(),addDays(today(),120))).filter(b=>b.kind==='match'&&b.status==='confirmed'); }catch(err){}
   $('m-list').innerHTML = rows.length ? `<div class="panel">${rows.map(b=>`<div class="slot"><div class="t">${hm(b.start_time)}<small>${niceDate(b.day)}</small></div>
     <div><div>${b.auto?'<span class="tag tr">From fixtures</span>':''}<span class="who">${esc(b.team)}</span></div><div class="meta">to ${hm(b.end_time)} · ${esc(describeHalves(b.halves))}</div>
-    <button class="btn small ghost" style="margin-top:6px" data-del="${b.id}">Remove fixture</button></div></div>`).join('')}</div>`
+    ${b.site?'<div class="meta">From the club website \u00b7 booking itself shortly</div>':`<button class="btn small ghost" style="margin-top:6px" data-del="${b.id}">Remove fixture</button>`}</div></div>`).join('')}</div>`
     : '<p class="empty">No fixtures entered yet. Add the first one above.</p>';
 }
 $('m-list').addEventListener('click',async e=>{ const b=e.target.closest('[data-del]'); if(!b) return;
