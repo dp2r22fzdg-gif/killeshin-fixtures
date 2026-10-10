@@ -111,6 +111,13 @@ input::placeholder{color:rgba(255,255,255,.35)}
 .pl em{flex:none;font-style:normal;font:600 14px var(--sans);color:var(--mute)}
 .pl.hot em{color:#fff;font:800 20px var(--num)}
 .pl:active{transform:scale(.98)}
+/* Players stay greyed out until how the score came has been picked. */
+.pl.locked{opacity:.35}
+.pl.locked:active{transform:none}
+.typehint{margin:14px 0 0;font-size:14px;font-weight:600;color:var(--accent)}
+.typehint.warn{color:var(--warn)}
+.addrow input:disabled{opacity:.4}
+.addrow button.locked{opacity:.4}
 .addrow{display:flex;gap:8px;margin-top:14px}
 .bulk{margin-top:22px;padding-top:16px;border-top:1px solid var(--line)}
 .bulk h4{margin:0 0 4px;font-size:16px}
@@ -194,7 +201,7 @@ input::placeholder{color:rgba(255,255,255,.35)}
   var queue = LS.get('kl_queue', []);          /* writes waiting to reach the server */
   var server = {}, loaded = false, online = true, blocked = '', flushing = false;
   var screen = auth ? 'list' : 'signin', cur = LS.get('kl_cur', null), draft = { venue: 'home' }, wake = null;
-  var picking = null;                          /* {ev: eventId} while naming a scorer, {manage: true} for the players list */
+  var picking = null;                          /* {ev: eventId, typed} while naming a scorer, {manage: true} for the players list */
   var HOLD_MS = 800, holdT = null, holdBtn = null;   /* press-and-hold on the half / full-time buttons */
   if (cur && screen === 'list') screen = 'match';
 
@@ -315,7 +322,7 @@ input::placeholder{color:rgba(255,255,255,.35)}
       return { k: k, n: names[k], t: today[k] || { g: 0, p: 0 }, s: season[k] || { g: 0, p: 0 } };
     }).sort(function (a, b) { return pts(b.t) - pts(a.t) || pts(b.s) - pts(a.s) || a.n.localeCompare(b.n); });
   }
-  /* How a score came: saved on the score as t. From play is the default. */
+  /* How a score came: saved on the score as t. From play is saved as no t. */
   var TYPES = {
     g: [['play', 'From play'], ['pen', 'Penalty'], ['free', 'Free']],
     '2': [['play', 'From play'], ['free', 'Free'], ['45', '45'], ['side', 'Sideline']],
@@ -584,9 +591,10 @@ input::placeholder{color:rgba(255,255,255,.35)}
 
   /* The pop-up list of players: after a Killeshin score, or from Players. */
   /* Men's football: a 45 is worth one point, so it isn't offered on a
-     two-pointer. Ladies football: a 45 kicked straight over is worth two. */
-  function typeChips(e, m) {
-    var cur_ = e.t || 'play';
+     two-pointer. Ladies football: a 45 kicked straight over is worth two.
+     chosen === false means nothing has been picked yet, so no chip is lit. */
+  function typeChips(e, m, chosen) {
+    var cur_ = chosen === false ? '' : (e.t || 'play');
     var list = (TYPES[e.v] || TYPES.p).filter(function (t) { return !(e.v === '2' && t[0] === '45' && m && m.branch !== 'ladies'); });
     return '<div class="chips">' + list.map(function (t) {
       return '<button data-act="stype" data-t="' + t[0] + '" class="' + (cur_ === t[0] ? 'on' : '') + '">' + t[1] + '</button>';
@@ -638,23 +646,28 @@ input::placeholder{color:rgba(255,255,255,.35)}
       return '<div class="sheetbg" data-act="pickclose"><div class="sheet" data-act="none"><h3>' + esc(m.opp || 'Opposition') + ' ' + word(e.v) + '</h3>' +
         '<p class="note">How did it come?</p>' + typeChips(e, m) + '<button class="undo" data-act="pickclose">Done</button></div></div>';
     }
+    /* A new Killeshin score: how it came must be picked before the player. */
+    var locked = !!(picking.ev && !picking.typed);
     var list = candidates(v, m), cur_ = e && e.n ? nkey(e.n) : '';
     var h = '<div class="sheetbg" data-act="pickclose"><div class="sheet" data-act="none">';
     h += picking.ev
-      ? '<h3>' + (e.v === 'g' ? 'Goal' : e.v === '2' ? '2-pointer' : 'Point') + '</h3>' + typeChips(e, m) +
+      ? '<h3>' + (e.v === 'g' ? 'Goal' : e.v === '2' ? '2-pointer' : 'Point') + '</h3>' +
+        '<h4>How did it come?</h4>' + typeChips(e, m, picking.typed ? true : false) +
+        (locked ? '<p class="typehint' + (picking.nudge ? ' warn' : '') + '">' +
+          (picking.nudge ? 'Pick how it came above first, then the player.' : 'Pick how it came first, then the player.') + '</p>' : '') +
         '<h4>Who scored it? <span style="opacity:.75">Top scorers first</span></h4>'
       : '<h3>' + esc(m.team) + ' players</h3><p class="note">Names added here come up when you record a score, in this match and every later ' + esc(m.team) + ' match.</p>';
     list.forEach(function (p) {
       var hot = pts(p.t) > 0;
       var sub = hot ? fmt(p.t.g, p.t.p) : (pts(p.s) > 0 ? 'Season ' + fmt(p.s.g, p.s.p) : '');
       h += picking.ev
-        ? '<button class="pl' + (hot ? ' hot' : '') + (cur_ === p.k ? ' sel' : '') + '" data-act="pick" data-n="' + esc(p.n) + '"><span>' + esc(p.n) + '</span><em>' + sub + '</em></button>'
+        ? '<button class="pl' + (hot ? ' hot' : '') + (cur_ === p.k ? ' sel' : '') + (locked ? ' locked' : '') + '" data-act="pick" data-n="' + esc(p.n) + '"' + (locked ? ' aria-disabled="true"' : '') + '><span>' + esc(p.n) + '</span><em>' + sub + '</em></button>'
         : '<div class="pl' + (hot ? ' hot' : '') + '"><span>' + esc(p.n) + '</span><em>' + sub + '</em>' +
           (hot ? '' : '<button class="x" data-act="drop" data-k="' + esc(p.k) + '" aria-label="Remove ' + esc(p.n) + '">\u00d7</button>') + '</div>';
     });
     if (!list.length) h += '<p class="note" style="margin-top:14px">No players yet for ' + esc(m.team) + '. Type a name below.</p>';
-    h += '<div class="addrow"><input id="nn" placeholder="New player name" autocomplete="off" autocapitalize="words" enterkeyhint="done">' +
-      '<button data-act="addname">' + (picking.ev ? 'Add' : 'Add player') + '</button></div>';
+    h += '<div class="addrow"><input id="nn" placeholder="New player name" autocomplete="off" autocapitalize="words" enterkeyhint="done"' + (locked ? ' disabled' : '') + '>' +
+      '<button data-act="addname"' + (locked ? ' class="locked" aria-disabled="true"' : '') + '>' + (picking.ev ? 'Add' : 'Add player') + '</button></div>';
     if (picking.manage) {
       h += '<div class="bulk"><h4>Add a whole team at once</h4>' +
         '<p class="note">Paste the names, one per line. Numbers, (c) and headings like SUBS are tidied up for you.</p>' +
@@ -770,6 +783,17 @@ input::placeholder{color:rgba(255,255,255,.35)}
     if (tm) draft.teamId = tm.value; if (op) draft.opp = op.value; if (cp) draft.comp = cp.value;
   }
   function blur() { if (document.activeElement && document.activeElement.blur) document.activeElement.blur(); }
+  /* Tapping a player before picking how the score came: point at the
+     buttons instead. */
+  function needsType() {
+    if (picking && picking.ev && !picking.typed) {
+      picking.nudge = true;
+      if (navigator.vibrate) navigator.vibrate([30, 60, 30]);
+      render();
+      return true;
+    }
+    return false;
+  }
 
   /* Subs and cards go in the match log with the time they happened. */
   function logItem(base, rec) {
@@ -826,17 +850,19 @@ input::placeholder{color:rgba(255,255,255,.35)}
       if (!confirm('Take this match off the website? You can put it back with Go live.')) return;
       enqueue({ m: 'PATCH', p: base, b: { live: false } });
     } else if (a === 'score') {
-      /* The score is saved straight away; the name is added after, so the
-         scoreboard never waits on the picker. */
+      /* The score is saved straight away; how it came and the name are
+         added after, so the scoreboard never waits on the picker. */
       var evId = uid('e');
-      if (b.dataset.s === 'k') picking = { ev: evId };
+      if (b.dataset.s === 'k') picking = { ev: evId, typed: false };
       enqueue({ m: 'PUT', p: base + '/events/' + evId, b: { s: b.dataset.s, v: b.dataset.v, ts: Date.now() } });
       if (navigator.vibrate) navigator.vibrate(25);
       var el = document.getElementById('s-' + b.dataset.s); if (el) el.classList.add('flash');
     } else if (a === 'pick') {
+      if (needsType()) return;
       var evp = picking && picking.ev; picking = null;
       if (evp) nameScore(base, evp, b.dataset.n);
     } else if (a === 'addname') {
+      if (needsType()) return;
       var inp = document.getElementById('nn'), nm = inp ? inp.value.replace(/\s+/g, ' ').trim() : '';
       blur();
       if (!nm || !nkey(nm)) { render(); return; }
@@ -868,6 +894,7 @@ input::placeholder{color:rgba(255,255,255,.35)}
       LS.set('kl_queue', queue); render(); flush();
     } else if (a === 'stype') {
       var evt = picking && picking.ev; if (!evt) return;
+      picking.typed = true; picking.nudge = false;  /* players unlock */
       enqueue({ m: 'PATCH', p: base + '/events/' + evt, b: { t: b.dataset.t === 'play' ? null : b.dataset.t } });
     } else if (a === 'subopen') {
       picking = { sub: {} }; render();
@@ -901,7 +928,7 @@ input::placeholder{color:rgba(255,255,255,.35)}
     } else if (a === 'pickclose') {
       blur(); picking = null; render();
     } else if (a === 'rename') {
-      picking = { ev: b.dataset.id }; render();
+      picking = { ev: b.dataset.id, typed: true }; render();   /* an earlier score already has how it came */
     } else if (a === 'players') {
       picking = { manage: true }; render();
     } else if (a === 'undo') {
