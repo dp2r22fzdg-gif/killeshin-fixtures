@@ -83,6 +83,15 @@
     '#tatcBubble .bnone{font-size:14px;color:var(--grey);padding:8px 0}' +
     '#tatcBubble .bmore{font-size:12px;font-weight:700;color:var(--green-dk);padding:7px 0 3px;border-top:1px solid var(--line)}' +
     '@keyframes tatcPop{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}' +
+    '#tatcSheet .dnav{display:flex;align-items:center;gap:8px;margin-bottom:6px}' +
+    '#tatcSheet .dn{flex:none;width:44px;height:44px;border-radius:12px;font-size:24px;font-weight:800;line-height:1;background:var(--green-lt);color:var(--green-dk);border:1.5px solid #BFDFCD;box-shadow:0 3px 0 #BFDFCD}' +
+    '#tatcSheet .dn:active{box-shadow:0 1px 0 #BFDFCD;transform:translateY(2px)}' +
+    '#tatcSheet .dd{flex:1;min-width:0;text-align:center;position:relative;cursor:pointer}' +
+    '#tatcSheet .dd b{display:block;font-family:"Bricolage Grotesque",Archivo,sans-serif;font-weight:800;font-size:19px;line-height:1.15}' +
+    '#tatcSheet .dd span{display:block;font-size:13px;color:var(--grey);margin-top:2px}' +
+    '#tatcSheet .dd em{font-style:normal;color:var(--green-dk);font-size:11px}' +
+    '#tatcSheet .dpick{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;-webkit-appearance:none;appearance:none}' +
+    '#tatcSheet .tchip{display:block;margin:6px auto 2px;padding:7px 14px;border-radius:999px;font-size:13px;font-weight:700;background:#fff;color:var(--green-dk);border:1px solid #BFDFCD}' +
     '#tatcSheet .none{font-size:14.5px;color:var(--grey);padding:10px 2px}' +
     '#tatcSheet .open{display:block;width:100%;text-align:center;margin-top:14px;padding:15px;border-radius:12px;background:var(--forest);color:#fff;font-weight:800;font-size:15px;border:1.5px solid #0F5C34;box-shadow:0 3px 0 #0F5C34;text-decoration:none}';
   document.head.appendChild(css);
@@ -108,11 +117,16 @@
   function kindOf(b){ return b.kind === 'match' ? 'Match' : b.practice ? 'Practice match' : 'Training'; }
   function title(b){ return b.team + (b.opponent ? ' v ' + b.opponent : ''); }
 
-  var ITEMS = [], LOADED = false;
+  var ITEMS = [], LOADED = false, SHEET_DAY = null, SITE_CACHE = null, SITE_AT = 0;
 
-  function homeGamesFromSite(day){
+  function siteData(){
+    if(SITE_CACHE && Date.now() - SITE_AT < 60000) return Promise.resolve(SITE_CACHE);
     return fetch('data.json?t=' + Date.now(), {cache:'no-store'})
       .then(function(r){ if(!r.ok) throw 0; return r.json(); })
+      .then(function(j){ SITE_CACHE = j; SITE_AT = Date.now(); return j; });
+  }
+  function homeGamesFromSite(day){
+    return siteData()
       .then(function(j){
         return (j.fixtures || []).filter(function(f){
           if(f.date !== day || !/^\d{1,2}:\d{2}$/.test(f.time || '')) return false;
@@ -129,8 +143,13 @@
       .catch(function(){ return []; });
   }
 
-  function load(){
-    var day = todayStr();
+  function addDays(day, n){
+    var p = day.split('-'), d = new Date(+p[0], p[1]-1, +p[2]); d.setDate(d.getDate() + n);
+    return d.getFullYear() + '-' + pad(d.getMonth()+1) + '-' + pad(d.getDate());
+  }
+  /* Everything on the club pitches for one day: bookings, plus any home game
+     on the website that hasn't been booked yet */
+  function fetchDay(day){
     var bookings = fetch(SUPA_URL + '/rest/v1/public_schedule?select=*&day=eq.' + day + '&status=eq.confirmed&order=start_time',
         {headers: {apikey: SUPA_KEY}, cache: 'no-store'})
       .then(function(r){ if(!r.ok) throw 0; return r.json(); })
@@ -143,18 +162,31 @@
         if(!dup) rows.push(g);
       });
       rows.sort(function(a,b){ return toMin(a.start_time) - toMin(b.start_time); });
-      ITEMS = rows; LOADED = res[0] !== null || rows.length > 0;
-      paintStrip();
-      if(document.getElementById('tatcSheet') && document.getElementById('tatcSheet').classList.contains('open')) paintSheet();
+      rows.ok = res[0] !== null;
+      return rows;
     });
   }
 
-  function split(){
+  function load(){
+    var day = todayStr();
+    return fetchDay(day).then(function(rows){
+      ITEMS = rows; LOADED = rows.ok || rows.length > 0;
+      paintStrip();
+      var sh = document.getElementById('tatcSheet');
+      if(sh && sh.classList.contains('open') && SHEET_DAY === day) paintSheet(day, rows);
+    });
+  }
+
+  /* Today splits into on now / later / earlier. Other days are all one list. */
+  function split(rows, day){
+    var t = todayStr();
+    if(day && day > t) return {live:[], later:rows, done:[]};
+    if(day && day < t) return {live:[], later:[], done:rows};
     var d = new Date(), n = d.getHours()*60 + d.getMinutes();
     return {
-      live:  ITEMS.filter(function(b){ return toMin(b.start_time) <= n && n < toMin(b.end_time); }),
-      later: ITEMS.filter(function(b){ return toMin(b.start_time) > n; }),
-      done:  ITEMS.filter(function(b){ return toMin(b.end_time) <= n; })
+      live:  rows.filter(function(b){ return toMin(b.start_time) <= n && n < toMin(b.end_time); }),
+      later: rows.filter(function(b){ return toMin(b.start_time) > n; }),
+      done:  rows.filter(function(b){ return toMin(b.end_time) <= n; })
     };
   }
 
@@ -175,7 +207,7 @@
 
   function paintStrip(){
     var el = document.getElementById('tatc'); if(!el) return;
-    var s = split(), line, sub;
+    var s = split(ITEMS), line, sub;
     if(!ITEMS.length){
       line = LOADED ? 'Nothing on the club pitches today' : 'Tap to see what\u2019s on';
       sub = LOADED ? 'Check back later' : '';
@@ -231,7 +263,20 @@
     sh.setAttribute('aria-label', 'Today at the Club');
     sh.innerHTML = '<div class="panel"><div class="grab"></div><div id="tatcBody"></div></div>';
     sh.addEventListener('click', function(e){
-      if(!e.target.closest('.panel') || e.target.closest('#tatcClose')) sh.classList.remove('open'); });
+      if(!e.target.closest('.panel') || e.target.closest('#tatcClose')){ sh.classList.remove('open'); return; }
+      var dn = e.target.closest('.dn');
+      if(dn){ showDay(addDays(SHEET_DAY, +dn.dataset.d)); return; }
+      if(e.target.closest('.tchip')){ showDay(todayStr()); }
+    });
+    sh.addEventListener('change', function(e){
+      if(e.target.classList.contains('dpick') && e.target.value) showDay(e.target.value);
+    });
+    var sx = 0, sy = 0;
+    sh.addEventListener('touchstart', function(e){ var t = e.touches[0]; sx = t.clientX; sy = t.clientY; }, {passive: true});
+    sh.addEventListener('touchend', function(e){
+      var t = e.changedTouches[0], dx = t.clientX - sx, dy = t.clientY - sy;
+      if(Math.abs(dx) > 60 && Math.abs(dy) < 45) showDay(addDays(SHEET_DAY, dx < 0 ? 1 : -1));
+    }, {passive: true});
     document.body.appendChild(sh);
     return sh;
   }
@@ -241,21 +286,55 @@
       '<small>to ' + hm(b.end_time) + '</small></div><div><span class="k">' + kindOf(b) + '</span>' +
       '<span class="w">' + esc(title(b)) + '</span><span class="p">' + ICON.pin + esc(where(b.halves)) + '</span></div></div>';
   }
-  function paintSheet(){
-    var s = split(), html = '<h3>Today at the Club</h3><div class="dt">' +
-      new Date().toLocaleDateString('en-IE', {weekday:'long', day:'numeric', month:'long'}) + '</div>';
-    if(!ITEMS.length) html += '<p class="none">Nothing on the club pitches today.</p>';
-    if(s.live.length)  html += '<div class="grp now">On now</div>' + s.live.map(function(b){ return item(b,'live'); }).join('');
-    if(s.later.length) html += '<div class="grp">' + (s.live.length ? 'Later today' : 'Coming up') + '</div>' + s.later.map(function(b){ return item(b,''); }).join('');
-    if(s.done.length)  html += '<div class="grp">Earlier today</div>' + s.done.map(function(b){ return item(b,'done'); }).join('');
+  function dayTitle(day){
+    var t = todayStr();
+    if(day === t) return 'Today at the Club';
+    if(day === addDays(t, 1)) return 'Tomorrow at the Club';
+    if(day === addDays(t, -1)) return 'Yesterday at the Club';
+    var p = day.split('-');
+    return new Date(+p[0], p[1]-1, +p[2]).toLocaleDateString('en-IE', {weekday:'long'}) + ' at the Club';
+  }
+  function dayLong(day){
+    var p = day.split('-');
+    return new Date(+p[0], p[1]-1, +p[2]).toLocaleDateString('en-IE', {weekday:'long', day:'numeric', month:'long', year:'numeric'});
+  }
+  function header(day){
+    var t = todayStr();
+    return '<div class="dnav">' +
+        '<button class="dn" type="button" data-d="-1" aria-label="Previous day">\u2039</button>' +
+        '<label class="dd"><b>' + esc(dayTitle(day)) + '</b>' +
+          '<span>' + esc(dayLong(day)) + ' <em>\u25BE</em></span>' +
+          '<input type="date" class="dpick" value="' + day + '" aria-label="Pick a day"></label>' +
+        '<button class="dn" type="button" data-d="1" aria-label="Next day">\u203A</button>' +
+      '</div>' +
+      (day !== t ? '<button class="tchip" type="button">Back to today</button>' : '');
+  }
+  function paintSheet(day, rows){
+    var t = todayStr(), s = split(rows, day), html = header(day);
+    if(!rows.length) html += '<p class="none">' + (day === t ? 'Nothing on the club pitches today.'
+      : day > t ? 'Nothing booked on the club pitches yet.' : 'Nothing was on the club pitches.') + '</p>';
+    if(day === t){
+      if(s.live.length)  html += '<div class="grp now">On now</div>' + s.live.map(function(b){ return item(b,'live'); }).join('');
+      if(s.later.length) html += '<div class="grp">' + (s.live.length ? 'Later today' : 'Coming up') + '</div>' + s.later.map(function(b){ return item(b,''); }).join('');
+      if(s.done.length)  html += '<div class="grp">Earlier today</div>' + s.done.map(function(b){ return item(b,'done'); }).join('');
+    } else if(rows.length){
+      html += '<div class="grp">' + (day > t ? 'What\u2019s on' : 'What was on') + '</div>' + rows.map(function(b){ return item(b,''); }).join('');
+    }
     html += '<button class="open" type="button" id="tatcClose">Close</button>';
     document.getElementById('tatcBody').innerHTML = html;
+  }
+  function showDay(day){
+    SHEET_DAY = day;
+    var body = document.getElementById('tatcBody');
+    if(day === todayStr() && LOADED){ paintSheet(day, ITEMS); return; }
+    body.innerHTML = header(day) + '<p class="none">Loading\u2026</p>';
+    fetchDay(day).then(function(rows){ if(SHEET_DAY === day) paintSheet(day, rows); });
   }
   /* Quick look: a small bubble just under the strip, on now and next only */
   function openBubble(){
     closeBubble();
     var el = document.getElementById('tatc'); if(!el) return;
-    var s = split(), r = el.getBoundingClientRect();
+    var s = split(ITEMS), r = el.getBoundingClientRect();
     var rows = s.live.map(function(b){ return ['On now', b]; })
       .concat(s.later.slice(0, Math.max(1, 3 - s.live.length)).map(function(b){ return ['Next', b]; }));
     var body = rows.length ? rows.map(function(x){ var b = x[1];
@@ -278,7 +357,7 @@
   }
   function closeBubble(){ var b = document.getElementById('tatcBubble'); if(b) b.remove(); }
 
-  function openSheet(){ var sh = sheet(); paintSheet(); requestAnimationFrame(function(){ sh.classList.add('open'); }); }
+  function openSheet(day){ var sh = sheet(); showDay(day || todayStr()); requestAnimationFrame(function(){ sh.classList.add('open'); }); }
 
   /* Only on the home (Fixtures) page, between the filters and Next match */
   function placeStrip(){
