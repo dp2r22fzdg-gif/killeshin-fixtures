@@ -211,6 +211,11 @@ input[type=date]::-webkit-calendar-picker-indicator{opacity:.6}
 .bar button.on::before{content:"";position:absolute;top:0;left:26%;right:26%;height:3px;border-radius:0 0 4px 4px;background:var(--green)}
 .bar button:active{opacity:.55}
 
+.mast{position:relative;padding-top:calc(56px + env(safe-area-inset-top))}
+.backsite{position:absolute;z-index:2;top:calc(14px + env(safe-area-inset-top));left:16px;display:inline-flex;align-items:center;gap:6px;
+  padding:7px 13px 7px 10px;border-radius:999px;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.3);
+  color:#fff;font-size:13.5px;font-weight:700;text-decoration:none}
+.backsite:active{background:rgba(255,255,255,.28)}
 body.embed{padding-bottom:0;background:transparent}
 body.embed .mast,body.embed .bar,body.embed #mine,body.embed .demo{display:none}
 body.embed main{padding:4px}
@@ -219,6 +224,7 @@ body.embed main{padding:4px}
 </head>
 <body>
 <header class="mast flecked">
+  <a class="backsite" href="./"><span aria-hidden="true">‹</span> Back to website</a>
   <span class="badge"><img src="crest.png" alt="Killeshin GAA crest"></span>
   <div><h1>Pitch Bookings</h1><span class="sub">Killeshin GAA</span></div>
 </header>

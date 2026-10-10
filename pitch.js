@@ -2,8 +2,8 @@
    1. "Today at the Club" strip on the home page, below Buy tickets and above
       Next match. For supporters: tap = full list for today, long press = quick
       overview bubble. Stays on the main site, no link to Pitch Bookings.
-   2. "Pitch bookings" and "What's on today" tiles at the top of the Club page.
-   3. "Pitch bookings" button in the More menu.
+   2. "Today at the Club" tile at the top of the Club page.
+   3. "Pitch bookings" and "Live scorer" buttons in the More menu (not on the Club page).
    Loaded by one line at the bottom of index.html:  <script src="pitch.js"></script> */
 (function(){
   "use strict";
@@ -453,13 +453,7 @@
     var wrap = document.createElement('div');
     wrap.id = 'pitchBookings';
     wrap.innerHTML =
-      '<div class="sec"><span class="lbl">Club apps</span></div>' +
-      '<div class="pgrid">' +
-        '<a class="ptile half" href="' + BOOKINGS + '"><span class="tile">' + ICON.pitch + '</span>' +
-          '<span class="tx"><b>Pitch Bookings</b><span>Book training or a practice match</span></span></a>' +
-        '<a class="ptile half" href="' + SCORER + '"><span class="tile">' + ICON.score + '</span>' +
-          '<span class="tx"><b>Live Scorer</b><span>Score a match live for the website</span></span></a>' +
-      '</div>' +
+      '<div class="sec"><span class="lbl">On the club pitches</span></div>' +
       '<a class="ptile" href="#" id="tatcTile"><span class="tile">' + ICON.clock + '</span>' +
         '<span class="tx"><b>Today at the Club</b><span>Training, practice matches and home games on the club pitches</span></span>' +
         '<span class="go">\u203A</span></a>';
@@ -476,9 +470,11 @@
   function addToMore(){
     var panel = document.querySelector('#sheet .panel');
     if(!panel || panel.querySelector('.pbtn')) return;
-    var a = document.createElement('a');
-    a.className = 'pbtn'; a.href = BOOKINGS; a.innerHTML = ICON.pitch + 'Pitch bookings';
-    panel.appendChild(a);
+    [[BOOKINGS, ICON.pitch, 'Pitch bookings'], [SCORER, ICON.score, 'Live scorer']].forEach(function(x){
+      var a = document.createElement('a');
+      a.className = 'pbtn'; a.href = x[0]; a.innerHTML = x[1] + x[2];
+      panel.appendChild(a);
+    });
   }
 
   function start(){
