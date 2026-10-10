@@ -57,7 +57,9 @@
     '@keyframes tatcPulse{0%{box-shadow:0 0 0 0 rgba(58,205,119,.6)}70%{box-shadow:0 0 0 8px rgba(58,205,119,0)}100%{box-shadow:0 0 0 0 rgba(58,205,119,0)}}' +
     '@media (prefers-reduced-motion:reduce){#tatc .tx b i{animation:none}}' +
     /* the overview bubble */
-    '#tatcSheet .panel{max-height:80vh;overflow-y:auto}' +
+    '#tatcSheet .panel{height:min(84vh,780px);overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;padding-top:0}' +
+    '#tatcSheet .grab{margin-top:10px}' +
+    '#tatcSheet .dhead{position:sticky;top:0;z-index:2;background:var(--paper-2,#EFF4F0);padding:4px 0 8px;margin:0 -2px}' +
     '#tatcSheet h3{font-family:"Bricolage Grotesque",Archivo,sans-serif;font-weight:800;font-size:20px;margin:0}' +
     '#tatcSheet .dt{font-size:13.5px;color:var(--grey);margin:3px 0 12px}' +
     '#tatcSheet .grp{font-size:10.5px;font-weight:800;letter-spacing:.15em;text-transform:uppercase;color:var(--grey);margin:14px 2px 7px}' +
@@ -86,15 +88,15 @@
     '#tatcBubble .bnone{font-size:14px;color:var(--grey);padding:8px 0}' +
     '#tatcBubble .bmore{font-size:12px;font-weight:700;color:var(--green-dk);padding:7px 0 3px;border-top:1px solid var(--line)}' +
     '@keyframes tatcPop{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}' +
-    '#tatcSheet .dnav{display:flex;align-items:center;gap:8px;margin-bottom:6px}' +
+    '#tatcSheet .dnav{display:flex;align-items:center;gap:8px;height:48px}' +
     '#tatcSheet .dn{flex:none;width:44px;height:44px;border-radius:12px;font-size:24px;font-weight:800;line-height:1;background:var(--green-lt);color:var(--green-dk);border:1.5px solid #BFDFCD;box-shadow:0 3px 0 #BFDFCD}' +
     '#tatcSheet .dn:active{box-shadow:0 1px 0 #BFDFCD;transform:translateY(2px)}' +
     '#tatcSheet .dd{flex:1;min-width:0;text-align:center;position:relative;cursor:pointer}' +
-    '#tatcSheet .dd b{display:block;font-family:"Bricolage Grotesque",Archivo,sans-serif;font-weight:800;font-size:19px;line-height:1.15}' +
-    '#tatcSheet .dd span{display:block;font-size:13px;color:var(--grey);margin-top:2px}' +
+    '#tatcSheet .dd b{display:block;font-family:"Bricolage Grotesque",Archivo,sans-serif;font-weight:800;font-size:18px;line-height:22px;height:22px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}' +
+    '#tatcSheet .dd span{display:block;font-size:13px;line-height:18px;height:18px;color:var(--grey);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}' +
     '#tatcSheet .dd em{font-style:normal;color:var(--green-dk);font-size:11px}' +
     '#tatcSheet .dpick{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;-webkit-appearance:none;appearance:none}' +
-    '#tatcSheet .tchip{display:block;margin:6px auto 2px;padding:7px 14px;border-radius:999px;font-size:13px;font-weight:700;background:#fff;color:var(--green-dk);border:1px solid #BFDFCD}' +
+    '#tatcSheet .tchip{display:block;height:32px;margin:6px auto 0;padding:7px 14px;border-radius:999px;font-size:13px;font-weight:700;background:#fff;color:var(--green-dk);border:1px solid #BFDFCD}' +
     '#tatcSheet .wxb{display:flex;align-items:center;gap:12px;margin:8px 0 2px;padding:11px 13px;border-radius:14px;background:linear-gradient(160deg,#F2FBF6,#E4F5EB);border:1px solid rgba(31,130,74,.22)}' +
     '#tatcSheet .wxb .wi{font-size:28px;line-height:1}' +
     '#tatcSheet .wxb b{display:block;font-size:15px}' +
@@ -361,18 +363,18 @@
   }
   function dayLong(day){
     var p = day.split('-');
-    return new Date(+p[0], p[1]-1, +p[2]).toLocaleDateString('en-IE', {weekday:'long', day:'numeric', month:'long', year:'numeric'});
+    return new Date(+p[0], p[1]-1, +p[2]).toLocaleDateString('en-IE', {weekday:'short', day:'numeric', month:'long', year:'numeric'});
   }
   function header(day){
     var t = todayStr();
-    return '<div class="dnav">' +
+    return '<div class="dhead"><div class="dnav">' +
         '<button class="dn" type="button" data-d="-1" aria-label="Previous day">\u2039</button>' +
         '<label class="dd"><b>' + esc(dayTitle(day)) + '</b>' +
           '<span>' + esc(dayLong(day)) + ' <em>\u25BE</em></span>' +
           '<input type="date" class="dpick" value="' + day + '" aria-label="Pick a day"></label>' +
         '<button class="dn" type="button" data-d="1" aria-label="Next day">\u203A</button>' +
       '</div>' +
-      (day !== t ? '<button class="tchip" type="button">Back to today</button>' : '');
+      '<button class="tchip" type="button"' + (day === t ? ' style="visibility:hidden" tabindex="-1" aria-hidden="true"' : '') + '>Back to today</button></div>';
   }
   function paintSheet(day, rows){
     var t = todayStr(), s = split(rows, day), html = header(day) + wxBanner(day);
@@ -387,6 +389,7 @@
     }
     html += '<button class="open" type="button" id="tatcClose">Close</button>';
     document.getElementById('tatcBody').innerHTML = html;
+    var pn = document.querySelector('#tatcSheet .panel'); if(pn) pn.scrollTop = 0;
   }
   function showDay(day){
     SHEET_DAY = day;
